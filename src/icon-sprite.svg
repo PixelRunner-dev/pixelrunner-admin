@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="icon--search" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M21 21l-4.35-4.35a7 7 0 10-1.41 1.41L21 21zM10 16a6 6 0 110-12 6 6 0 010 12z" />
+  </symbol>
+
+  <symbol id="icon--check" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z" />
+  </symbol>
+</svg>

@@ -1,0 +1,43 @@
+{
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "vendor/**/*.ts",
+    "vendor/**/*.vue",
+    "translations/*.json",
+    "test/mocks/playlists.json"
+  ],
+  "exclude": [
+    "test/**/*",
+    "vendor/**/components/Calendar.vue",
+    "vendor/**/components/CalendarInput.vue",
+    "vendor/**/components/CalendarSkeleton.vue",
+    "vendor/**/components/CountdownTimers.vue",
+    "vendor/**/components/Dropdown.vue",
+    "vendor/**/components/DropdownButton.vue",
+    "vendor/**/components/DropdownContent.vue",
+    "vendor/**/components/DropdownTarget.vue",
+    "vendor/**/components/MenuExpand.vue",
+    "vendor/**/components/MenuExpandToggle.vue",
+    "vendor/**/components/RangeMeasure.vue",
+    "vendor/**/components/RangeMeasureTick.vue",
+    "vendor/**/components/ThemeController.vue",
+    "vendor/**/components/ThemeProvider.vue",
+    "vendor/**/components/Toast.vue",
+    "vendor/**/components/Tooltip.vue",
+    "vendor/**/components/TooltipContent.vue",
+    "vendor/**/components/TooltipTarget.vue"
+  ],
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "composite": true,
+
+    "paths": {
+      "@/*": ["./src/*"],
+      "(vendor)/*": ["./vendor/*"]
+    },
+    "lib": ["ESNext", "DOM", "WebWorker"]
+  }
+}

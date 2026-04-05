@@ -1,0 +1,42 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
+import PlayList from '@/components/PlayList.vue';
+import { useWebSocket } from '@/ws';
+import { vibrateDevice } from '@/utils/generic.ts';
+
+import type { IPlaylist } from 'pixelrunner-shared/lib/interfaces';
+
+// import playlistsMock from '@/../test/mocks/playlists.json';
+// const playlists: IPlaylist[] = playlistsMock;
+
+const playlists = ref<IPlaylist[]>([]);
+
+// Get WebSocket functionality
+const { isConnected, applets } = useWebSocket();
+
+onMounted(async () => {
+  if (isConnected.value) {
+    playlists.value = await applets.get;
+  }
+
+  playlists.value = (await import('@/../test/mocks/playlists.json')).default;
+});
+</script>
+
+<template>
+  <main class="site-wrapper">
+    <h1 class="text-5xl">[Your Pixelrunner]</h1>
+
+    <!-- activeAppletIndex="0" -->
+    <PlayList v-if="playlists.length" v-bind="playlists.at(0)" />
+
+    <div class="text-center m-4">
+      <router-link to="/store" class="btn btn-primary btn-wide" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">
+        {{ $t('generic.add') }}
+      </router-link>
+    </div>
+  </main>
+</template>
+
+<style scoped></style>

@@ -1,0 +1,26 @@
+{
+  "language": {
+    "en": "English",
+    "nl": "Dutch (Nederlands)",
+    "de": "German (Deutsch)",
+    "fr": "French (Français)",
+    "es": "Spanish (Español)"
+  },
+  "generic": {
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "settingsPage": {
+    "deviceName": {
+      "label": "Gerätename",
+      "placeholder": "Geben Sie Gerätename ein"
+    },
+    "localization": {
+      "location": {
+        "label": "Standort",
+        "placeholder": "Standort eingeben",
+        "error": "Bitte wählen Sie einen Standort aus der Liste"
+      }
+    }
+  }
+}

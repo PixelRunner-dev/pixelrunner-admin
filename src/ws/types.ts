@@ -1,0 +1,73 @@
+import type { ErrorResponse, SuccessResponse } from 'pixelrunner-shared/lib/interfaces/index.ts';
+
+// ============================================================================
+// API - Device
+// ============================================================================
+
+export interface DeviceStatusResult {
+  result: {
+    status: 'idle' | 'busy' | 'error';
+    uptime: [number, number];
+    updateAvailable: boolean;
+    // temperature?: number;
+    cpus?: unknown[];
+    memory?: [number, number, number];
+    versions?: {
+      admin: string;
+      applets: string;
+      controller: string;
+      shared: string;
+      os: string;
+    };
+  };
+}
+export type DeviceStatusResponse = SuccessResponse<DeviceStatusResult> | ErrorResponse;
+
+type DeviceUpdateStatus =
+  | 'idle'
+  | 'skipping'
+  | 'downloading'
+  | 'installing'
+  | 'restarting'
+  | 'error'
+  | 'done';
+export interface DeviceUpdateResult {
+  result?: {
+    admin: DeviceUpdateStatus;
+    applets: DeviceUpdateStatus;
+    controller: DeviceUpdateStatus;
+    shared: DeviceUpdateStatus;
+    os: DeviceUpdateStatus;
+  };
+}
+export type DeviceUpdateResponse = SuccessResponse<DeviceUpdateResult> | ErrorResponse;
+
+// ============================================================================
+// API - Applets
+// ============================================================================
+
+export interface AppletListResponse {
+  applets: Array<AppletResponse>;
+}
+
+export interface AppletResponse {
+  uuid: string;
+  name: string;
+  version: string;
+  enabled: boolean;
+  configuration: Record<string, unknown>;
+}
+
+export interface InstallResponse {
+  uuid: string;
+  installed: boolean;
+  requiresReboot: boolean;
+}
+
+// ============================================================================
+// API - Playlist
+// ============================================================================
+
+export interface PlaylistResponse {
+  success: boolean;
+}

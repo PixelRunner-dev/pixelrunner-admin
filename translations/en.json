@@ -1,0 +1,184 @@
+{
+  "language": {
+    "en": "English",
+    "nl": "Dutch (Nederlands)",
+    "de": "German (Deutsch)",
+    "fr": "French (Français)",
+    "es": "Spanish (Español)"
+  },
+  "generic": {
+    "prev": "Previous",
+    "next": "Next",
+    "loading": "Loading...",
+    "accessWarning": {
+      "title": "Access Via Device IP",
+      "message": "You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device's local IP address.",
+      "instruction": "Find your device's IP address in your router's connected devices list, then access this admin interface via: http://[device-ip]"
+    },
+    "official": "official"
+  },
+  "settingsPage": {
+    "deviceName": {
+      "label": "Device name",
+      "placeholder": "Enter device name",
+      "description": "Use only alphabetic characters, numbers, '_' and '-'."
+    },
+    "dateAndTime": {
+      "legend": "Date and Time",
+      "date": {
+        "label": "Current Date"
+      },
+      "time": {
+        "label": "Current Time"
+      }
+    },
+    "localization": {
+      "legend": "Localization",
+      "language": {
+        "label": "Language"
+      },
+      "location": {
+        "label": "Location",
+        "placeholder": "Enter location",
+        "error": "Please select a location from the list"
+      }
+    },
+    "wifiNetwork": {
+      "legend": "Wifi Network",
+      "ssid": {
+        "label": "SSID (Network Name)",
+        "placeholder": "Enter SSID (Network Name)"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter Password"
+      },
+      "security": {
+        "label": "Security",
+        "options": {
+          "none": "None",
+          "wep": "WEP",
+          "wpa": "WPA",
+          "wpa23": "WPA2 / WPA3",
+          "wpa3": "WPA3",
+          "wpae": "WPA Enterprise",
+          "wpa2e": "WPA 2 Enterprise",
+          "wpa3e": "WPA 3 Enterprise"
+        }
+      },
+      "advancedOptions": "Advanced Options",
+      "hiddenNetwork": {
+        "label": "Network is a hidden network"
+      },
+      "ipConfiguration": {
+        "legend": "IP",
+        "dhcp": {
+          "label": "IP Configuration",
+          "options": {
+            "dhcp": "DHCP",
+            "static": "Static"
+          }
+        },
+        "ip": {
+          "label": "IP Address",
+          "placeholder": "Enter IP Address"
+        },
+        "subnet": {
+          "label": "Subnet Mask",
+          "placeholder": "Enter Subnet Mask"
+        },
+        "gateway": {
+          "label": "Gateway",
+          "placeholder": "Enter Gateway"
+        }
+      },
+      "dnsConfiguration": {
+        "legend": "DNS",
+        "dns": {
+          "label": "DNS Configuration",
+          "options": {
+            "auto": "Automatic",
+            "manual": "Manual"
+          }
+        },
+        "primaryDns": {
+          "label": "Primary DNS",
+          "placeholder": "Enter primary DNS address"
+        },
+        "secondaryDns": {
+          "label": "Secondary DNS",
+          "placeholder": "Enter secondary DNS address"
+        }
+      },
+      "proxyConfiguration": {
+        "legend": "Proxy",
+        "proxy": {
+          "label": "Proxy Configuration",
+          "options": {
+            "none": "None",
+            "manual": "Manual",
+            "autoConfig": "Auto config (by URL)"
+          }
+        },
+        "proxyServer": {
+          "label": "Server (domain)",
+          "placeholder": "proxy.example.com"
+        },
+        "proxyPort": {
+          "label": "Port",
+          "placeholder": 8080
+        },
+        "proxyAutoConfig": {
+          "label": "Auto config URL",
+          "placeholder": "https://proxy.example.com/proxy.pac"
+        }
+      }
+    },
+    "brightness": {
+      "label": "Screen Brightness"
+    },
+    "dimAtSunset": {
+      "label": "Dim the screen at sunset automatically"
+    },
+    "nightMode": {
+      "legend": "Night Mode",
+      "label": "Enable 'night mode'",
+      "description": "If 'night mode' is enabled, it will dim the screen to the lowest brightness and display a clock with dark colors.",
+      "nightModeStart": {
+        "label": "Start time"
+      },
+      "nightModeEnd": {
+        "label": "End time"
+      },
+      "alarmClock": {
+        "legend": "Alarm Clock",
+        "label": "Enable 'alarm clock'",
+        "description": "If 'alarm clock' is enabled, it will slowly, but within 5 minutes, light up the screen to its maximum brightness to wake you up. You can snooze it via the admin interface.",
+        "alarmTime": {
+          "label": "Alarm time"
+        }
+      }
+    },
+    "theme": {
+      "label": "Theme (Admin Interface)"
+    },
+    "actions": {
+      "legend": "Actions",
+      "update": {
+        "button": "Update Device"
+      },
+      "shutdown": {
+        "button": "Shutdown Device",
+        "alert": "Device is shutting down..."
+      },
+      "reboot": {
+        "button": "Reboot Device",
+        "alert": "Device is rebooting..."
+      },
+      "factoryReset": {
+        "button": "Factory Reset",
+        "confirm": "This will erase all data on the device. Are you sure you want to factory reset this device?"
+      }
+    }
+  }
+}

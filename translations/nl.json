@@ -1,0 +1,26 @@
+{
+  "language": {
+    "en": "English",
+    "nl": "Dutch (Nederlands)",
+    "de": "German (Deutsch)",
+    "fr": "French (Français)",
+    "es": "Spanish (Español)"
+  },
+  "generic": {
+    "prev": "Vorige",
+    "next": "Volgende"
+  },
+  "settingsPage": {
+    "deviceName": {
+      "label": "Naam van het apparaat",
+      "placeholder": "Voer de naam van het apparaat in"
+    },
+    "localization": {
+      "location": {
+        "label": "Locatie",
+        "placeholder": "Locatie invoeren",
+        "error": "Selecteer een locatie uit de lijst"
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "language": {
+    "en": "English",
+    "nl": "Dutch (Nederlands)",
+    "de": "German (Deutsch)",
+    "fr": "French (Français)",
+    "es": "Spanish (Español)"
+  },
+  "generic": {
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "settingsPage": {
+    "deviceName": {
+      "label": "Nom du périphérique",
+      "placeholder": "Entrez le nom du périphérique"
+    },
+    "localization": {
+      "location": {
+        "label": "Emplacement",
+        "placeholder": "Entrer l'emplacement",
+        "error": "Veuillez sélectionner un emplacement dans la liste"
+      }
+    }
+  }
+}

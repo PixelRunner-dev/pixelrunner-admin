@@ -1,0 +1,32 @@
+body {
+  margin: 0.5rem;
+  min-width: 20rem;
+}
+
+figure {
+  margin: 0;
+}
+
+ol,
+ul {
+  padding: 0;
+}
+
+.is-dark-mode {
+  color-scheme: dark;
+}
+
+summary {
+  cursor: pointer;
+}
+
+.site-wrapper {
+  margin: 0 auto;
+  max-width: 50rem;
+}
+
+@media (max-width: 50rem) {
+  .site-wrapper {
+    max-width: 100%;
+  }
+}
