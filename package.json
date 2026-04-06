@@ -50,7 +50,7 @@
     "fuse.js": "^7.1.0",
     "i18next": "^25.7.3",
     "i18next-vue": "^5.4.0",
-    "pixelrunner-shared": "file:../shared",
+    "pixelrunner-shared": "github:PixelRunner-dev/pixelrunner-shared",
     "trystero": "^0.22.0",
     "vue": "^3.5.26",
     "vue-draggable-plus": "^0.6.1",
