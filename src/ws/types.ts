@@ -41,33 +41,3 @@ export interface DeviceUpdateResult {
   };
 }
 export type DeviceUpdateResponse = SuccessResponse<DeviceUpdateResult> | ErrorResponse;
-
-// ============================================================================
-// API - Applets
-// ============================================================================
-
-export interface AppletListResponse {
-  applets: Array<AppletResponse>;
-}
-
-export interface AppletResponse {
-  uuid: string;
-  name: string;
-  version: string;
-  enabled: boolean;
-  configuration: Record<string, unknown>;
-}
-
-export interface InstallResponse {
-  uuid: string;
-  installed: boolean;
-  requiresReboot: boolean;
-}
-
-// ============================================================================
-// API - Playlist
-// ============================================================================
-
-export interface PlaylistResponse {
-  success: boolean;
-}

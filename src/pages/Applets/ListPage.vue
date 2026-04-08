@@ -7,20 +7,17 @@ import { vibrateDevice } from '@/utils/generic.ts';
 
 import type { IPlaylist } from 'pixelrunner-shared/lib/interfaces';
 
-// import playlistsMock from '@/../test/mocks/playlists.json';
-// const playlists: IPlaylist[] = playlistsMock;
-
-const playlists = ref<IPlaylist[]>([]);
+const activePlaylist = ref<IPlaylist>();
 
 // Get WebSocket functionality
-const { isConnected, applets } = useWebSocket();
+const { isConnected, playlist } = useWebSocket();
 
 onMounted(async () => {
   if (isConnected.value) {
-    playlists.value = await applets.get;
+    activePlaylist.value = await playlist.activePlaylist();
   }
 
-  playlists.value = (await import('@/../test/mocks/playlists.json')).default;
+  // playlists.value = (await import('@/../test/mocks/playlists.json')).default;
 });
 </script>
 
@@ -29,7 +26,7 @@ onMounted(async () => {
     <h1 class="text-5xl">[Your Pixelrunner]</h1>
 
     <!-- activeAppletIndex="0" -->
-    <PlayList v-if="playlists.length" v-bind="playlists.at(0)" />
+    <PlayList v-if="activePlaylist" v-bind="activePlaylist" />
 
     <div class="text-center m-4">
       <router-link to="/store" class="btn btn-primary btn-wide" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">

@@ -12,6 +12,7 @@ import AppletCard from '@/components/Applet/AppletCard.vue';
 import CategoryList from '@/components/CategoryList.vue';
 
 import { toCapitalizeWords } from '@/utils/generic.ts';
+import type { ICategory, IFullApplet } from 'pixelrunner-shared/lib/interfaces';
 
 const categories = [
   {
@@ -126,9 +127,9 @@ const categories = [
       alt: 'Religion'
     }
   }
-];
+] as ICategory[];
 
-const newlyAddedItems = [
+const newlyAddedItems: IFullApplet[] = [
   {
     fileName: 'file-name.webp',
     packageName: 'myApp',
@@ -492,8 +493,8 @@ const newlyAddedItems = [
 ];
 
 const spotlightItems = newlyAddedItems;
-
-// const spotlightItems = newlyAddedItems;
+const mostInstalledItems = newlyAddedItems;
+const starterPackItems = newlyAddedItems;
 
 const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'];
 </script>
@@ -533,7 +534,7 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
       <AppletCarousel :applets="spotlightItems">
         <template #item="applet">
           <AppletCard view="vertical" :applet hasCategories>
-            <template #cta>test</template>
+            <template #cta>[test]</template>
           </AppletCard>
         </template>
       </AppletCarousel>
@@ -543,7 +544,7 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
       <AppletCarousel :applets="newlyAddedItems">
         <template #item="applet">
           <AppletCard view="preview" :applet>
-            <template #cta>test</template>
+            <template #cta>[test]</template>
           </AppletCard>
         </template>
       </AppletCarousel>
@@ -557,7 +558,7 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
       <AppletCarousel :applets="mostInstalledItems">
         <template #item="applet">
           <AppletCard view="preview" :applet>
-            <template #cta>test</template>
+            <template #cta>[test]</template>
           </AppletCard>
         </template>
       </AppletCarousel>
@@ -571,13 +572,13 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
       <AppletCarousel :applets="starterPackItems">
         <template #item="applet">
           <AppletCard view="vertical" :applet>
-            <template #cta>test</template>
+            <template #cta>[test]</template>
           </AppletCard>
         </template>
       </AppletCarousel>
     </StoreSection>
 
-    <section>Build your own applet! Submit it via Github</section>
+    <section>[Build your own applet! Submit it via Github]</section>
   </main>
 </template>
 

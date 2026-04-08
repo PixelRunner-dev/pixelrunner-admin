@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, TransitionGroup } from 'vue';
+import { ref, nextTick, /* TransitionGroup */ } from 'vue';
 import { useDraggable } from 'vue-draggable-plus';
 
 import AppletItem from './AppletItem.vue';
@@ -62,7 +62,7 @@ list item actief class toevoegen
     <TransitionGroup type="transition" :name="!drag ? 'fade' : undefined">
       <li
         v-for="applet in sortableApplets"
-        :key="applet.installedApplet?.uuid || applet.packageName"
+        :key="applet.installationDetails?.uuid || applet.packageName"
         :class="['bg-base-200 rounded-box my-2 shadow-sm', classes?.item]"
       >
         <template v-if="isDragable">

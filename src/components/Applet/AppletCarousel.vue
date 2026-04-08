@@ -4,10 +4,10 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { Carousel } from '@/adapters/CarouselAdapter.ts';
 import AppletList from './AppletList.vue';
 
-import type { IApplet, IInstalledApplet } from 'pixelrunner-shared/lib/interfaces';
+import type { IFullApplet } from 'pixelrunner-shared/lib/interfaces';
 
 interface Props {
-  applets: IApplet[] | IInstalledApplet[];
+  applets: IFullApplet[];
 }
 
 const { applets }: Props = defineProps<Props>();

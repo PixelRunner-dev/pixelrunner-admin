@@ -22,17 +22,14 @@ export interface Props {
 const {
   applet,
   view = 'horizontal' as IAppletViews,
-  isDragable = false,
   hasCallToAction = false,
   hasCategories = false
 }: Props = defineProps<Props>();
 const { details, categories } = applet;
 
-const isInstalledApplet = applet.installedApplet && 'uuid' in applet.installedApplet;
-
 const appletImage = computed(() => {
-  if (isInstalledApplet && applet.installedApplet?.image) {
-    return applet.installedApplet.image;
+  if (applet.isInstalled && applet.installationDetails?.image) {
+    return applet.installationDetails.image;
   }
   return applet.defaultImage;
 })
@@ -52,8 +49,8 @@ const appletImage = computed(() => {
           <CategoryList v-if="hasCategories" :categories hasItemsInline />
 
           <router-link
-            v-if="hasCallToAction && isInstalledApplet"
-            :to="`/applets/${applet.installedApplet?.uuid}`"
+            v-if="hasCallToAction && applet.isInstalled"
+            :to="`/applets/${applet.installationDetails?.uuid}`"
             class="btn btn-secondary">
             <slot name="cta" />
           </router-link>

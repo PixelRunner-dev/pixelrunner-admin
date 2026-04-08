@@ -147,10 +147,11 @@ onMounted(async () => {
 });
 
 function fieldValue(item: IAppletSchemaObject) {
-  return {
-    ...item,
-    default: applet?.installedApplet?.appliedConfigurations[item.id]
+  const itemWithAppliedConfigurations = { ...item };
+  if (applet.isInstalled && applet.installationDetails && applet.installationDetails.appliedConfigurations) {
+    itemWithAppliedConfigurations.default = applet.installationDetails.appliedConfigurations[item.id];
   }
+  return itemWithAppliedConfigurations;
 }
 </script>
 
@@ -160,7 +161,7 @@ function fieldValue(item: IAppletSchemaObject) {
     <template v-if="appletSchema">
       <DDivider vertical />
       <!-- <pre>[{{ appletSchema }}]</pre> -->
-      <!-- <pre>[{{ applet.installedApplet?.appliedConfigurations }}]</pre> -->
+      <!-- <pre>[{{ applet.installationDetails?.appliedConfigurations }}]</pre> -->
       <template v-for="item in appletSchema.schema" :key="item.id">
         <FormField :id="item.id" :label="item.name" :description="item.desc">
           <component :is="getFieldComponent(item)" v-bind="fieldValue(item)" />
@@ -174,8 +175,8 @@ function fieldValue(item: IAppletSchemaObject) {
     <FieldSchedule />
 
     <DFlex class="gap-4">
-      <DButton type="submit" primary wide>{{ (applet.installedApplet && 'uuid' in applet.installedApplet) ? $t('generic.save') : $t('generic.install') }}</DButton>
-      <DButton type="button" outline dash error v-if="applet.installedApplet?.uuid">{{ $t('generic.remove') }}</DButton>
+      <DButton type="submit" primary wide>{{ (applet.isInstalled) ? $t('generic.save') : $t('generic.install') }}</DButton>
+      <DButton type="button" outline dash error v-if="applet.installationDetails?.uuid">{{ $t('generic.remove') }}</DButton>
     </DFlex>
   </form>
 </div>

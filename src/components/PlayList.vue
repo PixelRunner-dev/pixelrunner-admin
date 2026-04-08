@@ -4,7 +4,7 @@ import AppletCard from './Applet/AppletCard.vue';
 
 import type { IPlaylist } from 'pixelrunner-shared/lib/interfaces';
 
-const { uuid, name, applets, dateCreated, dateModified }: IPlaylist = defineProps<IPlaylist>();
+const { applets, dateCreated, dateModified }: IPlaylist = defineProps<IPlaylist>();
 </script>
 
 <template>
@@ -12,8 +12,8 @@ const { uuid, name, applets, dateCreated, dateModified }: IPlaylist = defineProp
     <template v-if="applets.length">
       <AppletList :applets :isDragable="true" :classes="{ list: 'playlist list', item: 'playlist__item list-row' }">
         <template #item="applet">
-          <AppletCard :applet :isDragable="true" :hasCallToAction="true">
-            <template #cta>Configureer</template>
+          <AppletCard :applet :hasCallToAction="true">
+            <template #cta>[Configureer]</template>
           </AppletCard>
         </template>
       </AppletList>

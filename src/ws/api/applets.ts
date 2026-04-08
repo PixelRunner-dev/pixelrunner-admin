@@ -2,7 +2,6 @@ import type { UUID } from 'pixelrunner-shared/lib/types.d.ts';
 
 import type { IFullAppletRecord } from 'pixelrunner-shared/lib/interfaces';
 import type { WebSocketClient } from '../client';
-import type { AppletListResponse, AppletResponse, InstallResponse } from '../types';
 
 // /**
 //  * Run applet action by providing the method name and optional parameters
@@ -22,8 +21,11 @@ export class AppletAPI {
   /**
    * Get list of all applets
    */
-  async list(): Promise<IFullAppletRecord[]> {
-    return this.client.request<IFullAppletRecord[]>('applets.list');
+  async listInstalled(): Promise<IFullAppletRecord[]> {
+    return this.client.request<IFullAppletRecord[]>('applets.action', {
+      method: 'getAllAppletsByPlaylistId', // getAllAppletsByActivePlaylist
+      params: { playlistId: 0 }
+    });
   }
 
   /**
@@ -49,23 +51,23 @@ export class AppletAPI {
     });
   }
 
-  /**
-   * Install an applet
-   * @param packageName - The package name to install
-   */
-  async install(packageName: string): Promise<InstallResponse> {
-    return this.client.request<InstallResponse>('applets.install', {
-      packageName
-    });
-  }
+  // /**
+  //  * Install an applet
+  //  * @param packageName - The package name to install
+  //  */
+  // async install(packageName: string): Promise<InstallResponse> {
+  //   return this.client.request<InstallResponse>('applets.install', {
+  //     packageName
+  //   });
+  // }
 
-  /**
-   * Uninstall an applet
-   * @param {UUID} uuid - The applet UUID to uninstall
-   */
-  async uninstall(uuid: UUID): Promise<void> {
-    return this.client.request<void>('applets.uninstall', { uuid });
-  }
+  // /**
+  //  * Uninstall an applet
+  //  * @param {UUID} uuid - The applet UUID to uninstall
+  //  */
+  // async uninstall(uuid: UUID): Promise<void> {
+  //   return this.client.request<void>('applets.uninstall', { uuid });
+  // }
 
   /**
    * Get the config of an (installed) applet
@@ -119,21 +121,21 @@ export class AppletAPI {
     return this.client.request<void>('applets.setconfig', { uuid, config });
   }
 
-  /**
-   * Subscribe to applet installed events
-   * @param handler - Callback function when an applet is installed
-   * @returns Unsubscribe function
-   */
-  onInstalled(handler: (applet: AppletResponse) => void): () => void {
-    return this.client.on('message:applets.installed', handler);
-  }
+  // /**
+  //  * Subscribe to applet installed events
+  //  * @param handler - Callback function when an applet is installed
+  //  * @returns Unsubscribe function
+  //  */
+  // onInstalled(handler: (applet: AppletResponse) => void): () => void {
+  //   return this.client.on('message:applets.installed', handler);
+  // }
 
-  /**
-   * Subscribe to applet uninstalled events
-   * @param handler - Callback function when an applet is uninstalled
-   * @returns Unsubscribe function
-   */
-  onUninstalled(handler: (data: { uuid: UUID }) => void): () => void {
-    return this.client.on('message:applets.uninstalled', handler);
-  }
+  // /**
+  //  * Subscribe to applet uninstalled events
+  //  * @param handler - Callback function when an applet is uninstalled
+  //  * @returns Unsubscribe function
+  //  */
+  // onUninstalled(handler: (data: { uuid: UUID }) => void): () => void {
+  //   return this.client.on('message:applets.uninstalled', handler);
+  // }
 }
