@@ -10,7 +10,7 @@ import AppletDetails from '@/components/Applet/AppletDetails.vue';
 import AppletImage from '@/components/Applet/AppletImage.vue';
 import CategoryList from '@/components/CategoryList.vue';
 
-import playlistMock from '@/../test/mocks/playlists.json';
+// import playlistMock from '@/../test/mocks/playlists.json';
 import type { UUID } from 'pixelrunner-shared/lib/types';
 
 const route = useRoute();
@@ -28,15 +28,12 @@ onMounted(async () => {
     applet.value = await applets.get(getValueOfParam(packageName), getValueOfParam(uuid) as UUID | undefined);
   }
 
-  applet.value = playlistMock[0]?.applets[0];
+  // applet.value = playlistMock[0]?.applets[0];
 });
 </script>
 
 <template>
   <main class="site-wrapper">
-
-    <!-- <pre>[applet: {{ applet }}]</pre> -->
-
     <template v-if="!applet">
       <h1>Applet not found</h1>
     </template>
