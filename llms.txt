@@ -1,0 +1,20 @@
+# Admin interface of Pixelrunner
+
+## Site Overview
+Pixelrunner is a matrix LED-screen device, showing various applets what are configured here in the admin interface.
+
+Key technical features include:
+- Add, edit or remove applets from a Applet Store with thousands of applets to choose from
+- Optionally configure the selected applet (if applicable) to finetune what will be displayed
+- Change the order of the configured applets in a playlist to determine when and in what order the applets will be shown on screen
+- Configure internet access, screen brightness, etc
+- Update the Pixelrunner Operating System and its packages, reboot the device or do a factory reset if needed
+
+## Key Resources (API)
+- [Add applet](https://192.168.1.1/api/applet/add): Add an applet from the store
+- change order
+- update setting of device
+- do a reboot of the device
+
+## Other Resources
+- [Website](https://pixelrunner.dev) Website of Pixelrunner
