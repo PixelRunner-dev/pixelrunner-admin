@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
-import { useWebSocket } from '@/ws';
+import { useWebSocket } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
 
 import type { IPlaylist } from 'pixelrunner-shared/lib/interfaces';
@@ -10,11 +10,11 @@ import type { IPlaylist } from 'pixelrunner-shared/lib/interfaces';
 const activePlaylist = ref<IPlaylist>();
 
 // Get WebSocket functionality
-const { isConnected, playlist } = useWebSocket();
+const { isConnected, playlists } = useWebSocket();
 
 onMounted(async () => {
   if (isConnected.value) {
-    activePlaylist.value = await playlist.activePlaylist();
+    activePlaylist.value = await playlists.activePlaylist();
   }
 
   // playlists.value = (await import('@/../test/mocks/playlists.json')).default;

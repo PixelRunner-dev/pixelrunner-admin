@@ -1,8 +1,7 @@
 import { inject } from 'vue';
-import type { WebSocketClient } from '../client';
-import { DeviceAPI } from '../api/device';
-import { AppletAPI } from '../api/applets';
-import { SettingsAPI } from '../api/settings';
+import { DeviceAPI, AppletAPI, PlaylistsAPI, SettingsAPI } from '../api/index.ts';
+
+import type { WebSocketClient } from '../client.ts';
 
 export const WS_INJECTION_KEY = Symbol('websocket-client');
 
@@ -61,6 +60,7 @@ export function useWebSocket() {
     // API namespaces
     device: new DeviceAPI(client),
     applets: new AppletAPI(client),
+    playlists: new PlaylistsAPI(client),
     settings: new SettingsAPI(client)
   };
 }

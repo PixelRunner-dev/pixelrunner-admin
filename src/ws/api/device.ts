@@ -51,12 +51,12 @@ export class DeviceAPI {
     return this.client.request<void>('device.factoryReset');
   }
 
-  /**
-   * Subscribe to device status change events
-   * @param handler - Callback function when device status changes
-   * @returns Unsubscribe function
-   */
-  onStatusChange(handler: (status: DeviceStatusResponse) => void): () => void {
-    return this.client.on('message:device.status_changed', handler);
-  }
+  // /**
+  //  * Subscribe to device status change events
+  //  * @param handler - Callback function when device status changes
+  //  * @returns Unsubscribe function
+  //  */
+  // onStatusChange(handler: (status: DeviceStatusResponse) => void): () => void {
+  //   return this.client.on('message:device.status_changed', handler);
+  // }
 }

@@ -1,3 +1,4 @@
-export { DeviceAPI } from './device';
-export { AppletAPI } from './applets';
-export { SettingsAPI } from './settings';
+export { DeviceAPI } from './device.ts';
+export { AppletAPI } from './applets.ts';
+export { SettingsAPI } from './settings.ts';
+export { PlaylistsAPI } from './playlists.ts';

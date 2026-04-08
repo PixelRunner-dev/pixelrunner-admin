@@ -14,7 +14,7 @@ import CategoryList from '@/components/CategoryList.vue';
 import { toCapitalizeWords } from '@/utils/generic.ts';
 import type { ICategory, IFullApplet } from 'pixelrunner-shared/lib/interfaces';
 
-const categories = [
+const categories: ICategory[] = [
   {
     name: 'Memes',
     icon: {
@@ -127,7 +127,7 @@ const categories = [
       alt: 'Religion'
     }
   }
-] as ICategory[];
+];
 
 const newlyAddedItems: IFullApplet[] = [
   {
@@ -146,7 +146,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: true
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory, categories[1] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -161,10 +162,11 @@ const newlyAddedItems: IFullApplet[] = [
       summary: 'bla die bla',
       desc: 'nog meer bla die bla dus',
       author: '@truus',
-      tags: ['tag 1', 'tag 2']
+      tags: ['tag 1', 'tag 2'],
+      isOfficialApplet: false
     },
-    categories: [categories[2], categories[3]],
-    isOfficialApplet: true
+    isInstalled: false,
+    categories: [categories[1] as ICategory, categories[2] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -182,7 +184,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[3], categories[4]]
+    isInstalled: false,
+    categories: [categories[3] as ICategory, categories[2] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -200,7 +203,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[2], categories[1], categories[3], categories[5]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[2] as ICategory, categories[3] as ICategory, categories[4] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -218,7 +222,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[4], categories[5]]
+    isInstalled: false,
+    categories: [categories[4] as ICategory, categories[5] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -236,7 +241,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[5], categories[6]]
+    isInstalled: false,
+    categories: [categories[3] as ICategory, categories[5] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -254,7 +260,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[6]]
+    isInstalled: false,
+    categories: [categories[6] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -272,7 +279,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[5], categories[6], categories[7]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[5] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -290,7 +298,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[7]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory, categories[6] as ICategory, categories[7] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -308,7 +317,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[5], categories[6]]
+    isInstalled: false,
+    categories: [categories[7] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -326,7 +336,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[4]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory, categories[6] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -344,7 +355,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[7], categories[8], categories[2]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[5] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -362,7 +374,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[4] as ICategory, categories[5] as ICategory, categories[8] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -380,7 +393,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[2], categories[4], categories[1]]
+    isInstalled: false,
+    categories: [categories[6] as ICategory, categories[7] as ICategory, categories[8] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -398,7 +412,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[3] as ICategory, categories[6] as ICategory, categories[7] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -416,7 +431,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -434,7 +450,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[5] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -452,7 +469,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[1] as ICategory, categories[4] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -470,7 +488,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[2] as ICategory, categories[3] as ICategory, categories[4] as ICategory, categories[5] as ICategory, categories[6] as ICategory, categories[7] as ICategory, categories[8] as ICategory]
   },
   {
     fileName: 'file-name.webp',
@@ -488,7 +507,8 @@ const newlyAddedItems: IFullApplet[] = [
       tags: ['tag 1', 'tag 2'],
       isOfficialApplet: false
     },
-    categories: [categories[0], categories[1]]
+    isInstalled: false,
+    categories: [categories[8] as ICategory]
   }
 ];
 
