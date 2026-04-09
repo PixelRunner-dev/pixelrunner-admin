@@ -20,6 +20,81 @@ import fs from 'fs';
 import path from 'path';
 import { Socket } from 'net';
 
+import { NOSTR_RELAYS } from '../src/constants.ts';
+
+// WebRTC polyfill for Node.js environment
+// Trystero requires RTCPeerConnection, but Node.js doesn't have it.
+// We provide a minimal shim that allows Trystero to initialize without errors.
+// In Node.js, communication will work via Nostr relays only (WebRTC won't function).
+if (typeof globalThis.RTCPeerConnection === 'undefined') {
+  // Create a stub that satisfies the basic structure Trystero expects
+  // It won't actually work for WebRTC connections, but allows Trystero to initialize
+  globalThis.RTCPeerConnection = function RTCPeerConnectionStub(_config) {
+    // Store config but don't use it - WebRTC isn't available in Node.js
+    this._config = _config;
+    this.iceGatheringState = 'complete';
+    this.iceConnectionState = 'closed';
+    this.signalingState = 'closed';
+    this.localDescription = null;
+    this.remoteDescription = null;
+  };
+
+  globalThis.RTCPeerConnection.prototype = {
+    createDataChannel(label) {
+      return {
+        label,
+        binaryType: 'arraybuffer',
+        bufferedAmountLowThreshold: 0xffff,
+        readyState: 'closed',
+        close() {},
+        send() { throw new Error('WebRTC not supported in Node.js'); },
+        onopen: null,
+        onmessage: null,
+        onclose: null,
+        onerror: null
+      };
+    },
+    createOffer() {
+      return Promise.reject(new Error('WebRTC not supported in Node.js'));
+    },
+    createAnswer() {
+      return Promise.reject(new Error('WebRTC not supported in Node.js'));
+    },
+    setLocalDescription(desc) {
+      this.localDescription = desc;
+      return Promise.resolve();
+    },
+    setRemoteDescription(desc) {
+      this.remoteDescription = desc;
+      return Promise.resolve();
+    },
+    addIceCandidate() {
+      return Promise.resolve();
+    },
+    close() {
+      this.signalingState = 'closed';
+      this.iceConnectionState = 'closed';
+    },
+    addEventListener() {},
+    removeEventListener() {},
+    dispatchEvent() { return false; }
+  };
+
+  // Also polyfill RTCSessionDescription and RTCIceCandidate for completeness
+  globalThis.RTCSessionDescription = function RTCSessionDescriptionStub(_init) {
+    this.type = _init?.type || null;
+    this.sdp = _init?.sdp || '';
+  };
+
+  globalThis.RTCIceCandidate = function RTCIceCandidateStub(_init) {
+    this.candidate = _init?.candidate || '';
+    this.sdpMid = _init?.sdpMid || null;
+    this.sdpMLineIndex = _init?.sdpMLineIndex ?? null;
+  };
+
+  console.log('[device-proxy] WebRTC stub initialized - using Nostr relays only');
+}
+
 // Configuration
 const DEFAULT_PORT = 8080;
 const DEFAULT_SOCKET = '/tmp/controller.sock';
@@ -31,12 +106,7 @@ const config = {
   socketPath: process.env.SOCKET_PATH || DEFAULT_SOCKET,
   githubPagesUrl: process.env.GHPAGES_URL || DEFAULT_GHPAGES,
   deviceId: process.env.DEVICE_ID || 'pxlr_f91a',
-  nostrRelays: [
-    'wss://relay.primal.net',
-    'wss://relay.nostr.band',
-    'wss://nos.lol',
-    'wss://relay.noderunners.network'
-  ]
+  nostrRelays: NOSTR_RELAYS
 };
 
 // Parse command line arguments
@@ -246,17 +316,21 @@ async function initTrystero() {
 
     // Trystero v0.22.x API: joinRoom(config, roomId)
     // Pass config options and roomId as separate arguments
-    room = trystero.joinRoom({
-      appId: config.appId,
-      nostrRelays: config.nostrRelays
-    }, roomId);
+    room = trystero.joinRoom(
+      {
+        appId: config.appId,
+        nostrRelays: config.nostrRelays
+      },
+      roomId
+    );
 
     // Create action for RPC
     const actionName = 'rpc';
-    sendAction = room.makeAction(actionName);
+    const [sendRpcAction, receiveRpcAction] = room.makeAction(actionName);
+    sendAction = sendRpcAction;
 
     // Handle incoming messages from browser
-    room.on(actionName, (data) => {
+    receiveRpcAction((data) => {
       handleRpcMessage(data);
     });
 
