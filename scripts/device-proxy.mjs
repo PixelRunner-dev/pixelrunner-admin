@@ -20,7 +20,7 @@ import fs from 'fs';
 import path from 'path';
 import { Socket } from 'net';
 
-import { NOSTR_RELAYS } from '../src/constants.ts';
+import { NOSTR_RELAYS, DEFAULT_TIMEOUT, ROOM_PREFIX } from '../src/constants.ts';
 
 // WebRTC polyfill for Node.js environment
 // Trystero requires RTCPeerConnection, but Node.js doesn't have it.
@@ -106,7 +106,8 @@ const config = {
   socketPath: process.env.SOCKET_PATH || DEFAULT_SOCKET,
   githubPagesUrl: process.env.GHPAGES_URL || DEFAULT_GHPAGES,
   deviceId: process.env.DEVICE_ID || 'pxlr_f91a',
-  nostrRelays: NOSTR_RELAYS
+  relayUrls: NOSTR_RELAYS,
+  requestTimeout: DEFAULT_TIMEOUT
 };
 
 // Parse command line arguments
@@ -304,22 +305,22 @@ async function initTrystero() {
     trystero = await import('trystero');
 
     // Ensure roomId is always defined with a fallback
-    const roomId = `pixelrunner-${config.deviceId || 'default'}`;
+    const roomId = `${ROOM_PREFIX}-${config.deviceId || 'default'}`;
 
     // Validate required configuration
-    if (!roomId || roomId === 'pixelrunner-') {
+    if (!roomId || roomId === `${ROOM_PREFIX}-`) {
       throw new Error('Trystero: roomId argument required - deviceId is missing');
     }
 
     console.log(`[device-proxy] Joining Trystero room: ${roomId}`);
-    console.log(`[device-proxy] Using Nostr relays: ${config.nostrRelays.join(', ')}`);
+    console.log(`[device-proxy] Using Nostr relays: ${config.relayUrls.join(', ')}`);
 
     // Trystero v0.22.x API: joinRoom(config, roomId)
     // Pass config options and roomId as separate arguments
     room = trystero.joinRoom(
       {
         appId: config.appId,
-        nostrRelays: config.nostrRelays
+        relayUrls: config.relayUrls
       },
       roomId
     );
@@ -425,7 +426,7 @@ async function forwardToController(message) {
       reject(err);
     });
 
-    socket.setTimeout(30000, () => {
+    socket.setTimeout(config.requestTimeout, () => {
       socket.destroy();
       reject(new Error('Request timeout'));
     });

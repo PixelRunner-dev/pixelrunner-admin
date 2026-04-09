@@ -1,5 +1,9 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
-import { DEFAULT_WEBSOCKET_CONFIG } from '../constants.ts';
+import {
+  DEFAULT_RECONNECT_MAX_INTERVAL,
+  DEFAULT_TIMEOUT,
+  DEFAULT_WEBSOCKET_CONFIG
+} from '../constants.ts';
 import { WebSocketConnectionError, WebSocketTimeoutError, JsonRpcError } from './errors.ts';
 
 import type {
@@ -148,7 +152,7 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
       };
 
       // Setup timeout
-      const timeout = options?.timeout ?? this.getConfigNumber('timeout', 30000);
+      const timeout = options?.timeout ?? this.getConfigNumber('timeout', DEFAULT_TIMEOUT);
       const timer = setTimeout(() => {
         this.pendingRequests.delete(id);
         reject(new WebSocketTimeoutError(method, timeout));
@@ -398,7 +402,7 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
     const delay = Math.min(
       this.getConfigNumber('reconnectInterval', 1000) *
         Math.pow(this.getConfigNumber('reconnectDecay', 1.5), this.reconnectAttempts - 1),
-      this.getConfigNumber('reconnectMaxInterval', 30000)
+      this.getConfigNumber('reconnectMaxInterval', DEFAULT_RECONNECT_MAX_INTERVAL)
     );
 
     if (this.config.debug) {

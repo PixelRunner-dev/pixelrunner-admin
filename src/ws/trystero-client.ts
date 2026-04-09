@@ -1,4 +1,4 @@
-import { DEFAULT_WEBSOCKET_CONFIG } from '../constants.ts';
+import { DEFAULT_WEBSOCKET_CONFIG, APP_ID, DEFAULT_TIMEOUT } from '../constants.ts';
 import { BaseWebSocketClient } from './base-client.ts';
 
 import type {
@@ -17,7 +17,7 @@ let trystero: typeof import('trystero') | null = null;
  */
 export interface TrysteroConfig extends IWebSocketConfig {
   roomId?: string;
-  nostrRelays?: string[];
+  relayUrls?: string[];
   joinSecret?: string;
 }
 
@@ -62,7 +62,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
               reject(new Error('Connection timeout'));
             }
           },
-          this.getConfigNumber('timeout', 30000)
+          this.getConfigNumber('timeout', DEFAULT_TIMEOUT)
         );
 
         this.connectTransport()
@@ -103,12 +103,12 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     const roomId = this.config.roomId || 'pixelrunner-default';
 
     const trysteroConfig: Record<string, unknown> = {
-      appId: 'pixelrunner'
+      appId: APP_ID
     };
 
     // Configure Nostr relays if provided
-    if (this.config.nostrRelays && this.config.nostrRelays.length > 0) {
-      trysteroConfig.nostrRelays = this.config.nostrRelays;
+    if (this.config.relayUrls && this.config.relayUrls.length > 0) {
+      trysteroConfig.relayUrls = this.config.relayUrls;
     }
 
     // Add join secret for authentication if provided

@@ -42,27 +42,33 @@ export const ROOM_PREFIX = 'pixelrunner';
 // ============================================================================
 
 /**
- * Default WebSocket configuration.
- * Used as base config for both WebSocket and Trystero clients.
+ * Default WebSocket port for local development.
  */
-export const DEFAULT_WEBSOCKET_CONFIG: Required<IWebSocketConfig> = {
-  url: 'ws://localhost:8765',
-  reconnect: true,
-  reconnectInterval: 1000, // 1 second
-  reconnectMaxInterval: 30000, // 30 seconds
-  reconnectDecay: 1.5, // exponential backoff multiplier
-  maxReconnectAttempts: Infinity,
-  timeout: 30000, // 30 seconds
-  heartbeatInterval: 30000, // 30 seconds
-  debug: true // process?.env?.DEV ?? false
-};
+export const DEFAULT_WS_PORT = 8765;
 
 /**
  * Default WebSocket URL for local development.
  */
-export const DEFAULT_WS_URL = 'ws://localhost:8765';
+export const DEFAULT_WS_URL = `ws://localhost:${DEFAULT_WS_PORT}`;
+
+export const DEFAULT_RECONNECT_INTERVAL = 1000;
+export const DEFAULT_RECONNECT_MAX_INTERVAL = 30000;
+export const DEFAULT_HEARTBEAT_INTERVAL = 30000;
+export const DEFAULT_TIMEOUT = 30000;
 
 /**
- * Default WebSocket port for local development.
+ * Default WebSocket configuration.
+ * Used as base config for both WebSocket and Trystero clients.
  */
-export const DEFAULT_WS_PORT = 8765;
+export const DEFAULT_WEBSOCKET_CONFIG: Required<IWebSocketConfig> = {
+  url: DEFAULT_WS_URL,
+  reconnect: true,
+  reconnectInterval: DEFAULT_RECONNECT_INTERVAL, // 1 second
+  reconnectMaxInterval: DEFAULT_RECONNECT_MAX_INTERVAL, // 30 seconds
+  reconnectDecay: 1.5, // exponential backoff multiplier
+  // maxReconnectAttempts: Infinity,
+  maxReconnectAttempts: 5,
+  timeout: DEFAULT_TIMEOUT, // 30 seconds
+  heartbeatInterval: DEFAULT_HEARTBEAT_INTERVAL, // 30 seconds
+  debug: true // process?.env?.DEV ?? false
+};
