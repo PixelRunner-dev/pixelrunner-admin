@@ -239,6 +239,7 @@ async function initTrystero() {
     console.log(`[device-proxy] Using Nostr relays: ${config.nostrRelays.join(', ')}`);
 
     room = trystero.joinRoom({
+      appId: config.appId,
       roomId,
       nostrRelays: config.nostrRelays
     });
