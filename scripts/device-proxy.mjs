@@ -98,7 +98,7 @@ if (typeof globalThis.RTCPeerConnection === 'undefined') {
 // Configuration
 const DEFAULT_PORT = 8080;
 const DEFAULT_SOCKET = '/tmp/controller.sock';
-const DEFAULT_GHPAGES = 'https://pixelrunner-dev.github.io/admin';
+const DEFAULT_GHPAGES = 'https://pixelrunner-dev.github.io/pixelrunner-admin';
 
 const config = {
   appId: DEFAULT_GHPAGES,
@@ -131,7 +131,7 @@ Usage: node device-proxy.mjs [options]
 Options:
   --port PORT         HTTP proxy port (default: 80)
   --socket PATH       Unix socket path for controller (default: /tmp/controller.sock)
-  --gh-pages URL      GitHub Pages URL (default: https://pixelrunner.github.io/admin)
+  --gh-pages URL      GitHub Pages URL (default: https://pixelrunner-dev.github.io/pixelrunner-admin)
   --help              Show this help message
 
 Environment variables:
