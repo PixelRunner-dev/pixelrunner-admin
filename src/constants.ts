@@ -16,8 +16,8 @@ import type { IWebSocketConfig } from 'pixelrunner-shared/lib/interfaces/index.t
 export const NOSTR_RELAYS = [
   'wss://relay.primal.net',
   'wss://relay.nostr.band',
-  'wss://nos.lol',
-  'wss://relay.noderunners.network'
+  'wss://nos.lol'
+  // 'wss://relay.noderunners.network'
 ] as const;
 
 /**
