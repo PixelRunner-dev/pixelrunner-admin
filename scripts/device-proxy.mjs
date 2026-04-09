@@ -244,16 +244,12 @@ async function initTrystero() {
     console.log(`[device-proxy] Joining Trystero room: ${roomId}`);
     console.log(`[device-proxy] Using Nostr relays: ${config.nostrRelays.join(', ')}`);
 
-    // Create room config following Trystero v0.22.x API
-    const roomConfig = {
-      roomId,
+    // Trystero v0.22.x API: joinRoom(config, roomId)
+    // Pass config options and roomId as separate arguments
+    room = trystero.joinRoom({
       appId: config.appId,
       nostrRelays: config.nostrRelays
-    };
-
-    console.log(`[device-proxy] Room config:`, JSON.stringify(roomConfig));
-
-    room = trystero.joinRoom(roomConfig);
+    }, roomId);
 
     // Create action for RPC
     const actionName = 'rpc';
