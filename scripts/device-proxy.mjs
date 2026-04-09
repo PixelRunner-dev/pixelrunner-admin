@@ -10,7 +10,7 @@
  * Usage:
  *   node scripts/device-proxy.mjs [--port PORT] [--gh-pages URL] [--socket PATH]
  *
- * Default port: 80 (requires sudo)
+ * Default port: 8080 (use --port 80 with sudo for production)
  * Default GitHub Pages URL: https://username.github.io/repo
  */
 
@@ -21,7 +21,7 @@ import path from 'path';
 import { Socket } from 'net';
 
 // Configuration
-const DEFAULT_PORT = 80;
+const DEFAULT_PORT = 8080;
 const DEFAULT_SOCKET = '/tmp/controller.sock';
 const DEFAULT_GHPAGES = 'https://pixelrunner-dev.github.io/admin';
 
@@ -233,16 +233,27 @@ async function initTrystero() {
   try {
     trystero = await import('trystero');
 
-    const roomId = `pixelrunner-${config.deviceId}`;
+    // Ensure roomId is always defined with a fallback
+    const roomId = `pixelrunner-${config.deviceId || 'default'}`;
+
+    // Validate required configuration
+    if (!roomId || roomId === 'pixelrunner-') {
+      throw new Error('Trystero: roomId argument required - deviceId is missing');
+    }
 
     console.log(`[device-proxy] Joining Trystero room: ${roomId}`);
     console.log(`[device-proxy] Using Nostr relays: ${config.nostrRelays.join(', ')}`);
 
-    room = trystero.joinRoom({
-      appId: config.appId,
+    // Create room config following Trystero v0.22.x API
+    const roomConfig = {
       roomId,
+      appId: config.appId,
       nostrRelays: config.nostrRelays
-    });
+    };
+
+    console.log(`[device-proxy] Room config:`, JSON.stringify(roomConfig));
+
+    room = trystero.joinRoom(roomConfig);
 
     // Create action for RPC
     const actionName = 'rpc';
