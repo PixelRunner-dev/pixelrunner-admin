@@ -1,16 +1,22 @@
+/**
+ * Playlists API
+ *
+ * Provides methods for managing playlists on the Pixelrunner device.
+ */
+
 import type { IPlaylist } from 'pixelrunner-shared/lib/interfaces/IPlaylist';
-import type { WebSocketClient } from '../client.ts';
-// import type { DeviceStatusResponse } from '../types.ts';
+import { ApiClientBase, type IRpcClient } from './client.ts';
 
-export class PlaylistsAPI {
-  constructor(private client: WebSocketClient) {}
-
-  // async store(): Promise<DeviceStatusResponse> {
-  //   return this.client.request<DeviceStatusResponse>('playlists.store');
-  // }
-
+/**
+ * PlaylistsAPI provides playlist management functionality.
+ * Works with any client that implements IRpcClient (WebSocket or Trystero).
+ */
+export class PlaylistsAPI extends ApiClientBase<IRpcClient> {
+  /**
+   * Get the currently active playlist
+   */
   async activePlaylist(): Promise<IPlaylist> {
-    return this.client.request<IPlaylist>('playlists.activePlaylist');
+    return this.request<IPlaylist>('playlists.activePlaylist');
   }
 
   // /**

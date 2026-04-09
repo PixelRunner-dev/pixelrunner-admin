@@ -1,4 +1,4 @@
-import { DEFAULT_CONFIG } from './config.ts';
+import { DEFAULT_WEBSOCKET_CONFIG } from '../constants.ts';
 import { BaseWebSocketClient } from './base-client.ts';
 
 import type {
@@ -33,7 +33,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   constructor(config?: TrysteroConfig) {
     super({
-      ...DEFAULT_CONFIG,
+      ...DEFAULT_WEBSOCKET_CONFIG,
       ...config,
       // Override URL since we use Trystero
       url: ''
@@ -102,7 +102,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     const roomId = this.config.roomId || 'pixelrunner-default';
 
-    const trysteroConfig: Record<string, unknown> = {};
+    const trysteroConfig: Record<string, unknown> = {
+      appId: 'pixelrunner'
+    };
 
     // Configure Nostr relays if provided
     if (this.config.nostrRelays && this.config.nostrRelays.length > 0) {

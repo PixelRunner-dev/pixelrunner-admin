@@ -7,6 +7,7 @@ import router from './router/index.ts';
 import { CookieStore } from './utils/CookieStore';
 import { WebSocketClient, WS_INJECTION_KEY } from '@/ws/index.ts';
 import { TrysteroWebRTCClient } from '@/ws/trystero-client.ts';
+import { NOSTR_RELAYS } from './constants.ts';
 import {
   detectAccessMode,
   requiresProxyConnection,
@@ -56,7 +57,7 @@ i18next
       console.log('[main] Using Trystero WebRTC client for proxy access');
       wsClient = new TrysteroWebRTCClient({
         roomId: `pixelrunner-${CookieStore.get('deviceId') || 'default'}`,
-        nostrRelays: ['wss://relay.damus.io', 'wss://relay.nostr.band', 'wss://nos.lol'],
+        nostrRelays: [...NOSTR_RELAYS],
         debug: import.meta.env.DEV,
         reconnect: true
       });

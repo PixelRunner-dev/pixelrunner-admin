@@ -3,6 +3,7 @@ declare module 'trystero' {
     roomId: string;
     nostrRelays?: string[];
     joinSecret?: string;
+    appId?: string;
     torrent?: boolean;
     trackerUrls?: string[];
   }
@@ -21,10 +22,4 @@ declare module 'trystero' {
   export function joinRoom(config: RoomConfig): JoinRoomResult;
   export function createRoom(config: RoomConfig): JoinRoomResult;
   export function getPeerIdFromSecret(secret: string): string;
-
-  export default {
-    joinRoom,
-    createRoom,
-    getPeerIdFromSecret
-  };
 }

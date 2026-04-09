@@ -1,54 +1,51 @@
-import type { WebSocketClient } from '../client.ts';
+/**
+ * Device API
+ *
+ * Provides methods for device management operations like status,
+ * reboot, shutdown, firmware update, and factory reset.
+ */
+
+import { ApiClientBase, type IRpcClient } from './client.ts';
 import type { DeviceStatusResponse, DeviceUpdateResponse } from '../types.ts';
 
-export class DeviceAPI {
-  constructor(private client: WebSocketClient) {}
-
+/**
+ * DeviceAPI provides device management functionality.
+ * Works with any client that implements IRpcClient (WebSocket or Trystero).
+ */
+export class DeviceAPI extends ApiClientBase<IRpcClient> {
   /**
    * Get the current device status
    */
   async status(): Promise<DeviceStatusResponse> {
-    return this.client.request<DeviceStatusResponse>('device.status');
+    return this.request<DeviceStatusResponse>('device.status');
   }
-
-  /**
-   * Send text to the printer
-   * @param text - The text to print
-   * @param options - Print options (copies, priority)
-   */
-  // async print(text: string, options?: PrintOptions): Promise<PrintResponse> {
-  //   return this.client.request<PrintResponse>('device.print', {
-  //     text,
-  //     ...options
-  //   });
-  // }
 
   /**
    * Reboot the device
    */
   async reboot(): Promise<void> {
-    return this.client.request<void>('device.reboot');
+    return this.request<void>('device.reboot');
   }
 
   /**
    * Shutdown the device
    */
   async shutdown(): Promise<void> {
-    return this.client.request<void>('device.shutdown');
+    return this.request<void>('device.shutdown');
   }
 
   /**
    * Update device firmware
    */
   async updateFirmware(): Promise<DeviceUpdateResponse> {
-    return this.client.request<DeviceUpdateResponse>('device.updateFirmware');
+    return this.request<DeviceUpdateResponse>('device.updateFirmware');
   }
 
   /**
    * Run factory reset
    */
   async factoryReset(): Promise<void> {
-    return this.client.request<void>('device.factoryReset');
+    return this.request<void>('device.factoryReset');
   }
 
   // /**

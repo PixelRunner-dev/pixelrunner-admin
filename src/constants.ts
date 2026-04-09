@@ -1,0 +1,68 @@
+/**
+ * Shared constants used across the application
+ * for Trystero/WebRTC connections, WebSocket configuration, and API actions.
+ */
+
+import type { IWebSocketConfig } from 'pixelrunner-shared/lib/interfaces/index.ts';
+
+// ============================================================================
+// Trystero/WebRTC Constants
+// ============================================================================
+
+/**
+ * Default Nostr relay URLs for Trystero WebRTC signaling.
+ * These are used for peer discovery and connection establishment.
+ */
+export const NOSTR_RELAYS = [
+  'wss://relay.primal.net',
+  'wss://relay.nostr.band',
+  'wss://nos.lol',
+  'wss://relay.noderunners.network'
+] as const;
+
+/**
+ * Application identifier used when creating Trystero rooms.
+ * This helps identify and namespace the peer-to-peer connections.
+ */
+export const APP_ID = 'pixelrunner';
+
+/**
+ * The action name used for JSON-RPC communication over Trystero.
+ * This is the channel name that both device and browser use to exchange RPC messages.
+ */
+export const ACTION_NAME = 'rpc';
+
+/**
+ * Default room prefix for Trystero rooms.
+ */
+export const ROOM_PREFIX = 'pixelrunner';
+
+// ============================================================================
+// WebSocket Configuration Constants
+// ============================================================================
+
+/**
+ * Default WebSocket configuration.
+ * Used as base config for both WebSocket and Trystero clients.
+ */
+export const DEFAULT_WEBSOCKET_CONFIG: Required<IWebSocketConfig> = {
+  url: 'ws://localhost:8765',
+  reconnect: true,
+  reconnectInterval: 1000, // 1 second
+  reconnectMaxInterval: 30000, // 30 seconds
+  reconnectDecay: 1.5, // exponential backoff multiplier
+  maxReconnectAttempts: Infinity,
+  timeout: 30000, // 30 seconds
+  heartbeatInterval: 30000, // 30 seconds
+  debug: true // process?.env?.DEV ?? false
+};
+
+/**
+ * Default WebSocket URL for local development.
+ */
+export const DEFAULT_WS_URL = 'ws://localhost:8765';
+
+/**
+ * Default WebSocket port for local development.
+ */
+export const DEFAULT_WS_PORT = 8765;

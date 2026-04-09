@@ -1,5 +1,5 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue';
-import { DEFAULT_CONFIG } from './config.ts';
+import { DEFAULT_WEBSOCKET_CONFIG } from '../constants.ts';
 import { WebSocketConnectionError, WebSocketTimeoutError, JsonRpcError } from './errors.ts';
 
 import type {
@@ -53,7 +53,7 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
   // ============================================================================
 
   constructor(config?: TConfig) {
-    this.config = { ...DEFAULT_CONFIG, ...config } as Required<TConfig>;
+    this.config = { ...DEFAULT_WEBSOCKET_CONFIG, ...config } as Required<TConfig>;
 
     // Initialize reactive state
     this.state = ref<IConnectionState>('disconnected');

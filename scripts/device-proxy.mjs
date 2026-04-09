@@ -26,14 +26,16 @@ const DEFAULT_SOCKET = '/tmp/controller.sock';
 const DEFAULT_GHPAGES = 'https://pixelrunner-dev.github.io/admin';
 
 const config = {
+  appId: DEFAULT_GHPAGES,
   port: parseInt(process.env.PORT || String(DEFAULT_PORT), 10),
   socketPath: process.env.SOCKET_PATH || DEFAULT_SOCKET,
   githubPagesUrl: process.env.GHPAGES_URL || DEFAULT_GHPAGES,
   deviceId: process.env.DEVICE_ID || 'pxlr_f91a',
   nostrRelays: [
-    'wss://relay.damus.io',
+    'wss://relay.primal.net',
     'wss://relay.nostr.band',
-    'wss://nos.lol'
+    'wss://nos.lol',
+    'wss://relay.noderunners.network'
   ]
 };
 
