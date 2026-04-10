@@ -27,10 +27,10 @@ const getFieldComponent = (item: { type: string }) => {
   return defineAsyncComponent(() => import(`../Form/AppletFields/Field${toPascalCase(item.type)}.vue`));
 };
 
-const appletSchema = ref();
+const appletSchema = ref<Record<string, unknown> | null>();
 
 onMounted(async () => {
-  if (isConnected && isConnected.value) {
+  if (isConnected && isConnected.value && applets) {
     appletSchema.value = await applets.getSchema(applet.packageName);
     console.log('applet appletSchema via ws', appletSchema.value);
   }
