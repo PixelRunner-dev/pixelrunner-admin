@@ -41,8 +41,6 @@
     "format:js": "eslint . --fix",
     "ci": "DEBUG_COLORS=false run-p -s audit type-check lint:syntax lint:js:ci test:unit:ci test:e2e:ci",
     "update-geo": "node scripts/update-geo-db.mjs",
-    "proxy-uds-ws": "node scripts/proxy-uds-ws.mjs",
-    "device-proxy": "node scripts/device-proxy.mjs",
     "remote:npm-install": "npx remote-npm install",
     "remote:push": "npx remote-push"
   },

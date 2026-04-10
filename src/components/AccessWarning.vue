@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-defineProps<{
-  isHidden: boolean;
-}>();
-
 // Use Vue's global t function from i18next-vue plugin
 const title = computed(() => (window as unknown as { $t: (key: string) => string }).$t?.('generic.accessWarning.title') ?? 'Access Via Device IP');
 const message = computed(() => (window as unknown as { $t: (key: string) => string }).$t?.('generic.accessWarning.message') ?? 'You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device\'s local IP address.');
@@ -13,7 +9,7 @@ const instruction = computed(() => (window as unknown as { $t: (key: string) => 
 
 <template>
   <Teleport to="body">
-    <div v-if="!isHidden" class="component--access-warning">
+    <div class="component--access-warning">
       <div class="access-warning__overlay"></div>
       <div class="access-warning__content">
         <div class="access-warning__icon">

@@ -2,7 +2,8 @@ import { ref, computed, type Ref, type ComputedRef } from 'vue';
 import {
   DEFAULT_RECONNECT_MAX_INTERVAL,
   DEFAULT_TIMEOUT,
-  DEFAULT_WEBSOCKET_CONFIG
+  DEFAULT_WEBSOCKET_CONFIG,
+  DEFAULT_RECONNECT_INTERVAL
 } from '../constants.ts';
 import { WebSocketConnectionError, WebSocketTimeoutError, JsonRpcError } from './errors.ts';
 
@@ -400,7 +401,7 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
 
     // Calculate delay with exponential backoff
     const delay = Math.min(
-      this.getConfigNumber('reconnectInterval', 1000) *
+      this.getConfigNumber('reconnectInterval', DEFAULT_RECONNECT_INTERVAL) *
         Math.pow(this.getConfigNumber('reconnectDecay', 1.5), this.reconnectAttempts - 1),
       this.getConfigNumber('reconnectMaxInterval', DEFAULT_RECONNECT_MAX_INTERVAL)
     );
