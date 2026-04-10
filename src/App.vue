@@ -9,20 +9,20 @@ import type { AccessMode } from '@/utils/access-detector.ts';
 import { Flex as DFlex } from '(vendor)/daisy-ui-kit/index.ts';
 
 const accessMode = inject<AccessMode>('accessMode', 'unknown');
-const hideAccessWarning = ref(false);
+const showAccessWarning = ref(true);
 
 const hasDarkPreference = ref(window.matchMedia?.('(prefers-color-scheme: dark)').matches);
 
 onMounted(() => {
   // Show warning if accessed directly (not via proxy)
   if (accessMode === 'local') {
-    hideAccessWarning.value = true;
+    showAccessWarning.value = false;
   }
 });
 </script>
 
 <template>
-  <template v-if="!hideAccessWarning">
+  <template v-if="!showAccessWarning">
     <header
       class="px-4 py-2 mb-8 rounded-box sticky top-3 z-500 shadow-md"
       :style="`background-color: ${hasDarkPreference ? '#1c0f04' : '#F7DBBF'}`">
