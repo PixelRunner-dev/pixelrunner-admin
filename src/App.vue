@@ -67,7 +67,11 @@ onMounted(() => {
     </router-view>
   </template>
 
-  <AccessWarning v-else/>
+  <template v-else>
+    <router-view>
+      <AccessWarning />
+    </router-view>
+  </template>
 
   <icon-sprite />
 </template>
