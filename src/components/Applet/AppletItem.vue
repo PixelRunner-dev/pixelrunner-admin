@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IFullApplet } from 'pixelrunner-shared;
+import type { IFullApplet } from 'pixelrunner-shared';
 
 interface Props {
   applet: IFullApplet;

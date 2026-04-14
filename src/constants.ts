@@ -3,7 +3,7 @@
  * for Trystero/WebRTC connections, WebSocket configuration, and API actions.
  */
 
-import type { IWebSocketConfig } from 'pixelrunner-shared;
+import type { IWebSocketConfig } from 'pixelrunner-shared';
 
 // ============================================================================
 // Trystero/WebRTC Constants

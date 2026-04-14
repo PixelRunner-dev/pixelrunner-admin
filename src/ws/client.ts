@@ -5,12 +5,11 @@ import { BaseWebSocketClient } from './base-client';
 import type {
   IJsonRpcResponse,
   IJsonRpcNotification,
-
   IWebSocketConfig,
   IConnectedEvent,
   IErrorEvent,
   INotificationEvent
-} from 'pixelrunner-shared;
+} from 'pixelrunner-shared';
 
 /**
  * WebSocketClient provides a WebSocket connection implementation

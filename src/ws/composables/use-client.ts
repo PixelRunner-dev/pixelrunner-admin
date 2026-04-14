@@ -18,7 +18,7 @@ import type {
   IEventHandler,
   IJsonRpcParams,
   IRequestOptions
-} from 'pixelrunner-shared;
+} from 'pixelrunner-shared';
 
 // Injection keys for different client types
 export const WS_INJECTION_KEY = Symbol('websocket-client');

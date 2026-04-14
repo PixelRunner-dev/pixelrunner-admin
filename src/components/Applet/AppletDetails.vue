@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IAppletDetails, IAppletViews } from 'pixelrunner-shared;
+import type { IAppletDetails, IAppletViews } from 'pixelrunner-shared';
 
 import { Flex as DFlex } from '(vendor)/daisy-ui-kit/index.ts';
 

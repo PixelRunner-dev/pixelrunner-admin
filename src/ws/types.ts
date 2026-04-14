@@ -1,4 +1,4 @@
-import type { ErrorResponse, SuccessResponse } from 'pixelrunner-shared;
+import type { ErrorResponse, SuccessResponse } from 'pixelrunner-shared';
 
 // ============================================================================
 // API - Device

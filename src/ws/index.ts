@@ -16,7 +16,7 @@ export {
 
 // Config
 export { DEFAULT_WEBSOCKET_CONFIG as DEFAULT_CONFIG } from '../constants.ts';
-export type { IWebSocketConfig } from 'pixelrunner-shared;
+export type { IWebSocketConfig } from 'pixelrunner-shared';
 
 // Types
 export * from './types.ts';

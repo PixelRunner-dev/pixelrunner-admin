@@ -7,7 +7,7 @@ import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
 import { useWebSocket } from '@/ws/index.ts';
 import { toPascalCase } from '@/utils/generic.ts';
 
-import type { IFullApplet, IAppletSchemaObject } from 'pixelrunner-shared;
+import type { IFullApplet, IAppletSchemaObject } from 'pixelrunner-shared';
 
 import {
   Button as DButton,

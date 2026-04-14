@@ -23,7 +23,7 @@ import type {
   IDisconnectedEvent,
   IReconnectingEvent,
   INotificationEvent
-} from 'pixelrunner-shared;
+} from 'pixelrunner-shared';
 
 /**
  * Abstract base class for WebSocket-like clients.

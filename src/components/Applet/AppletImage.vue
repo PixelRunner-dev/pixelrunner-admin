@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue';
 
-import type { IAppletImage } from 'pixelrunner-shared;
+import type { IAppletImage } from 'pixelrunner-shared';
 
 const TIMESTAMP_DEVIATION = 100000;
 const { src, alt, dateCreated, dateModified }: IAppletImage = defineProps<IAppletImage>();

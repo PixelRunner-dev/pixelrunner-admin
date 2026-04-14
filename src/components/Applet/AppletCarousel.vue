@@ -4,7 +4,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { Carousel } from '@/adapters/CarouselAdapter.ts';
 import AppletList from './AppletList.vue';
 
-import type { IFullApplet } from 'pixelrunner-shared;
+import type { IFullApplet } from 'pixelrunner-shared';
 
 interface Props {
   applets: IFullApplet[];

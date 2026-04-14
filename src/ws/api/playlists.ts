@@ -4,7 +4,7 @@
  * Provides methods for managing playlists on the Pixelrunner device.
  */
 
-import type { IPlaylist } from 'pixelrunner-shared;
+import type { IPlaylist } from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
 
 /**

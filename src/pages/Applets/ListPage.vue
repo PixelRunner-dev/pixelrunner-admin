@@ -5,7 +5,7 @@ import PlayList from '@/components/PlayList.vue';
 import { useWebSocket } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
 
-import type { IPlaylist } from 'pixelrunner-shared;
+import type { IPlaylist } from 'pixelrunner-shared';
 
 const activePlaylist = ref<IPlaylist>();
 

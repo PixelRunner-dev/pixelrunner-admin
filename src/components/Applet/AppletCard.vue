@@ -5,7 +5,7 @@ import AppletDetails from './AppletDetails.vue';
 import AppletImage from './AppletImage.vue';
 import CategoryList from '@/components/CategoryList.vue';
 
-import type { IAppletViews, IFullApplet } from 'pixelrunner-shared;
+import type { IAppletViews, IFullApplet } from 'pixelrunner-shared';
 
 import {
   Flex as DFlex

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IIconImage } from 'pixelrunner-shared;
+import type { IIconImage } from 'pixelrunner-shared';
 
 const {
   iconId,
