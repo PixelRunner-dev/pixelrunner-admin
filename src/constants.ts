@@ -70,5 +70,5 @@ export const DEFAULT_WEBSOCKET_CONFIG: Required<IWebSocketConfig> = {
   maxReconnectAttempts: 5,
   timeout: DEFAULT_TIMEOUT, // 30 seconds
   heartbeatInterval: DEFAULT_HEARTBEAT_INTERVAL, // 30 seconds
-  debug: true // process?.env?.DEV ?? false
+  debug: import.meta.env.DEV
 };

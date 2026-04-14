@@ -57,7 +57,7 @@ i18next
       console.log('[main] Using Trystero WebRTC client for proxy access');
       wsClient = new TrysteroWebRTCClient({
         roomId: `pixelrunner-${CookieStore.get('deviceId') || 'default'}`,
-        nostrRelays: [...NOSTR_RELAYS],
+        relayUrls: [...NOSTR_RELAYS],
         debug: import.meta.env.DEV,
         reconnect: true
       });
