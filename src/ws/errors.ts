@@ -1,4 +1,4 @@
-import type { IJsonRpcError } from 'pixelrunner-shared/lib/interfaces/index.ts';
+import type { IJsonRpcError } from 'pixelrunner-shared;
 
 export class WebSocketError extends Error {
   constructor(

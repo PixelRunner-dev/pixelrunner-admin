@@ -12,7 +12,7 @@ import AppletCard from '@/components/Applet/AppletCard.vue';
 import CategoryList from '@/components/CategoryList.vue';
 
 import { toCapitalizeWords } from '@/utils/generic.ts';
-import type { ICategory, IFullApplet } from 'pixelrunner-shared/lib/interfaces';
+import type { ICategory, IFullApplet } from 'pixelrunner-shared;
 
 const categories: ICategory[] = [
   {

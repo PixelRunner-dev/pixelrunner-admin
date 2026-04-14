@@ -10,7 +10,7 @@ import type {
   IConnectedEvent,
   IErrorEvent,
   INotificationEvent
-} from 'pixelrunner-shared/lib/interfaces/index.ts';
+} from 'pixelrunner-shared;
 
 /**
  * WebSocketClient provides a WebSocket connection implementation

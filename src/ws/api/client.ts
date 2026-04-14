@@ -14,7 +14,7 @@ import type {
   IConnectionState,
   IWebSocketEventType,
   IEventHandler
-} from 'pixelrunner-shared/lib/interfaces/index.ts';
+} from 'pixelrunner-shared;
 
 /**
  * Generic RPC client interface.

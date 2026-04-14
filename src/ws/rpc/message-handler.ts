@@ -3,7 +3,7 @@
  * Used by both WebSocket and Trystero clients for parsing JSON-RPC messages.
  */
 
-import type { IJsonRpcMessage } from 'pixelrunner-shared/lib/interfaces/index.ts';
+import type { IJsonRpcMessage } from 'pixelrunner-shared;
 
 /**
  * Parses a JSON-RPC message from a string.

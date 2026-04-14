@@ -7,7 +7,7 @@ import type {
   IWebSocketConfig,
   IConnectedEvent,
   IErrorEvent
-} from 'pixelrunner-shared/lib/interfaces/index.ts';
+} from 'pixelrunner-shared;
 
 // Dynamic import for Trystero to handle potential SSR
 let trystero: typeof import('trystero') | null = null;

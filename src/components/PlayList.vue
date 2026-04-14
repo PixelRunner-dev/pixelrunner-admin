@@ -2,7 +2,7 @@
 import AppletList from './Applet/AppletList.vue';
 import AppletCard from './Applet/AppletCard.vue';
 
-import type { IPlaylist } from 'pixelrunner-shared/lib/interfaces';
+import type { IPlaylist } from 'pixelrunner-shared;
 
 const { applets, dateCreated, dateModified }: IPlaylist = defineProps<IPlaylist>();
 </script>

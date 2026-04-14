@@ -6,7 +6,7 @@ import AppletItem from './AppletItem.vue';
 
 import { vibrateDevice } from '@/utils/generic.ts';
 
-import type { IFullApplet } from 'pixelrunner-shared/lib/interfaces';
+import type { IFullApplet } from 'pixelrunner-shared;
 
 export interface Props {
   applets: IFullApplet[];

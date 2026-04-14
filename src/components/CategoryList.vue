@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import IconImage from '@/components/Icon/IconImage.vue';
 
-import { slugify } from 'pixelrunner-shared/lib/utils/StringUtils.ts';
+import { slugify } from 'pixelrunner-shared;
 
-import type { ICategory } from 'pixelrunner-shared/lib/interfaces';
+import type { ICategory } from 'pixelrunner-shared;
 
 export interface Props {
   categories: ICategory[];

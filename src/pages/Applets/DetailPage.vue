@@ -11,7 +11,7 @@ import AppletImage from '@/components/Applet/AppletImage.vue';
 import CategoryList from '@/components/CategoryList.vue';
 
 // import playlistMock from '@/../test/mocks/playlists.json';
-import type { UUID } from 'pixelrunner-shared/lib/types';
+import type { UUID } from 'pixelrunner-shared;
 
 const route = useRoute();
 const { packageName, uuid } = route.params;
