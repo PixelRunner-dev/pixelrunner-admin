@@ -12,7 +12,7 @@ export default defineComponent({
     return () =>
       h(
         resolveIs(props.is),
-        mergeProps(attrs, { class: 'fieldset bg-base-200 border-base-300 rounded-box border p-4' }),
+        mergeProps(attrs, { class: 'fieldset bg-base-200 rounded-box p-4' }),
         [props.legend ? h('legend', { class: 'fieldset-legend' }, props.legend) : slots.legend?.(), slots.default?.()],
       )
   },

@@ -92,5 +92,5 @@ i18next
   });
 
 if (CookieStore.has('theme')) {
-  document.documentElement.dataset.theme = CookieStore.get('theme') ?? 'autumn';
+  document.documentElement.dataset.theme = CookieStore.get('theme') ?? 'pixelrunner';
 }

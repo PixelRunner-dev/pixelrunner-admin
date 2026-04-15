@@ -120,6 +120,7 @@ const themesDark = computed<string[]>(() => ([
 ]));
 
 const themesLight = computed<string[]>(() => ([
+  'pixelrunner',
   'light',
   'emerald',
   'garden',
