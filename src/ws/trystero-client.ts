@@ -1,4 +1,5 @@
-import { DEFAULT_WEBSOCKET_CONFIG, APP_ID, DEFAULT_TIMEOUT } from '../constants.ts';
+import type { BaseRoomConfig, RelayConfig, TurnConfig } from 'trystero';
+import { DEFAULT_WEBSOCKET_CONFIG, APP_ID, DEFAULT_TIMEOUT, ROOM_PREFIX } from '../constants.ts';
 import { BaseWebSocketClient } from './base-client.ts';
 
 import type {
@@ -100,9 +101,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       trystero = await import('trystero');
     }
 
-    const roomId = this.config.roomId || 'pixelrunner-default';
+    const roomId = this.config.roomId || `${ROOM_PREFIX}-default`;
 
-    const trysteroConfig: Record<string, unknown> = {
+    const trysteroConfig: BaseRoomConfig & RelayConfig & TurnConfig = {
       appId: APP_ID
     };
 
@@ -112,15 +113,14 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     }
 
     // Add join secret for authentication if provided
-    if (this.config.joinSecret) {
-      trysteroConfig.joinSecret = this.config.joinSecret;
-    }
+    // if (this.config.joinSecret) {
+    //   trysteroConfig.joinSecret = this.config.joinSecret;
+    // }
 
     // Create the room (acts as host/join peer)
-    this.room = trystero.joinRoom({
-      roomId,
-      ...trysteroConfig
-    });
+    this.room = trystero.joinRoom(trysteroConfig, roomId);
+
+    console.log('this.room', this.room);
 
     // Set up peer join handler
     (this.room as { onPeerJoin: (cb: () => void) => void }).onPeerJoin(() => {
@@ -135,17 +135,18 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     // Create an action for RPC communication
     const actionName = 'rpc';
-    this.sendAction = (this.room as { makeAction: (name: string) => unknown }).makeAction(
+    const action = (this.room as { makeAction: (name: string) => unknown }).makeAction(
       actionName
-    ) as (data: string) => void;
-
-    // Set up the receiver
-    (this.room as { on: (name: string, cb: (data: string) => void) => void }).on(
-      actionName,
-      (data: string) => {
-        this.handleTransportMessage(data);
-      }
-    );
+    ) as unknown as [
+      (data: string) => void,
+      (handler: (data: string, peerId: string) => void) => void,
+      (progress: unknown) => void
+    ];
+    this.sendAction = action[0];
+    const receiver = action[1];
+    receiver((data: string, _peerId: string) => {
+      this.handleTransportMessage(data);
+    });
   }
 
   protected disconnectTransport(): void {
@@ -159,6 +160,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   protected send(message: string): void {
     if (this.sendAction) {
+      console.log('this.sendAction', this.sendAction);
       this.sendAction(message);
 
       if (this.config.debug) {

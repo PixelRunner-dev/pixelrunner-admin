@@ -24,10 +24,10 @@ import LocationSearch, { type LocationResult } from '@/components/Form/SettingFi
 
 import { toCamelCase, toCapitalizeWords, vibrateDevice } from '@/utils/generic.ts';
 
-import { useWebSocket } from '@/ws/index.ts';
+import { useClientApi } from '@/ws/index.ts';
 
 // Get WebSocket functionality
-const { device, isConnected, settings } = useWebSocket();
+const { device, isConnected, settings } = useClientApi();
 
 function setLanguage(e: Event) {
   const target = e.target as HTMLSelectElement | null;

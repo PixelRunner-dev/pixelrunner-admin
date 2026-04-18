@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-import { useWebSocket } from '@/ws';
+import { useClientApi } from '@/ws/index.ts';
 
 import AppletItem from '@/components/Applet/AppletItem.vue';
 import AppletConfig from '@/components/Applet/AppletConfig.vue';
@@ -15,7 +15,7 @@ import type { UUID } from 'pixelrunner-shared';
 
 const route = useRoute();
 const { packageName, uuid } = route.params;
-const { isConnected, applets } = useWebSocket();
+const { isConnected, applets } = useClientApi();
 
 const applet = ref();
 

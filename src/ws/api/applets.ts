@@ -5,7 +5,7 @@
  * on the Pixelrunner device.
  */
 
-import type { UUID } from 'pixelrunner-shared';
+import type { ICategory, UUID } from 'pixelrunner-shared';
 import type { IFullAppletRecord } from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
 
@@ -102,6 +102,14 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
    */
   async setConfig(uuid: UUID, config: Record<string, unknown>): Promise<void> {
     return this.request<void>('applets.setconfig', { uuid, config });
+  }
+
+  async getAppletsByCategory(category: ICategory): Promise<IFullAppletRecord[]> {
+    console.log('ik ben in getAppletsByCategory');
+    return this.request<IFullAppletRecord[]>('applets.action', {
+      method: 'getAppletsByCategoryName',
+      params: { category: category.name }
+    });
   }
 
   // /**

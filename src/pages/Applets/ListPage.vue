@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
-import { useWebSocket } from '@/ws/index.ts';
+import { useClientApi } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
 
 import type { IPlaylist } from 'pixelrunner-shared';
@@ -10,7 +10,7 @@ import type { IPlaylist } from 'pixelrunner-shared';
 const activePlaylist = ref<IPlaylist>();
 
 // Get WebSocket functionality
-const { isConnected, playlists } = useWebSocket();
+const { isConnected, playlists } = useClientApi();
 
 onMounted(async () => {
   if (isConnected.value) {

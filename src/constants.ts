@@ -15,7 +15,6 @@ import type { IWebSocketConfig } from 'pixelrunner-shared';
  */
 export const NOSTR_RELAYS = [
   'wss://relay.primal.net',
-  'wss://relay.nostr.band',
   'wss://nos.lol'
   // 'wss://relay.noderunners.network'
 ] as const;
@@ -70,5 +69,5 @@ export const DEFAULT_WEBSOCKET_CONFIG: Required<IWebSocketConfig> = {
   maxReconnectAttempts: 5,
   timeout: DEFAULT_TIMEOUT, // 30 seconds
   heartbeatInterval: DEFAULT_HEARTBEAT_INTERVAL, // 30 seconds
-  debug: import.meta.env.DEV
+  debug: import.meta.env.DEV || false
 };

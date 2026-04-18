@@ -9,9 +9,6 @@ import {
   Join as DJoin
 } from '(vendor)/daisy-ui-kit/index.ts';
 
-import CallToAction from '@/components/CallToAction.vue';
-import IconImage from '@/components/Icon/IconImage.vue';
-
 const router = useRouter();
 const route = useRoute();
 

@@ -30,6 +30,3 @@ export * from './api/index.ts';
 
 // Composables
 export * from './composables/index.ts';
-
-// Backwards compatibility - alias useClientApi as useWebSocket
-export { useClientApi as useWebSocket } from './composables/index.ts';

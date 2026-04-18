@@ -46,7 +46,7 @@ const appletImage = computed(() => {
         <figcaption>
           <AppletDetails v-bind="details" :view="view" />
 
-          <CategoryList v-if="hasCategories" :categories hasItemsInline />
+          <!-- <CategoryList v-if="hasCategories" :categories hasItemsInline /> -->
 
           <router-link
             v-if="hasCallToAction && applet.isInstalled"

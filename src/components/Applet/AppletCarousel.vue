@@ -31,10 +31,10 @@ onBeforeUnmount(() => {
       </template>
     </AppletList>
 
-    <button class="btn btn-xs _prev" data-action="prev">
+    <button class="btn btn-xs _prev mr-2 mt-1" data-action="prev">
       {{ $t('generic.prev') }}
     </button>
-    <button class="btn btn-xs next" data-action="next">
+    <button class="btn btn-xs next mt-1" data-action="next">
       {{ $t('generic.next') }}
     </button>
   </div>

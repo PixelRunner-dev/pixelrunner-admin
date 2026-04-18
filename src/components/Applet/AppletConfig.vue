@@ -4,7 +4,7 @@ import { defineAsyncComponent, onMounted, ref } from 'vue';
 import FormField from '../Form/FormField.vue';
 import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
 
-import { useWebSocket } from '@/ws/index.ts';
+import { useClientApi } from '@/ws/index.ts';
 import { toPascalCase } from '@/utils/generic.ts';
 
 import type { IFullApplet, IAppletSchemaObject } from 'pixelrunner-shared';
@@ -21,7 +21,7 @@ export interface Props {
 
 const { applet }: Props = defineProps<Props>();
 
-const { isConnected, applets } = useWebSocket();
+const { isConnected, applets } = useClientApi();
 
 const getFieldComponent = (item: { type: string }) => {
   return defineAsyncComponent(() => import(`../Form/AppletFields/Field${toPascalCase(item.type)}.vue`));

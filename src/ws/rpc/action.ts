@@ -5,7 +5,7 @@
  */
 
 import { ACTION_NAME, APP_ID, NOSTR_RELAYS, ROOM_PREFIX } from '../../constants.ts';
-import type { Room, RoomConfig } from 'trystero';
+import type { Room, BaseRoomConfig, RelayConfig, TurnConfig } from 'trystero';
 
 /**
  * Configuration for creating a Trystero room.
@@ -19,7 +19,7 @@ export interface TrysteroRoomConfig {
    * Custom Nostr relays to use for signaling.
    * If not provided, defaults to NOSTR_RELAYS.
    */
-  nostrRelays?: readonly string[];
+  relayUrls?: readonly string[];
   /**
    * Optional secret for joining the room.
    */
@@ -36,14 +36,12 @@ export interface TrysteroRoomConfig {
  * @param config - Room configuration options
  * @returns The room configuration object for Trystero
  */
-export function createTrysteroRoomConfig(config: TrysteroRoomConfig): RoomConfig {
+export function createTrysteroRoomConfig(
+  config: TrysteroRoomConfig
+): BaseRoomConfig & RelayConfig & TurnConfig {
   return {
-    roomId: config.roomId ?? `${ROOM_PREFIX}-default`,
     appId: APP_ID,
-    nostrRelays: [...(config.nostrRelays ?? NOSTR_RELAYS)],
-    ...(config.joinSecret && { joinSecret: config.joinSecret }),
-    ...(config.torrent && { torrent: config.torrent }),
-    ...(config.trackerUrls && { trackerUrls: config.trackerUrls })
+    relayUrls: [...(config.relayUrls ?? NOSTR_RELAYS)]
   };
 }
 
@@ -61,7 +59,7 @@ export function createRpcAction(
   // makeAction returns [sender, receiver, progress] - we use the sender function
   const action = room.makeAction(actionName) as unknown as [
     (data: string) => void,
-    (data: unknown) => void,
+    (handler: (data: string, peerId: string) => void) => void,
     (progress: unknown) => void
   ];
   return action[0];
@@ -76,10 +74,17 @@ export function createRpcAction(
  */
 export function setupRpcHandler(
   room: Room,
-  handler: (data: string, peerId: string) => void,
+  handler: (data: string) => void,
   actionName: string = ACTION_NAME
 ): () => void {
-  room.on(actionName, handler as (data: unknown, peerId: string) => void);
+  console.log('room.on in setupRpcHandler', actionName);
+  const action = room.makeAction(actionName) as unknown as [
+    (data: string) => void,
+    (callback: (data: string, peerId: string) => void) => void,
+    (callback: (progress: unknown) => void) => void
+  ];
+  const receiver = action[1];
+  receiver(handler);
   // Return an unsubscribe function
   return () => {
     // Trystero doesn't have direct unsubscribe, so we need a workaround
@@ -126,14 +131,22 @@ export async function createTrysteroRoomInstance(
 ): Promise<TrysteroRoomInstance> {
   const trystero = await import('trystero');
   const roomConfig = createTrysteroRoomConfig(config);
-  const room = trystero.joinRoom(roomConfig) as Room;
+  const roomId = config.roomId ?? `${ROOM_PREFIX}-default`;
+  const room = trystero.joinRoom(roomConfig, roomId) as Room;
   const sendAction = createRpcAction(room);
 
   return {
     room,
     sendAction,
     onMessage: (handler) => {
-      room.on(ACTION_NAME, handler as (data: unknown, peerId: string) => void);
+      console.log('room.on in createTrysteroRoomInstance', ACTION_NAME);
+      const action = room.makeAction(ACTION_NAME) as unknown as [
+        (data: string) => void,
+        (callback: (data: unknown, peerId: string) => void) => void,
+        (callback: (progress: unknown) => void) => void
+      ];
+      const receiver = action[1];
+      receiver(handler as (data: unknown, peerId: string) => void);
       return () => {
         // Cleanup - Trystero doesn't have removeListener
       };

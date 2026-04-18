@@ -4,10 +4,10 @@ import I18NextVue from 'i18next-vue';
 
 import App from './App.vue';
 import router from './router/index.ts';
-import { CookieStore } from './utils/CookieStore';
+import { CookieStore } from './utils/CookieStore.ts';
 import { WebSocketClient, WS_INJECTION_KEY } from '@/ws/index.ts';
 import { TrysteroWebRTCClient } from '@/ws/trystero-client.ts';
-import { NOSTR_RELAYS } from './constants.ts';
+import { NOSTR_RELAYS, ROOM_PREFIX } from './constants.ts';
 import {
   detectAccessMode,
   requiresProxyConnection,
@@ -51,12 +51,14 @@ i18next
     // Determine which WebSocket client to use
     let wsClient;
 
+    console.log('requiresProxyConnection', requiresProxyConnection());
+
     if (requiresProxyConnection()) {
       // When accessed via local IP/proxy, use Trystero for P2P connection
       // The device will also connect via Trystero to establish P2P link
       console.log('[main] Using Trystero WebRTC client for proxy access');
       wsClient = new TrysteroWebRTCClient({
-        roomId: `pixelrunner-${CookieStore.get('deviceId') || 'default'}`,
+        roomId: `${ROOM_PREFIX}-${CookieStore.get('deviceId') || 'default'}`,
         relayUrls: [...NOSTR_RELAYS],
         debug: import.meta.env.DEV,
         reconnect: true
@@ -66,7 +68,8 @@ i18next
       console.log('[main] Using standard WebSocket client');
       wsClient = new WebSocketClient({
         url: `ws://${window.location.hostname}:8765`,
-        debug: import.meta.env.DEV
+        debug: import.meta.env.DEV,
+        reconnect: true
       });
     }
 
@@ -84,6 +87,8 @@ i18next
     wsClient.connect().catch((err) => {
       console.error('Failed to connect to WebSocket:', err);
     });
+
+    console.log('DIT IS IN MAIN', wsClient, wsClient.state.value);
 
     const languageFromCookie = CookieStore.get('language');
     if (languageFromCookie) {

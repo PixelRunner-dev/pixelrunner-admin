@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import {
-  Button as DButton,
-  Flex as DFlex,
-  Text as DText
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { onMounted, ref } from 'vue';
+
+import type { ICategory, IFullApplet } from 'pixelrunner-shared';
+
+import { useClientApi } from '@/ws/index.ts';
+import { toCapitalizeWords } from '@/utils/generic.ts';
 
 import StoreSearch from '@/components/Store/StoreSearch.vue';
 import StoreSection from '@/components/Store/StoreSection.vue';
@@ -11,8 +12,11 @@ import AppletCarousel from '@/components/Applet/AppletCarousel.vue';
 import AppletCard from '@/components/Applet/AppletCard.vue';
 import CategoryList from '@/components/CategoryList.vue';
 
-import { toCapitalizeWords } from '@/utils/generic.ts';
-import type { ICategory, IFullApplet } from 'pixelrunner-shared';
+import {
+  Button as DButton,
+  Flex as DFlex,
+  Text as DText
+} from '(vendor)/daisy-ui-kit/index.ts';
 
 const categories: ICategory[] = [
   {
@@ -134,7 +138,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/btcfagi.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -153,7 +157,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/amazing.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -172,7 +176,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/arcadeclassics.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -191,7 +195,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/bitcointicker.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -210,7 +214,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/btcdifficulty.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -220,7 +224,7 @@ const newlyAddedItems: IFullApplet[] = [
       desc: 'nog meer bla die bla dus',
       author: '@truus',
       tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
+      isOfficialApplet: true
     },
     isInstalled: false,
     categories: [categories[4] as ICategory, categories[5] as ICategory]
@@ -229,7 +233,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/usdebtclock.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -248,7 +252,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/btcmoscowtime.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -267,7 +271,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/buienradar.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -286,7 +290,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/daynightmap.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -305,7 +309,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/homerhiding.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -324,7 +328,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/knmialert.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -343,7 +347,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/lastfm.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -362,7 +366,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/mempool.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -381,7 +385,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/nos.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -400,7 +404,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/nunl.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -419,7 +423,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/nyancat.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -438,7 +442,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/skynews.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -457,7 +461,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/solaredgemonitor.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -476,7 +480,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/sonicthehedgehogclock.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -495,7 +499,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: 'https://picsum.photos/64/32',
+      src: '/.webp/starfield.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -512,15 +516,37 @@ const newlyAddedItems: IFullApplet[] = [
   }
 ];
 
-const spotlightItems = newlyAddedItems;
+// const spotlightItems = newlyAddedItems;
 const mostInstalledItems = newlyAddedItems;
 const starterPackItems = newlyAddedItems;
 
 const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'];
+
+const { isConnected, applets, isConnecting, lastError, connect, state } = useClientApi();
+
+const spotlightItems = ref<IFullApplet[] | null>(null);
+
+onMounted(async () => {
+  console.log('exxtra', isConnecting.value, isConnected.value, lastError.value);
+  if (isConnected.value) {
+    console.log('ik ben connected');
+    spotlightItems.value = await applets?.getAppletsByCategory(categories[0] as ICategory);
+  }
+
+  console.log('spotlightItems', spotlightItems.value);
+});
 </script>
 
 <template>
   <main class="site-wrapper">
+    <div class="border">
+      <pre>connection: {{ isConnected ? 'connected' : 'not connected' }}</pre>
+      <pre>state: {{ state }}</pre>
+      <pre v-if="isConnecting">connecting</pre>
+      <pre v-if="lastError">{{ lastError }}</pre>
+      <button v-if="!isConnected" class="btn" @click="connect">connect</button>
+    </div>
+
     <DText is="h1" size="5xl" class="my-4">{{ toCapitalizeWords(String($route.name)) }}</DText>
 
     <section class="search my-4">
@@ -538,7 +564,7 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
     </section>
 
 
-    (spotlight)<br />
+    <!-- (spotlight)<br />
     Kleine tiles met plaatje links en op max 2 lijnen titel rechts.<br />
     Tiles in grid van max 2 tiles hoog.
 
@@ -548,9 +574,9 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
         tiles met grote plaat, onder titel op max 2 regels. na laatste zichtbare tile is de volgende
         voor 10% zichtbaar
       </div>
-    </section>
+    </section> -->
 
-    <StoreSection v-if="spotlightItems" title="Spotlight">
+    <StoreSection v-if="spotlightItems" title="[Spotlight]">
       <AppletCarousel :applets="spotlightItems">
         <template #item="applet">
           <AppletCard view="vertical" :applet hasCategories>
@@ -560,7 +586,7 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
       </AppletCarousel>
     </StoreSection>
 
-    <StoreSection v-if="newlyAddedItems" title="Newly Added" payoff="New applets added">
+    <StoreSection v-if="newlyAddedItems" title="[Newly Added]" payoff="[New applets added]">
       <AppletCarousel :applets="newlyAddedItems">
         <template #item="applet">
           <AppletCard view="preview" :applet>
@@ -570,11 +596,11 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
       </AppletCarousel>
     </StoreSection>
 
-    <StoreSection v-if="categories" title="Categories">
+    <!-- <StoreSection v-if="categories" title="Categories">
       <CategoryList :categories isInteractive />
-    </StoreSection>
+    </StoreSection> -->
 
-    <StoreSection v-if="mostInstalledItems" title="Most Installed" payoff="Most installed applets">
+    <StoreSection v-if="mostInstalledItems" title="[Most Installed]" payoff="[Most installed applets]">
       <AppletCarousel :applets="mostInstalledItems">
         <template #item="applet">
           <AppletCard view="preview" :applet>
@@ -586,8 +612,8 @@ const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'
 
     <StoreSection
       v-if="starterPackItems"
-      title="Starter Pack"
-      payoff="Start here with these applets"
+      title="[Starter Pack]"
+      payoff="[Start here with these applets]"
     >
       <AppletCarousel :applets="starterPackItems">
         <template #item="applet">

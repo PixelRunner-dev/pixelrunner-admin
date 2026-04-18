@@ -9,9 +9,9 @@ const { title, payoff }: Props = defineProps<Props>();
 
 <template>
   <section class="component--store-selection">
-    <hgroup>
-      <h2>{{ title }}</h2>
-      <p v-if="payoff">{{ payoff }}</p>
+    <hgroup class="mt-8 my-1">
+      <h2 class="text-3xl">{{ title }}</h2>
+      <p v-if="payoff" class="text-lg">{{ payoff }}</p>
     </hgroup>
 
     <slot />
