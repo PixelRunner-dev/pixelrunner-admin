@@ -138,7 +138,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/btcfagi.webp',
+      src: 'https://applets.pixelrunner.dev/btcfagi.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -157,7 +157,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/amazing.webp',
+      src: 'https://applets.pixelrunner.dev/amazing.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -176,7 +176,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/arcadeclassics.webp',
+      src: 'https://applets.pixelrunner.dev/arcadeclassics.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -195,7 +195,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/bitcointicker.webp',
+      src: 'https://applets.pixelrunner.dev/bitcointicker.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -214,7 +214,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/btcdifficulty.webp',
+      src: 'https://applets.pixelrunner.dev/btcdifficulty.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -233,7 +233,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/usdebtclock.webp',
+      src: 'https://applets.pixelrunner.dev/usdebtclock.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -252,7 +252,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/btcmoscowtime.webp',
+      src: 'https://applets.pixelrunner.dev/btcmoscowtime.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -271,7 +271,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/buienradar.webp',
+      src: 'https://applets.pixelrunner.dev/buienradar.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -290,7 +290,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/daynightmap.webp',
+      src: 'https://applets.pixelrunner.dev/daynightmap.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -309,7 +309,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/homerhiding.webp',
+      src: 'https://applets.pixelrunner.dev/homerhiding.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -328,7 +328,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/knmialert.webp',
+      src: 'https://applets.pixelrunner.dev/knmialert.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -347,7 +347,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/lastfm.webp',
+      src: 'https://applets.pixelrunner.dev/lastfm.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -366,7 +366,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/mempool.webp',
+      src: 'https://applets.pixelrunner.dev/mempool.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -385,7 +385,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/nos.webp',
+      src: 'https://applets.pixelrunner.dev/nos.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -404,7 +404,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/nunl.webp',
+      src: 'https://applets.pixelrunner.dev/nunl.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -423,7 +423,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/nyancat.webp',
+      src: 'https://applets.pixelrunner.dev/nyancat.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -442,7 +442,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/skynews.webp',
+      src: 'https://applets.pixelrunner.dev/skynews.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -461,7 +461,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/solaredgemonitor.webp',
+      src: 'https://applets.pixelrunner.dev/solaredgemonitor.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -480,7 +480,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/sonicthehedgehogclock.webp',
+      src: 'https://applets.pixelrunner.dev/sonicthehedgehogclock.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
@@ -499,7 +499,7 @@ const newlyAddedItems: IFullApplet[] = [
     fileName: 'file-name.webp',
     packageName: 'myApp',
     defaultImage: {
-      src: '/.webp/starfield.webp',
+      src: 'https://applets.pixelrunner.dev/starfield.webp',
       alt: 'alt',
       dateCreated: new Date()
     },
