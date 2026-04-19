@@ -144,7 +144,8 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     ];
     this.sendAction = action[0];
     const receiver = action[1];
-    receiver((data: string, _peerId: string) => {
+    receiver((data: string, peerId: string) => {
+      console.log('[trystero] received:', peerId, data);
       this.handleTransportMessage(data);
     });
   }
