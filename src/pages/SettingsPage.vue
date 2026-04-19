@@ -20,7 +20,7 @@ import {
 } from '(vendor)/daisy-ui-kit/index.ts';
 
 import { CookieStore } from '@/utils/CookieStore';
-import LocationSearch, { type LocationResult } from '@/components/Form/SettingFields/LocationSearch.vue';
+import LocationSearch from '@/components/Form/SettingFields/LocationSearch.vue';
 
 import { toCamelCase, toCapitalizeWords, vibrateDevice } from '@/utils/generic.ts';
 
@@ -55,7 +55,7 @@ async function doFirmwareUpdate() {
   console.log('doFirmwareUpdate');
 
   try {
-    const status = await device.status();
+    const status = await device?.status();
     console.log('Device status:', status);
     // Continue with firmware update logic
   } catch (error) {
@@ -80,7 +80,7 @@ async function doReboot() {
   //   console.log('Rebooting device');
   // }, 3000);
   try {
-    const result = await device.reboot();
+    const result = await device?.reboot();
     console.log('reboot result', result);
   } catch (error) {
     console.error('Reboot failed:', error);
@@ -192,7 +192,7 @@ const alarmTime = ref('08:00');
 const theme = ref(CookieStore.get('theme') || themesLight.value[0]);
 
 onMounted(async () => {
-  const allSettings = await settings.getAll();
+  const allSettings = await settings?.getAll();
 
   console.log('allSettings', allSettings);
 
