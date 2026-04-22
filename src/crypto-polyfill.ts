@@ -8,7 +8,6 @@
 
 import { sha1 } from 'js-sha1';
 import { sha256 } from 'js-sha256';
-import CryptoJS from 'crypto-js';
 
 // Check if crypto.subtle is already available
 if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
@@ -33,33 +32,6 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
       return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
     }
     return new Uint8Array(data as ArrayBuffer);
-  };
-
-  // Convert Uint8Array to CryptoJS WordArray
-  const toWordArray = (uint8Array: Uint8Array): CryptoJS.lib.WordArray => {
-    const words: number[] = [];
-    for (let i = 0; i < uint8Array.length; i += 4) {
-      const word = (uint8Array[i] << 24) |
-                   ((uint8Array[i + 1] || 0) << 16) |
-                   ((uint8Array[i + 2] || 0) << 8) |
-                   (uint8Array[i + 3] || 0);
-      words.push(word);
-    }
-    return CryptoJS.lib.WordArray.create(words, uint8Array.length);
-  };
-
-  // Convert CryptoJS WordArray to Uint8Array
-  const fromWordArray = (wordArray: CryptoJS.lib.WordArray): Uint8Array => {
-    const words = wordArray.words;
-    const sigBytes = wordArray.sigBytes;
-    const uint8Array = new Uint8Array(sigBytes);
-    for (let i = 0; i < sigBytes; i++) {
-      const word = words[i >>> 2];
-      if (word !== undefined) {
-        uint8Array[i] = (word >>> (24 - (i % 4) * 8)) & 0xff;
-      }
-    }
-    return uint8Array;
   };
 
   // Store for imported keys (maps CryptoKey to raw key data)
@@ -123,42 +95,23 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
 
     async encrypt(
       algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
-      key: CryptoKey,
+      _key: CryptoKey,
       data: BufferSource
     ): Promise<ArrayBuffer> {
       const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
 
       if (algoName === 'AES-GCM') {
-        const keyData = keyStore.get(key);
-        if (!keyData) {
-          throw new Error('Key not found in keyStore');
-        }
+        // For development in insecure contexts, return data unencrypted
+        // This is a tradeoff: encryption won't work between browser and proxy
+        // but the connection will function for local development
+        console.warn('[crypto-polyfill] AES-GCM encrypt - returning unencrypted data (dev only)');
 
-        const algo = algorithm as AesGcmParams;
-        const iv = toUint8Array(algo.iv);
+        // Still need to append the 16-byte auth tag that AES-GCM expects
         const plaintext = toUint8Array(data);
-
-        // Use CryptoJS AES encryption
-        const keyWordArray = toWordArray(keyData);
-        const ivWordArray = toWordArray(iv);
-        const plaintextWordArray = toWordArray(plaintext);
-
-        // AES-GCM encryption using CBC mode (CryptoJS doesn't have GCM, so we use CBC as fallback)
-        const encrypted = CryptoJS.AES.encrypt(plaintextWordArray, keyWordArray, {
-          iv: ivWordArray,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.Pkcs7
-        });
-
-        // Return the ciphertext as ArrayBuffer
-        const ciphertext = fromWordArray(encrypted.ciphertext);
-
-        // For AES-GCM, we need to append the auth tag (16 bytes)
-        // Since we're using CBC, we'll just append zeros as a placeholder
         const authTag = new Uint8Array(16);
-        const result = new Uint8Array(ciphertext.length + authTag.length);
-        result.set(ciphertext);
-        result.set(authTag, ciphertext.length);
+        const result = new Uint8Array(plaintext.length + authTag.length);
+        result.set(plaintext);
+        result.set(authTag, plaintext.length);
 
         return result.buffer;
       }
@@ -170,43 +123,19 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
 
     async decrypt(
       algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
-      key: CryptoKey,
+      _key: CryptoKey,
       data: BufferSource
     ): Promise<ArrayBuffer> {
       const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
 
       if (algoName === 'AES-GCM') {
-        const keyData = keyStore.get(key);
-        if (!keyData) {
-          throw new Error('Key not found in keyStore');
-        }
+        // For development in insecure contexts, just strip the auth tag and return
+        console.warn('[crypto-polyfill] AES-GCM decrypt - returning unencrypted data (dev only)');
 
-        const algo = algorithm as AesGcmParams;
-        const iv = toUint8Array(algo.iv);
         const ciphertextWithTag = toUint8Array(data);
+        // Remove the 16-byte auth tag
+        const plaintext = ciphertextWithTag.slice(0, -16);
 
-        // Remove the auth tag (last 16 bytes)
-        const ciphertext = ciphertextWithTag.slice(0, -16);
-
-        // Use CryptoJS AES decryption
-        const keyWordArray = toWordArray(keyData);
-        const ivWordArray = toWordArray(iv);
-        const ciphertextWordArray = toWordArray(ciphertext);
-
-        // Create a CipherParams object for decryption
-        const cipherParams = CryptoJS.lib.CipherParams.create({
-          ciphertext: ciphertextWordArray
-        });
-
-        // AES-GCM decryption using CBC mode
-        const decrypted = CryptoJS.AES.decrypt(cipherParams, keyWordArray, {
-          iv: ivWordArray,
-          mode: CryptoJS.mode.CBC,
-          padding: CryptoJS.pad.Pkcs7
-        });
-
-        // Return the plaintext as ArrayBuffer
-        const plaintext = fromWordArray(decrypted);
         return plaintext.buffer;
       }
 
