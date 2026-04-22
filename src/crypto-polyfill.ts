@@ -8,6 +8,7 @@
 
 import { sha1 } from 'js-sha1';
 import { sha256 } from 'js-sha256';
+import CryptoJS from 'crypto-js';
 
 // Check if crypto.subtle is already available
 if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
@@ -34,6 +35,36 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     return new Uint8Array(data as ArrayBuffer);
   };
 
+  // Convert Uint8Array to CryptoJS WordArray
+  const toWordArray = (uint8Array: Uint8Array): CryptoJS.lib.WordArray => {
+    const words: number[] = [];
+    for (let i = 0; i < uint8Array.length; i += 4) {
+      const word = (uint8Array[i] << 24) |
+                   ((uint8Array[i + 1] || 0) << 16) |
+                   ((uint8Array[i + 2] || 0) << 8) |
+                   (uint8Array[i + 3] || 0);
+      words.push(word);
+    }
+    return CryptoJS.lib.WordArray.create(words, uint8Array.length);
+  };
+
+  // Convert CryptoJS WordArray to Uint8Array
+  const fromWordArray = (wordArray: CryptoJS.lib.WordArray): Uint8Array => {
+    const words = wordArray.words;
+    const sigBytes = wordArray.sigBytes;
+    const uint8Array = new Uint8Array(sigBytes);
+    for (let i = 0; i < sigBytes; i++) {
+      const word = words[i >>> 2];
+      if (word !== undefined) {
+        uint8Array[i] = (word >>> (24 - (i % 4) * 8)) & 0xff;
+      }
+    }
+    return uint8Array;
+  };
+
+  // Store for imported keys (maps CryptoKey to raw key data)
+  const keyStore = new WeakMap<CryptoKey, Uint8Array>();
+
   // SubtleCrypto implementation with real SHA-1 and SHA-256
   const subtleCrypto = {
     async digest(algorithm: AlgorithmIdentifier, data: BufferSource): Promise<ArrayBuffer> {
@@ -54,19 +85,28 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     },
 
     async importKey(
-      _format: KeyFormat,
-      _keyData: BufferSource | JsonWebKey,
+      format: KeyFormat,
+      keyData: BufferSource | JsonWebKey,
       algorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
       extractable: boolean,
       keyUsages: KeyUsage[]
     ): Promise<CryptoKey> {
-      // Return a mock CryptoKey that stores the raw key data
-      return {
+      // Store the raw key data
+      const cryptoKey = {
         type: 'secret',
         extractable,
         algorithm: algorithm as Algorithm,
         usages: keyUsages
       } as CryptoKey;
+
+      // Store the raw key bytes for later use in encrypt/decrypt
+      if (format === 'raw' && keyData instanceof ArrayBuffer) {
+        keyStore.set(cryptoKey, new Uint8Array(keyData));
+      } else if (format === 'raw' && ArrayBuffer.isView(keyData)) {
+        keyStore.set(cryptoKey, toUint8Array(keyData));
+      }
+
+      return cryptoKey;
     },
 
     async deriveBits(
@@ -82,23 +122,96 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     },
 
     async encrypt(
-      _algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
-      _key: CryptoKey,
+      algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
+      key: CryptoKey,
       data: BufferSource
     ): Promise<ArrayBuffer> {
-      // For development, return data as-is
-      // A real implementation would need proper AES encryption
-      console.warn('[crypto-polyfill] encrypt() - returning unencrypted data');
+      const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
+
+      if (algoName === 'AES-GCM') {
+        const keyData = keyStore.get(key);
+        if (!keyData) {
+          throw new Error('Key not found in keyStore');
+        }
+
+        const algo = algorithm as AesGcmParams;
+        const iv = toUint8Array(algo.iv);
+        const plaintext = toUint8Array(data);
+
+        // Use CryptoJS AES encryption
+        const keyWordArray = toWordArray(keyData);
+        const ivWordArray = toWordArray(iv);
+        const plaintextWordArray = toWordArray(plaintext);
+
+        // AES-GCM encryption using CBC mode (CryptoJS doesn't have GCM, so we use CBC as fallback)
+        const encrypted = CryptoJS.AES.encrypt(plaintextWordArray, keyWordArray, {
+          iv: ivWordArray,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+
+        // Return the ciphertext as ArrayBuffer
+        const ciphertext = fromWordArray(encrypted.ciphertext);
+
+        // For AES-GCM, we need to append the auth tag (16 bytes)
+        // Since we're using CBC, we'll just append zeros as a placeholder
+        const authTag = new Uint8Array(16);
+        const result = new Uint8Array(ciphertext.length + authTag.length);
+        result.set(ciphertext);
+        result.set(authTag, ciphertext.length);
+
+        return result.buffer;
+      }
+
+      // Fallback for other algorithms
+      console.warn('[crypto-polyfill] encrypt() - returning unencrypted data for', algoName);
       return toUint8Array(data).buffer;
     },
 
     async decrypt(
-      _algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
-      _key: CryptoKey,
+      algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
+      key: CryptoKey,
       data: BufferSource
     ): Promise<ArrayBuffer> {
-      // For development, return data as-is
-      console.warn('[crypto-polyfill] decrypt() - returning data as-is');
+      const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
+
+      if (algoName === 'AES-GCM') {
+        const keyData = keyStore.get(key);
+        if (!keyData) {
+          throw new Error('Key not found in keyStore');
+        }
+
+        const algo = algorithm as AesGcmParams;
+        const iv = toUint8Array(algo.iv);
+        const ciphertextWithTag = toUint8Array(data);
+
+        // Remove the auth tag (last 16 bytes)
+        const ciphertext = ciphertextWithTag.slice(0, -16);
+
+        // Use CryptoJS AES decryption
+        const keyWordArray = toWordArray(keyData);
+        const ivWordArray = toWordArray(iv);
+        const ciphertextWordArray = toWordArray(ciphertext);
+
+        // Create a CipherParams object for decryption
+        const cipherParams = CryptoJS.lib.CipherParams.create({
+          ciphertext: ciphertextWordArray
+        });
+
+        // AES-GCM decryption using CBC mode
+        const decrypted = CryptoJS.AES.decrypt(cipherParams, keyWordArray, {
+          iv: ivWordArray,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7
+        });
+
+        // Return the plaintext as ArrayBuffer
+        const plaintext = fromWordArray(decrypted);
+        return plaintext.buffer;
+      }
+
+      // Fallback for other algorithms
+      console.warn('[crypto-polyfill] decrypt() - returning data as-is for', algoName);
       return toUint8Array(data).buffer;
     }
   };
