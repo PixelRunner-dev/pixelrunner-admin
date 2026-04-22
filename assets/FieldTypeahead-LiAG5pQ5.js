@@ -1,0 +1,1 @@
+import{_ as e,c as t,o as c}from"./index-BlsEpZAi.js";const o={},n={class:"component--field-typeahead"};function a(s,r){return c(),t("div",n," [not implemented yet] ")}const d=e(o,[["render",a]]);export{d as default};
