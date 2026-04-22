@@ -54,6 +54,10 @@ watch(
 
 .applet-image {
   aspect-ratio: 2 / 1;
+  background-image: url(/broken-image.webp);
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: 50%;
   display: flex;
   image-rendering: pixelated;
   mask-image: url('/mask.png');
