@@ -1,1 +1,0 @@
-import{_ as e,c as t,o as n}from"./index-BP-7r3JJ.js";const c={},o={class:"component--field-generated"};function r(s,a){return n(),t("div",o," [not implemented yet] ")}const d=e(c,[["render",r]]);export{d as default};
