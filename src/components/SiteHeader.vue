@@ -18,7 +18,7 @@ import { Flex as DFlex } from '(vendor)/daisy-ui-kit/index.ts';
           <path d="M67.9794884,32.0001994 C68.557103,32.0122276 69.0039369,32.4446408 68.9999738,32.9877134 C68.9960108,33.5524367 68.5343154,34.0083049 67.9745346,33.9998852 C67.4291198,33.9914655 66.9916981,33.5386043 67.0001196,32.9907205 C67.0085411,32.4205845 67.4350644,31.989374 67.9794884,32.0001994 Z" style="fill: var(--color-primary);" fill-rule="nonzero" />
         </svg>
       </router-link>
-      <img src="https://picsum.photos/64/32" alt="" class="w-[50px] aspect-ratio-[2/1] absolute left-[21px] top-[6px] -z-1" />
+      <img src="https://applets.pixelrunner.dev/hashrate.webp" alt="" class="w-[50px] aspect-ratio-[2/1] absolute left-[21px] top-[6px] -z-1" />
     </div>
 
     <DFlex is="nav" justifyCenter itemsCenter>
