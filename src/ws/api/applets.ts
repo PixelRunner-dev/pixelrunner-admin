@@ -5,8 +5,7 @@
  * on the Pixelrunner device.
  */
 
-import type { ICategory, UUID } from 'pixelrunner-shared';
-import type { IFullAppletRecord } from 'pixelrunner-shared';
+import type { ICategory, UUID, IFullAppletRecord } from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
 
 /**

@@ -4,8 +4,8 @@
  * browser and Node.js Trystero clients.
  */
 
-import { ACTION_NAME, APP_ID, NOSTR_RELAYS, ROOM_PREFIX } from '../../constants.ts';
 import type { Room, BaseRoomConfig, RelayConfig, TurnConfig } from 'trystero';
+import { ACTION_NAME, APP_ID, NOSTR_RELAYS, ROOM_PREFIX } from '../../constants.ts';
 
 /**
  * Configuration for creating a Trystero room.
