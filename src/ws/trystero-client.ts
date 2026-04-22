@@ -135,6 +135,18 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.room = trystero.joinRoom(trysteroConfig, roomId);
     console.log('[trystero-client] joinRoom() returned, room object created');
 
+    // Check for existing peers periodically
+    const checkPeers = () => {
+      const getPeers = (this.room as { getPeers?: () => string[] }).getPeers;
+      if (getPeers) {
+        const peers = getPeers();
+        console.log('[trystero-client] Current peers:', peers);
+      }
+    };
+    setTimeout(checkPeers, 2000);
+    setTimeout(checkPeers, 5000);
+    setTimeout(checkPeers, 10000);
+
     // Set up peer join handler
     (this.room as { onPeerJoin: (cb: (peerId: string) => void) => void }).onPeerJoin((peerId) => {
       console.log('[trystero-client] ✅ PEER JOINED:', peerId);
