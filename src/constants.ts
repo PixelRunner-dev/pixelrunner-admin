@@ -12,10 +12,12 @@ import type { IWebSocketConfig } from 'pixelrunner-shared';
 /**
  * Default Nostr relay URLs for Trystero WebRTC signaling.
  * These are used for peer discovery and connection establishment.
+ * Using relays that don't require PoW and are more reliable.
  */
 export const NOSTR_RELAYS = [
   'wss://relay.primal.net',
-  'wss://nos.lol'
+  'wss://nostr.mom',
+  'wss://nostr-relay.psfoundation.info'
   // 'wss://relay.noderunners.network'
 ] as const;
 
