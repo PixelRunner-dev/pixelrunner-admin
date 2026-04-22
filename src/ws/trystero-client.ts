@@ -97,19 +97,32 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   // ============================================================================
 
   protected async connectTransport(): Promise<void> {
+    console.log('[trystero-client] connectTransport() called');
+
     if (!trystero) {
+      console.log('[trystero-client] Loading trystero module...');
       trystero = await import('trystero');
+      console.log('[trystero-client] Trystero module loaded');
     }
 
     const roomId = this.config.roomId || `${ROOM_PREFIX}-default`;
+    console.log('[trystero-client] Room ID:', roomId);
 
     const trysteroConfig: BaseRoomConfig & RelayConfig & TurnConfig = {
-      appId: APP_ID
+      appId: APP_ID,
+      // Add STUN servers for NAT traversal
+      rtcConfig: {
+        iceServers: [
+          { urls: 'stun:stun.cloudflare.com:3478' },
+          { urls: 'stun:openrelay.metered.ca:80' }
+        ]
+      }
     };
 
     // Configure Nostr relays if provided
     if (this.config.relayUrls && this.config.relayUrls.length > 0) {
       trysteroConfig.relayUrls = this.config.relayUrls;
+      console.log('[trystero-client] Relay URLs configured:', this.config.relayUrls);
     }
 
     // Add join secret for authentication if provided
@@ -118,18 +131,18 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     // }
 
     // Create the room (acts as host/join peer)
+    console.log('[trystero-client] About to join room with config:', trysteroConfig, 'roomId:', roomId);
     this.room = trystero.joinRoom(trysteroConfig, roomId);
-
-    console.log('this.room', this.room);
+    console.log('[trystero-client] joinRoom() returned, room object created');
 
     // Set up peer join handler
-    (this.room as { onPeerJoin: (cb: () => void) => void }).onPeerJoin(() => {
-      console.log('[trystero] Peer joined');
+    (this.room as { onPeerJoin: (cb: (peerId: string) => void) => void }).onPeerJoin((peerId) => {
+      console.log('[trystero-client] ✅ PEER JOINED:', peerId);
     });
 
     // Set up peer leave handler
-    (this.room as { onPeerLeave: (cb: () => void) => void }).onPeerLeave(() => {
-      console.log('[trystero] Peer left');
+    (this.room as { onPeerLeave: (cb: (peerId: string) => void) => void }).onPeerLeave((peerId) => {
+      console.log('[trystero-client] Peer left:', peerId);
       this.handleTransportClose(1000, 'Peer left', true);
     });
 
@@ -145,7 +158,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.sendAction = action[0];
     const receiver = action[1];
     receiver((data: string, peerId: string) => {
-      console.log('[trystero] received:', peerId, data);
+      console.log('[trystero-client] Received from peer', peerId, ':', data);
       this.handleTransportMessage(data);
     });
   }
@@ -161,12 +174,14 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   protected send(message: string): void {
     if (this.sendAction) {
-      console.log('this.sendAction', this.sendAction);
+      console.log('[trystero-client] Sending message:', message);
       this.sendAction(message);
 
       if (this.config.debug) {
-        console.log('[trystero] sent:', message);
+        console.log('[trystero-client] Message sent successfully');
       }
+    } else {
+      console.error('[trystero-client] Cannot send - no sendAction available');
     }
   }
 
