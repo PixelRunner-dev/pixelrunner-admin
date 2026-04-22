@@ -1,11 +1,12 @@
 /**
  * crypto.subtle polyfill for insecure contexts (HTTP)
- * Uses js-sha256 for proper SHA-256 hashing
+ * Uses js-sha1 and js-sha256 for proper hashing
  *
  * WARNING: While this provides real cryptographic hashing, it's still
  * recommended to use HTTPS in production for full security.
  */
 
+import { sha1 } from 'js-sha1';
 import { sha256 } from 'js-sha256';
 
 // Check if crypto.subtle is already available
@@ -33,13 +34,18 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     return new Uint8Array(data as ArrayBuffer);
   };
 
-  // SubtleCrypto implementation with real SHA-256
+  // SubtleCrypto implementation with real SHA-1 and SHA-256
   const subtleCrypto = {
     async digest(algorithm: AlgorithmIdentifier, data: BufferSource): Promise<ArrayBuffer> {
       const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
+      const uint8Data = toUint8Array(data);
+
+      if (algoName === 'SHA-1') {
+        const hashHex = sha1(uint8Data);
+        return hexToArrayBuffer(hashHex);
+      }
 
       if (algoName === 'SHA-256') {
-        const uint8Data = toUint8Array(data);
         const hashHex = sha256(uint8Data);
         return hexToArrayBuffer(hashHex);
       }
@@ -104,7 +110,7 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     configurable: false
   });
 
-  console.log('[crypto-polyfill] ✅ crypto.subtle polyfill installed with real SHA-256');
+  console.log('[crypto-polyfill] ✅ crypto.subtle polyfill installed with SHA-1 and SHA-256');
 }
 
 export {};

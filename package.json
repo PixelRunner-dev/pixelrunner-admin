@@ -48,6 +48,7 @@
     "fuse.js": "^7.1.0",
     "i18next": "^25.7.3",
     "i18next-vue": "^5.4.0",
+    "js-sha1": "^0.7.0",
     "js-sha256": "^0.11.1",
     "pixelrunner-shared": "github:PixelRunner-dev/pixelrunner-shared",
     "trystero": "^0.22.0",
