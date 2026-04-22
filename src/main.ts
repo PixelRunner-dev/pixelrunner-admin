@@ -1,3 +1,7 @@
+// IMPORTANT: Import crypto polyfill FIRST, before any other imports
+// This ensures crypto.subtle is available in insecure contexts (HTTP)
+import './crypto-polyfill.ts';
+
 import { createApp } from 'vue';
 import i18next from 'i18next';
 import I18NextVue from 'i18next-vue';
