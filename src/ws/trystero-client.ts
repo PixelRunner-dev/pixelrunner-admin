@@ -183,9 +183,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       }
     };
 
-    while (!this.peerConnected) {
-      setTimeout(checkPeers, 3000);
-    }
+    const checkPeersLoop = () => {
+      checkPeers();
+      if (!this.peerConnected) setTimeout(checkPeersLoop, 3000);
+    };
+    if (!this.peerConnected) checkPeersLoop();
 
     // Create an action for RPC communication
     const actionName = 'rpc';
