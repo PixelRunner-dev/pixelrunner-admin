@@ -213,7 +213,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     const actionName = 'rpc';
     try {
       const action = this.room.makeAction(actionName);
-      console.log('[trystero] makeAction result:', typeof action, 
+      console.log('[trystero] makeAction result:', typeof action,
         Array.isArray(action) ? `[${action.length} elements]` : action);
 
       if (!Array.isArray(action)) {
@@ -221,7 +221,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       }
 
       const [sender, receiver] = action;
-      
+
       if (typeof sender !== 'function') {
         throw new Error(`Sender is not a function: ${typeof sender}`);
       }
@@ -278,6 +278,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   }
 
   protected isTransportConnected(): boolean {
+    console.log('isTransportConnected', this.sendAction, this.peerConnected);
     return this.sendAction !== null && this.peerConnected;
     //this.state.value === 'connected';
   }
