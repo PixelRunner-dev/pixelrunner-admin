@@ -249,9 +249,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       try {
         if (this.room.leave) {
           this.room.leave();
-        } catch (e) {
-          console.log('[trystero] Error leaving room', e);
         }
+      } catch (e) {
+        console.log('[trystero] Error leaving room', e);
       }
       this.room = null;
     }
