@@ -31,6 +31,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   // Private properties specific to Trystero
   private room: unknown = null;
   private sendAction: ((data: string) => void) | null = null;
+  private peerConnected: boolean = false;
 
   constructor(config?: TrysteroConfig) {
     super({
@@ -105,6 +106,8 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       console.log('[trystero-client] Trystero module loaded');
     }
 
+    console.log('[trystero-client] Trystero version check:', (trystero as unknown as { VERSION?: string }).VERSION || 'unknown');
+
     const roomId = this.config.roomId || `${ROOM_PREFIX}-default`;
     console.log('[trystero-client] Room ID:', roomId);
 
@@ -135,44 +138,81 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.room = trystero.joinRoom(trysteroConfig, roomId);
     console.log('[trystero-client] joinRoom() returned, room object created');
 
+    // IMPORTANT: Use promise-based peer discovery
+    // Trystero v0.22+ has a promise that resolves when peers join
+    const roomAny = this.room;
+
+    if (roomAny.onPeerJoin) {
+      roomAny.onPeerJoin((peerId: string) => {
+        console.log('[trystero-client] Peer joined:', peerId);
+        this.peerConnected = true;
+        this.handleOpen();
+      });
+    }
+    if (roomAny.onPeerLeave) {
+      roomAny.onPeerLeave((peerId: string) => {
+        console.log('[trystero-client] Peer left:', peerId);
+        this.peerConnected = false;
+        this.handleTransportClose(1000, 'Peer left', true);
+      });
+    }
+    if (roomAny.onError) {
+      roomAny.onError((error: Error) => {
+        console.error('[trystero-client] Room error:', error);
+        this.handleTransportError(error);
+      });
+    }
+    if (roomAny.getPeers) {
+      const existingPeers = roomAny.getPeers();
+      console.log('[trystero-client] Existing peers:', existingPeers);
+      if (existingPeers.length > 0) {
+        this.peerConnected = true;
+        this.handleOpen();
+      }
+    }
+
     // Check for existing peers periodically
     const checkPeers = () => {
-      const getPeers = (this.room as { getPeers?: () => string[] }).getPeers;
-      if (getPeers) {
-        const peers = getPeers();
+      if (roomAny.getPeers) {
+        const peers = roomAny.getPeers();
         console.log('[trystero-client] Current peers:', peers);
+        if (peers.length > 0 && !this.peerConnected) {
+          this.peerConnected = true;
+          this.handleOpen();
+        }
       }
     };
-    setTimeout(checkPeers, 2000);
-    setTimeout(checkPeers, 5000);
-    setTimeout(checkPeers, 10000);
-
-    // Set up peer join handler
-    (this.room as { onPeerJoin: (cb: (peerId: string) => void) => void }).onPeerJoin((peerId) => {
-      console.log('[trystero-client] ✅ PEER JOINED:', peerId);
-    });
-
-    // Set up peer leave handler
-    (this.room as { onPeerLeave: (cb: (peerId: string) => void) => void }).onPeerLeave((peerId) => {
-      console.log('[trystero-client] Peer left:', peerId);
-      this.handleTransportClose(1000, 'Peer left', true);
-    });
+    setTimeout(checkPeers, 3000);
+    setTimeout(checkPeers, 6000);
+    setTimeout(checkPeers, 9000);
+    setTimeout(checkPeers, 12000);
+    setTimeout(checkPeers, 15000);
+    setTimeout(checkPeers, 18000);
+    setTimeout(checkPeers, 21000);
 
     // Create an action for RPC communication
     const actionName = 'rpc';
-    const action = (this.room as { makeAction: (name: string) => unknown }).makeAction(
-      actionName
-    ) as unknown as [
-      (data: string) => void,
-      (handler: (data: string, peerId: string) => void) => void,
-      (progress: unknown) => void
-    ];
-    this.sendAction = action[0];
-    const receiver = action[1];
-    receiver((data: string, peerId: string) => {
-      console.log('[trystero-client] Received from peer', peerId, ':', data);
-      this.handleTransportMessage(data);
-    });
+    try {
+      const action = roomAny.makeAction(actionName);
+      console.log('[trystero-client] makeAction result type:', typeof action, Array.isArray(action));
+
+      if (Array.isArray(action) && action.length >= 2) {
+        this.sendAction = action[0];
+        const receiver = action[1];
+
+        receiver((data: string, peerId: string) => {
+          console.log('[trystero-client] Received from peer', peerId, ':', data);
+          this.handleTransportMessage(data);
+        });
+
+        console.log('[trystero-client] Action handlers set up successfully');
+      } else {
+        console.error('[trystero-client] Unexpected makeAction result:', action);
+      }
+    } catch (error) {
+      console.error('[trystero-client] makeAction error:', error);
+      throw error;
+    }
   }
 
   protected disconnectTransport(): void {
@@ -198,7 +238,8 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   }
 
   protected isTransportConnected(): boolean {
-    return this.sendAction !== null && this.state.value === 'connected';
+    return this.sendAction !== null && this.peerConnected;
+    //this.state.value === 'connected';
   }
 
   protected handleTransportError(error: unknown): void {
