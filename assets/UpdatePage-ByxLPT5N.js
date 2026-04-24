@@ -1,0 +1,1 @@
+import{_ as t,c as a,k as n,o}from"./index-BkFJCdVh.js";const r={};function s(c,e){return o(),a("main",null,[...e[0]||(e[0]=[n("h1",null,"Update",-1)])])}const _=t(r,[["render",s]]);export{_ as default};
