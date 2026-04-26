@@ -209,12 +209,43 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   }
 
   private async setupRpcAction(): Promise<void> {
+
+
+
+/////////////////////////////////////////////////////////////
+    // After room = joinRoom(...)
+    console.log('🔍 Room internal state:', {
+      roomId: this.room._roomId,
+      appId: this.room._appId,
+      relays: this.room._relayUrls,
+      peerCount: Object.keys(this.room.getPeers()).length
+    });
+
+    // Also try to manually trigger peer discovery
+    if (this.room._discoverPeers) {
+      console.log('📡 Triggering manual peer discovery...');
+      this.room._discoverPeers();
+    }
+/////////////////////////////////////////////////////////////
+
+
+
     // Create an action for RPC communication
     const actionName = 'rpc';
     try {
       const action = this.room.makeAction(actionName);
       console.log('[trystero] makeAction result:', typeof action,
         Array.isArray(action) ? `[${action.length} elements]` : action);
+
+/////////////////////////////////////////////////////////////
+console.log('🔧 Action result:', {
+  isArray: Array.isArray(action),
+  length: Array.isArray(action) ? action.length : 'N/A',
+  sendType: typeof action[0],
+  recvType: typeof action[1]
+});
+/////////////////////////////////////////////////////////////
+
 
       if (!Array.isArray(action)) {
         throw new Error(`makeAction returned unexpected type: ${typeof action}`);
@@ -264,8 +295,8 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   protected send(message: string): void {
     if (!this.sendAction) {
-      throw new Error('Not connected to peer');
       console.error('[trystero-client] Cannot send - no sendAction available');
+      throw new Error('Not connected to peer');
     }
 
     if (!this.peerConnected) {
@@ -278,7 +309,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   }
 
   protected isTransportConnected(): boolean {
-    console.log('isTransportConnected', this.sendAction, this.peerConnected);
+    console.log('isTransportConnected', this.peerConnected);
     return this.sendAction !== null && this.peerConnected;
     //this.state.value === 'connected';
   }
