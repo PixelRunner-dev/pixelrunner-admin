@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
-import { useClientApi } from '@/ws/index.ts';
+import { JsonRpcError, useClientApi } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
 
 import type { IPlaylist } from 'pixelrunner-shared';
+
+const CONTROLLER_RETRY_DELAY_MS = 2000;
 
 const activePlaylist = ref<IPlaylist>();
 const isLoading = ref(false);
 const loadError = ref<string | null>(null);
 const hasLoadAttempted = ref(false);
+let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
 const { isConnected, state, lastError, playlists } = useClientApi();
 const isWaitingForPeer = computed(() => (
@@ -30,6 +33,42 @@ const debugState = computed(() => ({
   playlistAppletCount: activePlaylist.value?.applets.length ?? 0
 }));
 
+function clearRetryTimer() {
+  if (!retryTimer) {
+    return;
+  }
+
+  clearTimeout(retryTimer);
+  retryTimer = null;
+}
+
+function isTransientControllerError(error: unknown): boolean {
+  if (error instanceof JsonRpcError) {
+    return error.code === 'service_unavailable';
+  }
+
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return (
+    error.message.includes('ECONNREFUSED') ||
+    error.message.includes('Controller unavailable') ||
+    error.message.includes('Controller socket not available')
+  );
+}
+
+function scheduleRetry() {
+  if (retryTimer || !isConnected.value) {
+    return;
+  }
+
+  retryTimer = setTimeout(() => {
+    retryTimer = null;
+    void loadActivePlaylist();
+  }, CONTROLLER_RETRY_DELAY_MS);
+}
+
 async function loadActivePlaylist() {
   if (!playlists || !isConnected.value || isLoading.value) {
     console.log('[ListPage] Skipping active playlist load', {
@@ -43,6 +82,7 @@ async function loadActivePlaylist() {
   isLoading.value = true;
   loadError.value = null;
   hasLoadAttempted.value = true;
+  clearRetryTimer();
   console.log('[ListPage] Requesting active playlist');
 
   try {
@@ -56,7 +96,12 @@ async function loadActivePlaylist() {
     }
   } catch (error) {
     activePlaylist.value = undefined;
-    loadError.value = error instanceof Error ? error.message : 'Failed to load active playlist';
+    if (isTransientControllerError(error)) {
+      loadError.value = 'Waiting for device controller...';
+      scheduleRetry();
+    } else {
+      loadError.value = error instanceof Error ? error.message : 'Failed to load active playlist';
+    }
     console.error('[ListPage] Failed to load active playlist:', error);
   } finally {
     isLoading.value = false;
@@ -69,6 +114,10 @@ onMounted(() => {
 
 watch(isConnected, (connected) => {
   console.log('[ListPage] Connection state changed:', connected);
+  if (!connected) {
+    clearRetryTimer();
+  }
+
   if (connected && !activePlaylist.value) {
     void loadActivePlaylist();
   }
@@ -84,6 +133,10 @@ watch(state, (nextState) => {
 watch(lastError, (error) => {
   if (!error) return;
   console.error('[ListPage] Client error observed:', error);
+});
+
+onBeforeUnmount(() => {
+  clearRetryTimer();
 });
 </script>
 
