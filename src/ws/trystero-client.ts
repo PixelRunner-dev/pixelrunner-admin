@@ -1,5 +1,5 @@
 import type { BaseRoomConfig, RelayConfig, TurnConfig } from 'trystero';
-import { DEFAULT_WEBSOCKET_CONFIG, APP_ID, DEFAULT_TIMEOUT, ROOM_PREFIX } from '../constants.ts';
+import { ACTION_NAME, DEFAULT_WEBSOCKET_CONFIG, APP_ID, DEFAULT_TIMEOUT, ROOM_PREFIX, ROOM_PASSWORD } from '../constants.ts';
 import { BaseWebSocketClient } from './base-client.ts';
 
 import type {
@@ -10,8 +10,40 @@ import type {
   IErrorEvent
 } from 'pixelrunner-shared';
 
+const ICE_SERVERS = [
+  { urls: 'stun:stun.cloudflare.com:3478' },
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun3.l.google.com:19302' },
+  { urls: 'stun:stun4.l.google.com:19302' },
+  { urls: 'stun:stun.xs4all.nl:3478' },
+  { urls: "stun:stun.relay.metered.ca:80" },
+  {
+    urls: [
+      "turn:europe.relay.metered.ca:80",
+      "turn:europe.relay.metered.ca:80?transport=tcp",
+      "turn:europe.relay.metered.ca:443",
+      "turns:europe.relay.metered.ca:443?transport=tcp",
+    ],
+    username: "73e194280dcd4bcaa50e24d0",
+    credential: "ILDh2OILkNzXQxFP"
+  }
+];
+
 // Dynamic import for Trystero to handle potential SSR
 let trystero: typeof import('trystero') | null = null;
+
+interface TrysteroRoomLike {
+  leave?: () => void;
+  getPeers?: () => string[] | Record<string, unknown>;
+  onPeerJoin?: (handler: (peerId: string) => void) => void;
+  onPeerLeave?: (handler: (peerId: string) => void) => void;
+  onError?: (handler: (error: Error) => void) => void;
+  onStream?: (handler: (stream: MediaStream, peerId: string) => void) => void;
+  onSignalingReady?: (handler: () => void) => void;
+  makeAction: (actionName: string) => unknown;
+}
 
 /**
  * Configuration for Trystero-based WebRTC connections
@@ -29,8 +61,8 @@ export interface TrysteroConfig extends IWebSocketConfig {
  */
 export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   // Private properties specific to Trystero
-  private room: unknown = null;
-  private sendAction: ((data: string) => void) | null = null;
+  private room: TrysteroRoomLike | null = null;
+  private sendAction: ((data: string, peerId?: string) => void) | null = null;
   private receiveAction: ((data: string, peerId: string) => void) | null = null;
   private peerConnected: boolean = false;
   private connectionCheckInterval: ReturnType<typeof setInterval> | null = null;
@@ -115,12 +147,10 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     const trysteroConfig: BaseRoomConfig & RelayConfig & TurnConfig = {
       appId: APP_ID,
+      password: ROOM_PASSWORD,
       // Add STUN servers for NAT traversal
       rtcConfig: {
-        iceServers: [
-          { urls: 'stun:stun.cloudflare.com:3478' },
-          { urls: 'stun:openrelay.metered.ca:80' }
-        ]
+        iceServers: ICE_SERVERS
       }
     };
 
@@ -168,9 +198,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       });
     } else console.log('[trystero-client] No onError event found');
     if (this.room.getPeers) {
-      const existingPeers = this.room.getPeers();
-      console.log('[trystero-client] Existing peers:', existingPeers);
-      if (existingPeers.length > 0) {
+      const existingPeerCount = this.getPeerCount();
+      console.log('[trystero-client] Existing peers:', this.room.getPeers());
+      if (existingPeerCount > 0) {
         this.peerConnected = true;
         this.handleOpen();
       }
@@ -190,12 +220,16 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   private startPeerMonitoring(): void {
     this.connectionCheckInterval = setInterval(() => {
       if (this.room && this.room?.getPeers) {
-        const peers = this.room.getPeers();
-        console.log('[trystero-client] Peer check', peers.length, 'peers', peers);
-        if (peers.length > 0 && !this.peerConnected) {
+        const peerCount = this.getPeerCount();
+        console.log('[trystero-client] Peer check', peerCount, 'peers', this.room.getPeers());
+        if (peerCount > 0 && !this.peerConnected) {
           console.log('[trystero-client] First peer detected');
           this.peerConnected = true;
           this.handleOpen();
+        } else if (peerCount === 0 && this.peerConnected) {
+          console.log('[trystero-client] No peers detected');
+          this.peerConnected = false;
+          this.handleTransportClose(1000, 'Peer disconnected', true);
         }
       }
     }, 2000);
@@ -209,43 +243,15 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   }
 
   private async setupRpcAction(): Promise<void> {
-
-
-
-/////////////////////////////////////////////////////////////
-    // After room = joinRoom(...)
-    console.log('🔍 Room internal state:', {
-      roomId: this.room._roomId,
-      appId: this.room._appId,
-      relays: this.room._relayUrls,
-      peerCount: Object.keys(this.room.getPeers()).length
-    });
-
-    // Also try to manually trigger peer discovery
-    if (this.room._discoverPeers) {
-      console.log('📡 Triggering manual peer discovery...');
-      this.room._discoverPeers();
-    }
-/////////////////////////////////////////////////////////////
-
-
-
     // Create an action for RPC communication
-    const actionName = 'rpc';
+    if (!this.room) {
+      throw new Error('No Trystero room available');
+    }
+
     try {
-      const action = this.room.makeAction(actionName);
+      const action = this.room.makeAction(ACTION_NAME);
       console.log('[trystero] makeAction result:', typeof action,
         Array.isArray(action) ? `[${action.length} elements]` : action);
-
-/////////////////////////////////////////////////////////////
-console.log('🔧 Action result:', {
-  isArray: Array.isArray(action),
-  length: Array.isArray(action) ? action.length : 'N/A',
-  sendType: typeof action[0],
-  recvType: typeof action[1]
-});
-/////////////////////////////////////////////////////////////
-
 
       if (!Array.isArray(action)) {
         throw new Error(`makeAction returned unexpected type: ${typeof action}`);
@@ -359,6 +365,8 @@ console.log('🔧 Action result:', {
       console.log('[trystero] closed:', code, reason);
     }
 
+    this.peerConnected = false;
+
     // Use base class handleClose which handles reconnection logic
     this.handleClose(code, reason, wasClean);
   }
@@ -411,6 +419,23 @@ console.log('🔧 Action result:', {
     }
 
     return Object.values(relayStatus).some(v => v);
+  }
+
+  private getPeerCount(): number {
+    if (!this.room?.getPeers) {
+      return 0;
+    }
+
+    const peers = this.room.getPeers();
+    if (Array.isArray(peers)) {
+      return peers.length;
+    }
+
+    if (peers && typeof peers === 'object') {
+      return Object.keys(peers).length;
+    }
+
+    return 0;
   }
 
 }

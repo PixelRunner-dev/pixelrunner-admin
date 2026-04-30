@@ -37,6 +37,11 @@ export const ACTION_NAME = 'rpc';
  */
 export const ROOM_PREFIX = 'pixelrunner';
 
+/**
+ * Default password for Trystero rooms.
+ */
+export const ROOM_PASSWORD = import.meta.env.ROOM_PASSWORD || 'your-secure-password-change-me';
+
 // ============================================================================
 // WebSocket Configuration Constants
 // ============================================================================
