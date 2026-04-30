@@ -33,6 +33,7 @@ const ICE_SERVERS = [
 
 // Dynamic import for Trystero to handle potential SSR
 let trystero: typeof import('trystero') | null = null;
+let relaySocketDebugInstalled = false;
 
 interface TrysteroRoomLike {
   leave?: () => void;
@@ -176,6 +177,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   protected async connectTransport(): Promise<void> {
     console.log('[trystero-client] connectTransport() called');
+    this.installRelaySocketDebugging();
 
     if (!trystero) {
       console.log('[trystero-client] Loading trystero module...');
@@ -543,6 +545,61 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     }
 
     return Array.from(buffer).map((value) => value.toString(36)).join('');
+  }
+
+  private installRelaySocketDebugging(): void {
+    if (relaySocketDebugInstalled || typeof window === 'undefined' || typeof window.WebSocket === 'undefined') {
+      return;
+    }
+
+    const relayUrls = new Set(this.config.relayUrls || []);
+    const NativeWebSocket = window.WebSocket;
+
+    class DebugWebSocket extends NativeWebSocket {
+      constructor(url: string | URL, protocols?: string | string[]) {
+        super(url, protocols);
+
+        const normalizedUrl = typeof url === 'string' ? url : url.toString();
+        if (!relayUrls.has(normalizedUrl)) {
+          return;
+        }
+
+        console.log('[trystero-client] Relay socket created:', normalizedUrl);
+
+        this.addEventListener('open', () => {
+          console.log('[trystero-client] Relay socket open:', normalizedUrl);
+        });
+
+        this.addEventListener('close', (event) => {
+          console.log('[trystero-client] Relay socket close:', normalizedUrl, {
+            code: event.code,
+            reason: event.reason,
+            wasClean: event.wasClean
+          });
+        });
+
+        this.addEventListener('error', () => {
+          console.log('[trystero-client] Relay socket error:', normalizedUrl);
+        });
+
+        this.addEventListener('message', (event) => {
+          console.log('[trystero-client] Relay socket message:', normalizedUrl, String(event.data).slice(0, 300));
+        });
+      }
+
+      override send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
+        const url = this.url;
+        if (relayUrls.has(url)) {
+          console.log('[trystero-client] Relay socket send:', url, String(data).slice(0, 300));
+        }
+
+        super.send(data);
+      }
+    }
+
+    window.WebSocket = DebugWebSocket as typeof WebSocket;
+    relaySocketDebugInstalled = true;
+    console.log('[trystero-client] Relay socket debugging installed');
   }
 
 }
