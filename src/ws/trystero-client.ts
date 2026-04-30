@@ -117,6 +117,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         if (settled) return;
         settled = true;
         cleanup();
+        this.lastError.value = error;
+        this.emit('error', {
+          error,
+          fatal: true
+        });
         this.stopPeerMonitoring();
         this.disconnectTransport();
         this.state.value = 'error';
@@ -196,6 +201,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     if (this.config.relayUrls && this.config.relayUrls.length > 0) {
       trysteroConfig.relayUrls = this.config.relayUrls;
       console.log('[trystero-client] Relay URLs configured:', this.config.relayUrls);
+      console.log('[trystero-client] Checking relay health...');
       const relayHealth = await this.checkRelayHealth();
       console.log('[trystero-client] Relay health:', relayHealth);
       if (!Object.values(relayHealth).some(Boolean)) {
