@@ -87,6 +87,22 @@ i18next
     app.use(router);
     app.mount('#app');
 
+    wsClient.on('connected', (event) => {
+      console.log('[main] Client connected:', event);
+    });
+
+    wsClient.on('disconnected', (event) => {
+      console.log('[main] Client disconnected:', event);
+    });
+
+    wsClient.on('reconnecting', (event) => {
+      console.log('[main] Client reconnecting:', event);
+    });
+
+    wsClient.on('error', (event) => {
+      console.error('[main] Client error:', event.error);
+    });
+
     // Auto-connect WebSocket
     wsClient.connect().catch((err) => {
       console.error('Failed to connect to WebSocket:', err);

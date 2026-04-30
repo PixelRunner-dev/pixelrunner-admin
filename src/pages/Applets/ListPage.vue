@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
 import { useClientApi } from '@/ws/index.ts';
@@ -10,8 +10,15 @@ import type { IPlaylist } from 'pixelrunner-shared';
 const activePlaylist = ref<IPlaylist>();
 const isLoading = ref(false);
 const loadError = ref<string | null>(null);
+const hasLoadAttempted = ref(false);
 
-const { isConnected, playlists } = useClientApi();
+const { isConnected, state, lastError, playlists } = useClientApi();
+const isWaitingForPeer = computed(() => (
+  !activePlaylist.value &&
+  !isLoading.value &&
+  !loadError.value &&
+  (state.value === 'connecting' || state.value === 'reconnecting' || !hasLoadAttempted.value)
+));
 
 async function loadActivePlaylist() {
   if (!playlists || !isConnected.value || isLoading.value) {
@@ -25,6 +32,7 @@ async function loadActivePlaylist() {
 
   isLoading.value = true;
   loadError.value = null;
+  hasLoadAttempted.value = true;
   console.log('[ListPage] Requesting active playlist');
 
   try {
@@ -55,6 +63,18 @@ watch(isConnected, (connected) => {
     void loadActivePlaylist();
   }
 }, { immediate: true });
+
+watch(state, (nextState) => {
+  console.log('[ListPage] Client state changed:', nextState, {
+    isConnected: isConnected.value,
+    lastError: lastError.value?.message ?? null
+  });
+});
+
+watch(lastError, (error) => {
+  if (!error) return;
+  console.error('[ListPage] Client error observed:', error);
+});
 </script>
 
 <template>
@@ -63,6 +83,7 @@ watch(isConnected, (connected) => {
 
     <PlayList v-if="activePlaylist" v-bind="activePlaylist" />
     <p v-else-if="isLoading" class="m-4 text-center">Loading active playlist...</p>
+    <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>
     <p v-else-if="loadError" class="m-4 text-center text-error">{{ loadError }}</p>
     <p v-else class="m-4 text-center">No active playlist available.</p>
 
