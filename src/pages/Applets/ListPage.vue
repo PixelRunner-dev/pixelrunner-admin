@@ -19,6 +19,16 @@ const isWaitingForPeer = computed(() => (
   !loadError.value &&
   (state.value === 'connecting' || state.value === 'reconnecting' || !hasLoadAttempted.value)
 ));
+const debugState = computed(() => ({
+  clientState: state.value,
+  isConnected: isConnected.value,
+  isLoading: isLoading.value,
+  hasLoadAttempted: hasLoadAttempted.value,
+  loadError: loadError.value,
+  lastClientError: lastError.value?.message ?? null,
+  playlistName: activePlaylist.value?.name ?? null,
+  playlistAppletCount: activePlaylist.value?.applets.length ?? 0
+}));
 
 async function loadActivePlaylist() {
   if (!playlists || !isConnected.value || isLoading.value) {
@@ -86,6 +96,18 @@ watch(lastError, (error) => {
     <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>
     <p v-else-if="loadError" class="m-4 text-center text-error">{{ loadError }}</p>
     <p v-else class="m-4 text-center">No active playlist available.</p>
+
+    <section class="debug-panel m-4 p-3 rounded-box bg-base-200 text-xs font-mono">
+      <h2 class="mb-2 text-sm font-bold">Connection Debug</h2>
+      <p>clientState: {{ debugState.clientState }}</p>
+      <p>isConnected: {{ debugState.isConnected }}</p>
+      <p>isLoading: {{ debugState.isLoading }}</p>
+      <p>hasLoadAttempted: {{ debugState.hasLoadAttempted }}</p>
+      <p>loadError: {{ debugState.loadError ?? 'null' }}</p>
+      <p>lastClientError: {{ debugState.lastClientError ?? 'null' }}</p>
+      <p>playlistName: {{ debugState.playlistName ?? 'null' }}</p>
+      <p>playlistAppletCount: {{ debugState.playlistAppletCount }}</p>
+    </section>
 
     <div class="text-center m-4">
       <router-link to="/store" class="btn btn-primary btn-wide" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">

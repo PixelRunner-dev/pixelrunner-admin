@@ -41,6 +41,7 @@ interface TrysteroRoomLike {
   onPeerLeave?: (handler: (peerId: string) => void) => void;
   onError?: (handler: (error: Error) => void) => void;
   onStream?: (handler: (stream: MediaStream, peerId: string) => void) => void;
+  onPeerStream?: (handler: (stream: MediaStream, peerId: string) => void) => void;
   onSignalingReady?: (handler: () => void) => void;
   makeAction: (actionName: string) => unknown;
 }
@@ -94,9 +95,13 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     return new Promise((resolve, reject) => {
       let settled = false;
+      let connectionTimeout: ReturnType<typeof setTimeout> | null = null;
 
       const cleanup = () => {
-        clearTimeout(connectionTimeout);
+        if (connectionTimeout) {
+          clearTimeout(connectionTimeout);
+          connectionTimeout = null;
+        }
         unsubscribeConnected();
         unsubscribeError();
       };
@@ -127,7 +132,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       });
 
       try {
-        const connectionTimeout = setTimeout(
+        connectionTimeout = setTimeout(
           () => {
             if (this.state.value !== 'connected') {
               rejectOnce(new Error('Connection timeout'));
@@ -206,6 +211,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.setupRoomHandlers();
     this.startPeerMonitoring();
     await this.setupRpcAction();
+    this.tryOpenConnection('rpc action ready');
   }
 
   private setupRoomHandlers(): void {
@@ -214,7 +220,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       this.room.onPeerJoin((peerId: string) => {
         console.log('[trystero-client] Peer joined:', peerId);
         this.peerConnected = true;
-        this.handleOpen();
+        this.tryOpenConnection('peer joined');
       });
     } else console.log('[trystero-client] No onPeerJoin event found');
     if (this.room.onPeerLeave) {
@@ -235,14 +241,18 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       console.log('[trystero-client] Existing peers:', this.room.getPeers());
       if (existingPeerCount > 0) {
         this.peerConnected = true;
-        this.handleOpen();
+        this.tryOpenConnection('existing peers');
       }
     } else console.log('[trystero-client] No getPeers event found');
     if (this.room.onStream) {
       this.room.onStream((stream: MediaStream, peerId: string) => {
         console.log('[trystero-client] Peer stream:', peerId, stream);
       });
-    } else console.log('[trystero-client] No onStream event found');
+    } else if ('onPeerStream' in this.room && typeof this.room.onPeerStream === 'function') {
+      this.room.onPeerStream((stream: MediaStream, peerId: string) => {
+        console.log('[trystero-client] Peer stream:', peerId, stream);
+      });
+    } else console.log('[trystero-client] No peer stream event found');
     if (this.room.onSignalingReady) {
       this.room.onSignalingReady(() => {
         console.log('[trystero-client] Signaling ready');
@@ -258,7 +268,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         if (peerCount > 0 && !this.peerConnected) {
           console.log('[trystero-client] First peer detected');
           this.peerConnected = true;
-          this.handleOpen();
+          this.tryOpenConnection('peer monitoring');
         } else if (peerCount === 0 && this.peerConnected) {
           console.log('[trystero-client] No peers detected');
           this.peerConnected = false;
@@ -474,6 +484,25 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     }
 
     return 0;
+  }
+
+  private tryOpenConnection(reason: string): void {
+    const peerCount = this.getPeerCount();
+    const hasTransport = this.sendAction !== null;
+
+    console.log('[trystero-client] tryOpenConnection', {
+      reason,
+      peerConnected: this.peerConnected,
+      peerCount,
+      hasTransport,
+      state: this.state.value
+    });
+
+    if (!this.peerConnected || peerCount === 0 || !hasTransport) {
+      return;
+    }
+
+    this.handleOpen();
   }
 
 }
