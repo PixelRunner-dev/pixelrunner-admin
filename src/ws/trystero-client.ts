@@ -80,7 +80,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   // ============================================================================
 
   public async connect(): Promise<void> {
-    if (this.state.value === 'connected' || this.state.value === 'connecting') {
+    if (
+      this.state.value === 'connected' ||
+      this.state.value === 'connecting' ||
+      this.state.value === 'reconnecting'
+    ) {
       return;
     }
 
@@ -89,12 +93,44 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.clearReconnectTimer();
 
     return new Promise((resolve, reject) => {
+      let settled = false;
+
+      const cleanup = () => {
+        clearTimeout(connectionTimeout);
+        unsubscribeConnected();
+        unsubscribeError();
+      };
+
+      const resolveOnce = () => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve();
+      };
+
+      const rejectOnce = (error: Error) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        this.stopPeerMonitoring();
+        this.disconnectTransport();
+        this.state.value = 'error';
+        reject(error);
+      };
+
+      const unsubscribeConnected = this.on('connected', () => {
+        resolveOnce();
+      });
+
+      const unsubscribeError = this.on('error', (event) => {
+        rejectOnce(event.error);
+      });
+
       try {
-        // Connection timeout
         const connectionTimeout = setTimeout(
           () => {
             if (this.state.value !== 'connected') {
-              reject(new Error('Connection timeout'));
+              rejectOnce(new Error('Connection timeout'));
             }
           },
           this.getConfigNumber('timeout', DEFAULT_TIMEOUT)
@@ -102,18 +138,15 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
         this.connectTransport()
           .then(() => {
-            clearTimeout(connectionTimeout);
-            this.handleOpen();
-            resolve();
+            if (this.state.value === 'connected') {
+              resolveOnce();
+            }
           })
           .catch((error) => {
-            clearTimeout(connectionTimeout);
-            this.state.value = 'error';
-            reject(error);
+            rejectOnce(error instanceof Error ? error : new Error(String(error)));
           });
       } catch (error) {
-        this.state.value = 'error';
-        reject(error);
+        rejectOnce(error instanceof Error ? error : new Error(String(error)));
       }
     });
   }
