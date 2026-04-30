@@ -196,6 +196,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     if (this.config.relayUrls && this.config.relayUrls.length > 0) {
       trysteroConfig.relayUrls = this.config.relayUrls;
       console.log('[trystero-client] Relay URLs configured:', this.config.relayUrls);
+      const relayHealth = await this.checkRelayHealth();
+      console.log('[trystero-client] Relay health:', relayHealth);
+      if (!Object.values(relayHealth).some(Boolean)) {
+        throw new Error('No Nostr relays reachable from browser');
+      }
     }
 
     // Add join secret for authentication if provided
@@ -446,7 +451,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     }
   }
 
-  private async checkRelayHealth(): Promise<boolean> {
+  private async checkRelayHealth(): Promise<Record<string, boolean>> {
     const relayStatus: Record<string, boolean> = {};
 
     for (const relayUrl of this.config.relayUrls || []) {
@@ -466,7 +471,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       }
     }
 
-    return Object.values(relayStatus).some(v => v);
+    return relayStatus;
   }
 
   private getPeerCount(): number {
