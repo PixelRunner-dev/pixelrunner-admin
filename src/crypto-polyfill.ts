@@ -1,11 +1,12 @@
 /**
  * crypto.subtle polyfill for insecure contexts (HTTP)
- * Uses js-sha1 and js-sha256 for proper hashing
+ * Uses js-sha1/js-sha256 for hashing and @noble/ciphers for AES-GCM.
  *
- * WARNING: While this provides real cryptographic hashing, it's still
+ * WARNING: While this provides the primitives Trystero needs, it's still
  * recommended to use HTTPS in production for full security.
  */
 
+import { gcm } from '@noble/ciphers/aes.js';
 import { sha1 } from 'js-sha1';
 import { sha256 } from 'js-sha256';
 
@@ -34,13 +35,44 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     return new Uint8Array(data as ArrayBuffer);
   };
 
+  const toArrayBuffer = (data: Uint8Array): ArrayBuffer => {
+    const result = new Uint8Array(data.byteLength);
+    result.set(data);
+    return result.buffer;
+  };
+
+  const getAlgorithmName = (algorithm: AlgorithmIdentifier): string =>
+    typeof algorithm === 'string' ? algorithm : algorithm.name;
+
+  const getAesGcmParams = (
+    algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams
+  ): AesGcmParams => {
+    const algoName = getAlgorithmName(algorithm);
+
+    if (algoName !== 'AES-GCM' || typeof algorithm === 'string') {
+      throw new Error(`Unsupported algorithm: ${algoName}`);
+    }
+
+    return algorithm as AesGcmParams;
+  };
+
+  const getAesKey = (key: CryptoKey): Uint8Array => {
+    const rawKey = keyStore.get(key);
+
+    if (!rawKey) {
+      throw new Error('AES-GCM key was not imported as raw key data');
+    }
+
+    return rawKey;
+  };
+
   // Store for imported keys (maps CryptoKey to raw key data)
   const keyStore = new WeakMap<CryptoKey, Uint8Array>();
 
-  // SubtleCrypto implementation with real SHA-1 and SHA-256
+  // SubtleCrypto subset used by Trystero in insecure local-IP contexts.
   const subtleCrypto = {
     async digest(algorithm: AlgorithmIdentifier, data: BufferSource): Promise<ArrayBuffer> {
-      const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
+      const algoName = getAlgorithmName(algorithm);
       const uint8Data = toUint8Array(data);
 
       if (algoName === 'SHA-1') {
@@ -59,11 +91,25 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     async importKey(
       format: KeyFormat,
       keyData: BufferSource | JsonWebKey,
-      algorithm: AlgorithmIdentifier | RsaHashedImportParams | EcKeyImportParams | HmacImportParams | AesKeyAlgorithm,
+      algorithm:
+        | AlgorithmIdentifier
+        | RsaHashedImportParams
+        | EcKeyImportParams
+        | HmacImportParams
+        | AesKeyAlgorithm,
       extractable: boolean,
       keyUsages: KeyUsage[]
     ): Promise<CryptoKey> {
-      // Store the raw key data
+      const algoName = getAlgorithmName(algorithm);
+
+      if (format !== 'raw') {
+        throw new Error(`Unsupported key format: ${format}`);
+      }
+
+      if (algoName !== 'AES-GCM') {
+        throw new Error(`Unsupported importKey algorithm: ${algoName}`);
+      }
+
       const cryptoKey = {
         type: 'secret',
         extractable,
@@ -71,14 +117,12 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
         usages: keyUsages
       } as CryptoKey;
 
-      // Store the raw key bytes for later use in encrypt/decrypt
-      if (format === 'raw' && keyData instanceof ArrayBuffer) {
-        keyStore.set(cryptoKey, new Uint8Array(keyData));
-      } else if (format === 'raw' && ArrayBuffer.isView(keyData)) {
-        keyStore.set(cryptoKey, toUint8Array(keyData));
+      if (keyData instanceof ArrayBuffer || ArrayBuffer.isView(keyData)) {
+        keyStore.set(cryptoKey, new Uint8Array(toUint8Array(keyData)));
+        return cryptoKey;
       }
 
-      return cryptoKey;
+      throw new Error('Unsupported keyData type for raw AES-GCM key');
     },
 
     async deriveBits(
@@ -95,53 +139,42 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
 
     async encrypt(
       algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
-      _key: CryptoKey,
+      key: CryptoKey,
       data: BufferSource
     ): Promise<ArrayBuffer> {
-      const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
+      const params = getAesGcmParams(algorithm);
+      const tagLength = params.tagLength ?? 128;
 
-      if (algoName === 'AES-GCM') {
-        // For development in insecure contexts, return data unencrypted
-        // This is a tradeoff: encryption won't work between browser and proxy
-        // but the connection will function for local development
-        console.warn('[crypto-polyfill] AES-GCM encrypt - returning unencrypted data (dev only)');
-
-        // Still need to append the 16-byte auth tag that AES-GCM expects
-        const plaintext = toUint8Array(data);
-        const authTag = new Uint8Array(16);
-        const result = new Uint8Array(plaintext.length + authTag.length);
-        result.set(plaintext);
-        result.set(authTag, plaintext.length);
-
-        return result.buffer;
+      if (tagLength !== 128) {
+        throw new Error(`Unsupported AES-GCM tagLength: ${tagLength}`);
       }
 
-      // Fallback for other algorithms
-      console.warn('[crypto-polyfill] encrypt() - returning unencrypted data for', algoName);
-      return toUint8Array(data).buffer;
+      const cipher = gcm(
+        getAesKey(key),
+        toUint8Array(params.iv),
+        params.additionalData ? toUint8Array(params.additionalData) : undefined
+      );
+      return toArrayBuffer(cipher.encrypt(toUint8Array(data)));
     },
 
     async decrypt(
       algorithm: AlgorithmIdentifier | RsaOaepParams | AesCtrParams | AesCbcParams | AesGcmParams,
-      _key: CryptoKey,
+      key: CryptoKey,
       data: BufferSource
     ): Promise<ArrayBuffer> {
-      const algoName = typeof algorithm === 'string' ? algorithm : algorithm.name;
+      const params = getAesGcmParams(algorithm);
+      const tagLength = params.tagLength ?? 128;
 
-      if (algoName === 'AES-GCM') {
-        // For development in insecure contexts, just strip the auth tag and return
-        console.warn('[crypto-polyfill] AES-GCM decrypt - returning unencrypted data (dev only)');
-
-        const ciphertextWithTag = toUint8Array(data);
-        // Remove the 16-byte auth tag
-        const plaintext = ciphertextWithTag.slice(0, -16);
-
-        return plaintext.buffer;
+      if (tagLength !== 128) {
+        throw new Error(`Unsupported AES-GCM tagLength: ${tagLength}`);
       }
 
-      // Fallback for other algorithms
-      console.warn('[crypto-polyfill] decrypt() - returning data as-is for', algoName);
-      return toUint8Array(data).buffer;
+      const cipher = gcm(
+        getAesKey(key),
+        toUint8Array(params.iv),
+        params.additionalData ? toUint8Array(params.additionalData) : undefined
+      );
+      return toArrayBuffer(cipher.decrypt(toUint8Array(data)));
     }
   };
 
@@ -152,7 +185,9 @@ if (typeof window !== 'undefined' && window.crypto && !window.crypto.subtle) {
     configurable: false
   });
 
-  console.log('[crypto-polyfill] ✅ crypto.subtle polyfill installed with SHA-1 and SHA-256');
+  console.log(
+    '[crypto-polyfill] crypto.subtle polyfill installed with SHA-1, SHA-256, and AES-GCM'
+  );
 }
 
 export {};

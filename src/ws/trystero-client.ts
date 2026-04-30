@@ -1,5 +1,12 @@
-import type { BaseRoomConfig, RelayConfig, TurnConfig } from 'trystero';
-import { ACTION_NAME, DEFAULT_WEBSOCKET_CONFIG, APP_ID, DEFAULT_TIMEOUT, ROOM_PREFIX, ROOM_PASSWORD } from '../constants.ts';
+import type { BaseRoomConfig, RelayConfig } from 'trystero';
+import {
+  ACTION_NAME,
+  DEFAULT_WEBSOCKET_CONFIG,
+  APP_ID,
+  DEFAULT_TIMEOUT,
+  ROOM_PREFIX,
+  ROOM_PASSWORD
+} from '../constants.ts';
 import { BaseWebSocketClient } from './base-client.ts';
 
 import type {
@@ -18,16 +25,16 @@ const ICE_SERVERS = [
   { urls: 'stun:stun3.l.google.com:19302' },
   { urls: 'stun:stun4.l.google.com:19302' },
   { urls: 'stun:stun.xs4all.nl:3478' },
-  { urls: "stun:stun.relay.metered.ca:80" },
+  { urls: 'stun:stun.relay.metered.ca:80' },
   {
     urls: [
-      "turn:europe.relay.metered.ca:80",
-      "turn:europe.relay.metered.ca:80?transport=tcp",
-      "turn:europe.relay.metered.ca:443",
-      "turns:europe.relay.metered.ca:443?transport=tcp",
+      'turn:europe.relay.metered.ca:80',
+      'turn:europe.relay.metered.ca:80?transport=tcp',
+      'turn:europe.relay.metered.ca:443',
+      'turns:europe.relay.metered.ca:443?transport=tcp'
     ],
-    username: "73e194280dcd4bcaa50e24d0",
-    credential: "ILDh2OILkNzXQxFP"
+    username: '73e194280dcd4bcaa50e24d0',
+    credential: 'ILDh2OILkNzXQxFP'
   }
 ];
 
@@ -73,7 +80,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     super({
       ...DEFAULT_WEBSOCKET_CONFIG,
       ...config,
-      url: '', // Override URL since we use Trystero
+      url: '' // Override URL since we use Trystero
     });
   }
 
@@ -191,7 +198,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     console.log('[trystero-client] APP_ID:', APP_ID);
     await this.logDerivedTopics(roomId);
 
-    const trysteroConfig: BaseRoomConfig & RelayConfig & TurnConfig = {
+    const trysteroConfig: BaseRoomConfig & RelayConfig = {
       appId: APP_ID,
       password: ROOM_PASSWORD,
       // Add STUN servers for NAT traversal
@@ -218,9 +225,23 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     // }
 
     // Create the room (acts as host/join peer)
-    console.log('[trystero-client] About to join room with config:', trysteroConfig, 'roomId:', roomId);
-    this.room = trystero.joinRoom(trysteroConfig, roomId);
-    console.log('[trystero-client] joinRoom() returned, room object created', Object.keys(this.room));
+    console.log(
+      '[trystero-client] About to join room with config:',
+      trysteroConfig,
+      'roomId:',
+      roomId
+    );
+    this.room = trystero.joinRoom(trysteroConfig, roomId, {
+      onJoinError: (details) => {
+        const error = new Error(details.error);
+        console.error('[trystero-client] Join error:', details);
+        this.handleTransportError(error);
+      }
+    });
+    console.log(
+      '[trystero-client] joinRoom() returned, room object created',
+      Object.keys(this.room)
+    );
 
     this.setupRoomHandlers();
     this.startPeerMonitoring();
@@ -307,8 +328,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     try {
       const action = this.room.makeAction(ACTION_NAME);
-      console.log('[trystero] makeAction result:', typeof action,
-        Array.isArray(action) ? `[${action.length} elements]` : action);
+      console.log(
+        '[trystero] makeAction result:',
+        typeof action,
+        Array.isArray(action) ? `[${action.length} elements]` : action
+      );
 
       if (!Array.isArray(action)) {
         throw new Error(`makeAction returned unexpected type: ${typeof action}`);
@@ -541,14 +565,22 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     );
 
     if (format === 'hex') {
-      return Array.from(buffer).map((value) => value.toString(16).padStart(2, '0')).join('');
+      return Array.from(buffer)
+        .map((value) => value.toString(16).padStart(2, '0'))
+        .join('');
     }
 
-    return Array.from(buffer).map((value) => value.toString(36)).join('');
+    return Array.from(buffer)
+      .map((value) => value.toString(36))
+      .join('');
   }
 
   private installRelaySocketDebugging(): void {
-    if (relaySocketDebugInstalled || typeof window === 'undefined' || typeof window.WebSocket === 'undefined') {
+    if (
+      relaySocketDebugInstalled ||
+      typeof window === 'undefined' ||
+      typeof window.WebSocket === 'undefined'
+    ) {
       return;
     }
 
@@ -583,7 +615,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         });
 
         this.addEventListener('message', (event) => {
-          console.log('[trystero-client] Relay socket message:', normalizedUrl, String(event.data).slice(0, 300));
+          console.log(
+            '[trystero-client] Relay socket message:',
+            normalizedUrl,
+            String(event.data).slice(0, 300)
+          );
         });
       }
 
@@ -601,5 +637,4 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     relaySocketDebugInstalled = true;
     console.log('[trystero-client] Relay socket debugging installed');
   }
-
 }

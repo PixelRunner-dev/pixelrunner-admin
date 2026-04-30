@@ -4,7 +4,7 @@
  * browser and Node.js Trystero clients.
  */
 
-import type { Room, BaseRoomConfig, RelayConfig, TurnConfig } from 'trystero';
+import type { Room, BaseRoomConfig, RelayConfig } from 'trystero';
 import { ACTION_NAME, APP_ID, NOSTR_RELAYS, ROOM_PREFIX } from '../../constants.ts';
 
 /**
@@ -36,9 +36,7 @@ export interface TrysteroRoomConfig {
  * @param config - Room configuration options
  * @returns The room configuration object for Trystero
  */
-export function createTrysteroRoomConfig(
-  config: TrysteroRoomConfig
-): BaseRoomConfig & RelayConfig & TurnConfig {
+export function createTrysteroRoomConfig(config: TrysteroRoomConfig): BaseRoomConfig & RelayConfig {
   return {
     appId: APP_ID,
     relayUrls: [...(config.relayUrls ?? NOSTR_RELAYS)]
