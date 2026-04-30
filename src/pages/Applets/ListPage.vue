@@ -15,17 +15,31 @@ const { isConnected, playlists } = useClientApi();
 
 async function loadActivePlaylist() {
   if (!playlists || !isConnected.value || isLoading.value) {
+    console.log('[ListPage] Skipping active playlist load', {
+      hasPlaylistsApi: Boolean(playlists),
+      isConnected: isConnected.value,
+      isLoading: isLoading.value
+    });
     return;
   }
 
   isLoading.value = true;
   loadError.value = null;
+  console.log('[ListPage] Requesting active playlist');
 
   try {
-    activePlaylist.value = await playlists.activePlaylist();
+    const playlist = await playlists.activePlaylist();
+    console.log('[ListPage] Active playlist response:', playlist);
+    console.log('[ListPage] Active playlist applet count:', playlist.applets.length);
+    activePlaylist.value = playlist;
+
+    if (!playlist.applets.length) {
+      console.warn('[ListPage] Active playlist received but contains no applets');
+    }
   } catch (error) {
     activePlaylist.value = undefined;
     loadError.value = error instanceof Error ? error.message : 'Failed to load active playlist';
+    console.error('[ListPage] Failed to load active playlist:', error);
   } finally {
     isLoading.value = false;
   }
@@ -36,6 +50,7 @@ onMounted(() => {
 });
 
 watch(isConnected, (connected) => {
+  console.log('[ListPage] Connection state changed:', connected);
   if (connected && !activePlaylist.value) {
     void loadActivePlaylist();
   }

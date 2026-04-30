@@ -393,6 +393,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     }
   }
 
+  protected handleResponse(response: IJsonRpcResponse): void {
+    console.log('[trystero-client] JSON-RPC response:', response);
+    super.handleResponse(response);
+  }
+
   protected handleTransportClose(code: number, reason: string, wasClean: boolean): void {
     if (this.config.debug) {
       console.log('[trystero] closed:', code, reason);
