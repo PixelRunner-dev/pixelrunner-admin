@@ -41,6 +41,7 @@ const ICE_SERVERS = [
 // Dynamic import for Trystero to handle potential SSR
 let trystero: typeof import('trystero') | null = null;
 let relaySocketDebugInstalled = false;
+let webRtcDebugInstalled = false;
 
 interface TrysteroRoomLike {
   leave?: () => void;
@@ -185,11 +186,13 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   protected async connectTransport(): Promise<void> {
     console.log('[trystero-client] connectTransport() called');
     this.installRelaySocketDebugging();
+    this.installWebRtcDebugging();
 
     if (!trystero) {
       console.log('[trystero-client] Loading trystero module...');
       trystero = await import('trystero');
       console.log('[trystero-client] Trystero module loaded');
+      console.log('[trystero-client] selfId:', trystero.selfId);
     }
 
     const roomId = this.config.roomId || `${ROOM_PREFIX}-default`;
@@ -636,5 +639,151 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     window.WebSocket = DebugWebSocket as typeof WebSocket;
     relaySocketDebugInstalled = true;
     console.log('[trystero-client] Relay socket debugging installed');
+  }
+
+  private installWebRtcDebugging(): void {
+    if (
+      webRtcDebugInstalled ||
+      typeof window === 'undefined' ||
+      typeof window.RTCPeerConnection === 'undefined'
+    ) {
+      return;
+    }
+
+    const NativePeerConnection = window.RTCPeerConnection;
+
+    class DebugPeerConnection extends NativePeerConnection {
+      constructor(configuration?: RTCConfiguration) {
+        console.log('[trystero-client] RTCPeerConnection created:', configuration);
+        super(configuration);
+
+        this.addEventListener('connectionstatechange', () => {
+          console.log('[trystero-client] RTCPeerConnection connectionState:', this.connectionState);
+        });
+
+        this.addEventListener('iceconnectionstatechange', () => {
+          console.log(
+            '[trystero-client] RTCPeerConnection iceConnectionState:',
+            this.iceConnectionState
+          );
+        });
+
+        this.addEventListener('icegatheringstatechange', () => {
+          console.log(
+            '[trystero-client] RTCPeerConnection iceGatheringState:',
+            this.iceGatheringState
+          );
+        });
+
+        this.addEventListener('signalingstatechange', () => {
+          console.log('[trystero-client] RTCPeerConnection signalingState:', this.signalingState);
+        });
+
+        this.addEventListener('icecandidateerror', (event) => {
+          console.error('[trystero-client] RTCPeerConnection icecandidateerror:', event);
+        });
+
+        this.addEventListener('icecandidate', (event) => {
+          console.log(
+            '[trystero-client] RTCPeerConnection icecandidate:',
+            event.candidate?.candidate ?? null
+          );
+        });
+      }
+
+      createDataChannel(label: string, dataChannelDict?: RTCDataChannelInit): RTCDataChannel {
+        console.log('[trystero-client] createDataChannel:', label, dataChannelDict);
+        const channel = super.createDataChannel(label, dataChannelDict);
+        channel.addEventListener('open', () => {
+          console.log('[trystero-client] datachannel open:', label);
+        });
+        channel.addEventListener('close', () => {
+          console.log('[trystero-client] datachannel close:', label);
+        });
+        channel.addEventListener('error', (event) => {
+          console.error('[trystero-client] datachannel error:', label, event);
+        });
+        return channel;
+      }
+
+      async createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {
+        console.log('[trystero-client] createOffer called:', options);
+        try {
+          const offer = await super.createOffer(options);
+          console.log('[trystero-client] createOffer resolved:', {
+            type: offer.type,
+            sdpLength: offer.sdp?.length ?? 0
+          });
+          return offer;
+        } catch (error) {
+          console.error('[trystero-client] createOffer failed:', error);
+          throw error;
+        }
+      }
+
+      async createAnswer(options?: RTCAnswerOptions): Promise<RTCSessionDescriptionInit> {
+        console.log('[trystero-client] createAnswer called:', options);
+        try {
+          const answer = await super.createAnswer(options);
+          console.log('[trystero-client] createAnswer resolved:', {
+            type: answer.type,
+            sdpLength: answer.sdp?.length ?? 0
+          });
+          return answer;
+        } catch (error) {
+          console.error('[trystero-client] createAnswer failed:', error);
+          throw error;
+        }
+      }
+
+      async setLocalDescription(description?: RTCLocalSessionDescriptionInit): Promise<void> {
+        console.log('[trystero-client] setLocalDescription called:', {
+          type: description?.type,
+          sdpLength: description?.sdp?.length ?? 0
+        });
+        try {
+          await super.setLocalDescription(description);
+          console.log('[trystero-client] setLocalDescription resolved:', {
+            type: this.localDescription?.type,
+            sdpLength: this.localDescription?.sdp?.length ?? 0
+          });
+        } catch (error) {
+          console.error('[trystero-client] setLocalDescription failed:', error);
+          throw error;
+        }
+      }
+
+      async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
+        console.log('[trystero-client] setRemoteDescription called:', {
+          type: description.type,
+          sdpLength: description.sdp?.length ?? 0
+        });
+        try {
+          await super.setRemoteDescription(description);
+          console.log('[trystero-client] setRemoteDescription resolved:', {
+            type: this.remoteDescription?.type,
+            sdpLength: this.remoteDescription?.sdp?.length ?? 0
+          });
+        } catch (error) {
+          console.error('[trystero-client] setRemoteDescription failed:', error);
+          throw error;
+        }
+      }
+
+      async addIceCandidate(candidate?: RTCIceCandidateInit | RTCIceCandidate): Promise<void> {
+        console.log('[trystero-client] addIceCandidate called:', candidate?.candidate ?? null);
+        try {
+          await super.addIceCandidate(candidate);
+          console.log('[trystero-client] addIceCandidate resolved');
+        } catch (error) {
+          console.error('[trystero-client] addIceCandidate failed:', error);
+          throw error;
+        }
+      }
+    }
+
+    window.RTCPeerConnection = DebugPeerConnection;
+    webRtcDebugInstalled = true;
+    console.log('[trystero-client] WebRTC debugging installed');
   }
 }
