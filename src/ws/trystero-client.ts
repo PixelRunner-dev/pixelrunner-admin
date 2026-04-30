@@ -187,6 +187,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     console.log('[trystero-client] Room ID:', roomId);
     console.log('[trystero-client] Relay URLs:', this.config.relayUrls);
     console.log('[trystero-client] APP_ID:', APP_ID);
+    await this.logDerivedTopics(roomId);
 
     const trysteroConfig: BaseRoomConfig & RelayConfig & TurnConfig = {
       appId: APP_ID,
@@ -514,6 +515,34 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     }
 
     this.handleOpen();
+  }
+
+  private async logDerivedTopics(roomId: string): Promise<void> {
+    const rootTopicPlaintext = `Trystero@${APP_ID}@${roomId}`;
+    const rootTopicHash = await this.hashTopic(rootTopicPlaintext, 'SHA-1');
+    const roomNamespace = await this.hashTopic(rootTopicPlaintext, 'SHA-256', 'hex');
+
+    console.log('[trystero-client] Derived topics:', {
+      rootTopicPlaintext,
+      rootTopicHash,
+      roomNamespace
+    });
+  }
+
+  private async hashTopic(
+    input: string,
+    algorithm: 'SHA-1' | 'SHA-256',
+    format: 'base36' | 'hex' = 'base36'
+  ): Promise<string> {
+    const buffer = new Uint8Array(
+      await crypto.subtle.digest(algorithm, new TextEncoder().encode(input))
+    );
+
+    if (format === 'hex') {
+      return Array.from(buffer).map((value) => value.toString(16).padStart(2, '0')).join('');
+    }
+
+    return Array.from(buffer).map((value) => value.toString(36)).join('');
   }
 
 }
