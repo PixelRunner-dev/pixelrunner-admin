@@ -16,6 +16,7 @@ import type {
   IConnectedEvent,
   IErrorEvent
 } from 'pixelrunner-shared';
+import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
 
 const ICE_SERVERS = [
   { urls: 'stun:stun.cloudflare.com:3478' },
@@ -37,6 +38,7 @@ const ICE_SERVERS = [
     credential: 'ILDh2OILkNzXQxFP'
   }
 ];
+const CONTROLLER_CONNECTION_LOST_DELAY_MS = 10_000;
 
 // Dynamic import for Trystero to handle potential SSR
 let trystero: typeof import('trystero') | null = null;
@@ -75,7 +77,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   private sendAction: ((data: string, peerId?: string) => void) | null = null;
   private receiveAction: ((data: string, peerId: string) => void) | null = null;
   private peerConnected: boolean = false;
+  private hasConnectedPeer: boolean = false;
   private connectionCheckInterval: ReturnType<typeof setInterval> | null = null;
+  private controllerConnectionLostTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(config?: TrysteroConfig) {
     super({
@@ -134,6 +138,13 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         this.stopPeerMonitoring();
         this.disconnectTransport();
         this.state.value = 'error';
+        if (
+          !this.isIntentionalClose &&
+          this.config.reconnect &&
+          this.reconnectAttempts < this.getConfigNumber('maxReconnectAttempts', Infinity)
+        ) {
+          this.scheduleReconnect();
+        }
         reject(error);
       };
 
@@ -174,6 +185,8 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.isIntentionalClose = true;
     this.clearReconnectTimer();
     this.stopPeerMonitoring();
+    this.clearControllerConnectionLostTimer();
+    controllerConnectionLost.value = false;
     this.disconnectTransport();
     this.rejectAllPendingRequests(new Error('WebSocket disconnected'));
     this.state.value = 'disconnected';
@@ -257,15 +270,16 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     if (this.room.onPeerJoin) {
       this.room.onPeerJoin((peerId: string) => {
         console.log('[trystero-client] Peer joined:', peerId);
-        this.peerConnected = true;
-        this.tryOpenConnection('peer joined');
+        this.handlePeersAvailable('peer joined');
       });
     } else console.log('[trystero-client] No onPeerJoin event found');
     if (this.room.onPeerLeave) {
       this.room.onPeerLeave((peerId: string) => {
         console.log('[trystero-client] Peer left:', peerId);
-        this.peerConnected = false;
-        this.handleTransportClose(1000, 'Peer left', true);
+        if (this.getPeerCount() > 0) {
+          return;
+        }
+        this.handleNoPeersDetected('Peer left');
       });
     } else console.log('[trystero-client] No onPeerLeave event found');
     if (this.room.onError) {
@@ -278,8 +292,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       const existingPeerCount = this.getPeerCount();
       console.log('[trystero-client] Existing peers:', this.room.getPeers());
       if (existingPeerCount > 0) {
-        this.peerConnected = true;
-        this.tryOpenConnection('existing peers');
+        this.handlePeersAvailable('existing peers');
       }
     } else console.log('[trystero-client] No getPeers event found');
     if (this.room.onStream) {
@@ -305,12 +318,10 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         console.log('[trystero-client] Peer check', peerCount, 'peers', this.room.getPeers());
         if (peerCount > 0 && !this.peerConnected) {
           console.log('[trystero-client] First peer detected');
-          this.peerConnected = true;
-          this.tryOpenConnection('peer monitoring');
+          this.handlePeersAvailable('peer monitoring');
         } else if (peerCount === 0 && this.peerConnected) {
           console.log('[trystero-client] No peers detected');
-          this.peerConnected = false;
-          this.handleTransportClose(1000, 'Peer disconnected', true);
+          this.handleNoPeersDetected('Peer disconnected');
         }
       }
     }, 2000);
@@ -320,6 +331,53 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     if (this.connectionCheckInterval) {
       clearInterval(this.connectionCheckInterval);
       this.connectionCheckInterval = null;
+    }
+  }
+
+  private handlePeersAvailable(reason: string): void {
+    this.clearReconnectTimer();
+    this.clearControllerConnectionLostTimer();
+    controllerConnectionLost.value = false;
+    this.hasConnectedPeer = true;
+    this.peerConnected = true;
+    this.tryOpenConnection(reason);
+  }
+
+  private handleNoPeersDetected(reason: string): void {
+    if (!this.hasConnectedPeer) {
+      return;
+    }
+
+    this.peerConnected = false;
+    this.emit('disconnected', {
+      code: 1000,
+      reason,
+      wasClean: true
+    });
+    this.rejectAllPendingRequests(new Error('Peer disconnected'));
+    this.state.value = 'disconnected';
+
+    this.scheduleControllerConnectionLostAlert();
+  }
+
+  private scheduleControllerConnectionLostAlert(): void {
+    if (this.controllerConnectionLostTimer || controllerConnectionLost.value) {
+      return;
+    }
+
+    this.controllerConnectionLostTimer = setTimeout(() => {
+      this.controllerConnectionLostTimer = null;
+
+      if (this.getPeerCount() === 0 && this.hasConnectedPeer && !this.isIntentionalClose) {
+        controllerConnectionLost.value = true;
+      }
+    }, CONTROLLER_CONNECTION_LOST_DELAY_MS);
+  }
+
+  private clearControllerConnectionLostTimer(): void {
+    if (this.controllerConnectionLostTimer) {
+      clearTimeout(this.controllerConnectionLostTimer);
+      this.controllerConnectionLostTimer = null;
     }
   }
 
@@ -380,7 +438,15 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.sendAction = null;
     this.receiveAction = null;
     this.peerConnected = false;
+    this.clearControllerConnectionLostTimer();
     console.log('[trystero] Transport disconnected');
+  }
+
+  protected prepareReconnect(): void {
+    this.stopPeerMonitoring();
+    this.clearControllerConnectionLostTimer();
+    this.disconnectTransport();
+    super.prepareReconnect();
   }
 
   protected send(message: string): void {

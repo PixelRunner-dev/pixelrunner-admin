@@ -421,8 +421,9 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
 
     this.emit('reconnecting', reconnectingEvent);
 
-    // Schedule reconnection
     this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      this.prepareReconnect();
       this.connect().catch((error) => {
         if (this.config.debug) {
           console.error('[ws] reconnection failed:', error);
@@ -436,6 +437,10 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
     }
+  }
+
+  protected prepareReconnect(): void {
+    this.state.value = 'disconnected';
   }
 
   protected rejectAllPendingRequests(error: Error): void {
