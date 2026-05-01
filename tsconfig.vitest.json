@@ -1,6 +1,17 @@
 {
   "extends": "./tsconfig.app.json",
-  "include": ["test/unit/**/*", "env.d.ts", "src/App.vue", "src/utils/**/*.ts", "vendor/**/*.ts", "vendor/**/*.vue"],
+  "include": [
+    "test/unit/**/*",
+    "env.d.ts",
+    "src/App.vue",
+    "src/components/AccessWarning.vue",
+    "src/components/Icon/IconSprite.vue",
+    "src/components/SiteHeader.vue",
+    "src/composables/useAdminVersionCheck.ts",
+    "src/utils/**/*.ts",
+    "vendor/**/*.ts",
+    "vendor/**/*.vue"
+  ],
   "exclude": [
     "vendor/**/components/Calendar.vue",
     "vendor/**/components/CalendarInput.vue",

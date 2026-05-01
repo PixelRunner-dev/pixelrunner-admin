@@ -4,14 +4,17 @@ import { ref, inject, onMounted } from 'vue';
 import SiteHeader from '@/components/SiteHeader.vue';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import AccessWarning from '@/components/AccessWarning.vue';
+import { useAdminVersionCheck } from '@/composables/useAdminVersionCheck.ts';
+
+import { Alert as DAlert, Button as DButton, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 import type { AccessMode } from '@/utils/access-detector.ts';
 
 const accessMode = inject<AccessMode>('accessMode', 'unknown');
 const showAccessWarning = ref(true);
+const { hasUpdateAvailable, refreshPage } = useAdminVersionCheck();
 
 onMounted(() => {
-  // Show warning if accessed directly (not via proxy)
   if (accessMode === 'local') {
     showAccessWarning.value = false;
   }
@@ -25,6 +28,13 @@ onMounted(() => {
         <SiteHeader />
       </div>
     </header>
+
+    <div v-if="hasUpdateAvailable" class="site-wrapper mb-8">
+      <DAlert warning role="alert" horizontal>
+        <DText>[A new version of this page is available. Click refresh to continue.]</DText>
+        <DButton btn sm primary @click="refreshPage">[Refresh]</DButton>
+      </DAlert>
+    </div>
 
     <router-view v-slot="{ Component }">
       <keep-alive>
@@ -45,19 +55,19 @@ onMounted(() => {
 </template>
 
 <style>
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @plugin "daisyui" {
   themes: all;
 }
 
 @plugin "daisyui/theme" {
-  name: "pixelrunner";
+  name: 'pixelrunner';
   default: true;
   prefersdark: false;
-  color-scheme: "light";
+  color-scheme: 'light';
   --color-base-100: oklch(97% 0.001 106.424);
-  --color-base-200: #F7DBBF;
+  --color-base-200: #f7dbbf;
   --color-base-300: oklch(70% 0.213 47.604);
   --color-base-content: #4f2a07;
   --color-primary: #4f2a07;

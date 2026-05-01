@@ -6,6 +6,10 @@ import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
 
+import {
+  Text as DText
+} from '(vendor)/daisy-ui-kit/index.ts';
+
 import type { IPlaylist } from 'pixelrunner-shared';
 
 const { isConnected, state, lastError, playlists } = useClientApi();
@@ -54,7 +58,7 @@ const debugState = computed(() => ({
 
 <template>
   <main class="site-wrapper">
-    <h1 class="text-5xl">[Your Pixelrunner]</h1>
+    <DText size="5xl" class="my-4">[Your Pixelrunner]</DText>
 
     <PlayList v-if="activePlaylist" v-bind="activePlaylist" />
     <p v-else-if="isLoading" class="m-4 text-center">Loading active playlist...</p>
