@@ -1,27 +1,45 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
-import { JsonRpcError, useClientApi } from '@/ws/index.ts';
+import { useControllerQuery } from '@/composables/useControllerQuery.ts';
+import { useClientApi } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
 
 import type { IPlaylist } from 'pixelrunner-shared';
 
-const CONTROLLER_RETRY_DELAY_MS = 2000;
-
-const activePlaylist = ref<IPlaylist>();
-const isLoading = ref(false);
-const loadError = ref<string | null>(null);
-const hasLoadAttempted = ref(false);
-let retryTimer: ReturnType<typeof setTimeout> | null = null;
-
 const { isConnected, state, lastError, playlists } = useClientApi();
-const isWaitingForPeer = computed(() => (
-  !activePlaylist.value &&
-  !isLoading.value &&
-  !loadError.value &&
-  (state.value === 'connecting' || state.value === 'reconnecting' || !hasLoadAttempted.value)
-));
+
+const {
+  data: activePlaylist,
+  isLoading,
+  error: loadError,
+  hasAttempted: hasLoadAttempted,
+  isWaitingForPeer
+} = useControllerQuery<IPlaylist>({
+  label: 'ListPage',
+  enabled: isConnected,
+  state,
+  lastError,
+  canLoad: () => Boolean(playlists),
+  skipContext: () => ({ hasPlaylistsApi: Boolean(playlists) }),
+  load: async () => {
+    if (!playlists) {
+      throw new Error('Playlists API not available');
+    }
+
+    return playlists.activePlaylist();
+  },
+  defaultErrorMessage: 'Failed to load active playlist',
+  onSuccess: (playlist) => {
+    console.log('[ListPage] Active playlist applet count:', playlist.applets.length);
+
+    if (!playlist.applets.length) {
+      console.warn('[ListPage] Active playlist received but contains no applets');
+    }
+  }
+});
+
 const debugState = computed(() => ({
   clientState: state.value,
   isConnected: isConnected.value,
@@ -32,112 +50,6 @@ const debugState = computed(() => ({
   playlistName: activePlaylist.value?.name ?? null,
   playlistAppletCount: activePlaylist.value?.applets.length ?? 0
 }));
-
-function clearRetryTimer() {
-  if (!retryTimer) {
-    return;
-  }
-
-  clearTimeout(retryTimer);
-  retryTimer = null;
-}
-
-function isTransientControllerError(error: unknown): boolean {
-  if (error instanceof JsonRpcError) {
-    return error.code === 'service_unavailable';
-  }
-
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  return (
-    error.message.includes('ECONNREFUSED') ||
-    error.message.includes('Controller unavailable') ||
-    error.message.includes('Controller socket not available')
-  );
-}
-
-function scheduleRetry() {
-  if (retryTimer || !isConnected.value) {
-    return;
-  }
-
-  retryTimer = setTimeout(() => {
-    retryTimer = null;
-    void loadActivePlaylist();
-  }, CONTROLLER_RETRY_DELAY_MS);
-}
-
-async function loadActivePlaylist() {
-  if (!playlists || !isConnected.value || isLoading.value) {
-    console.log('[ListPage] Skipping active playlist load', {
-      hasPlaylistsApi: Boolean(playlists),
-      isConnected: isConnected.value,
-      isLoading: isLoading.value
-    });
-    return;
-  }
-
-  isLoading.value = true;
-  loadError.value = null;
-  hasLoadAttempted.value = true;
-  clearRetryTimer();
-  console.log('[ListPage] Requesting active playlist');
-
-  try {
-    const playlist = await playlists.activePlaylist();
-    console.log('[ListPage] Active playlist response:', playlist);
-    console.log('[ListPage] Active playlist applet count:', playlist.applets.length);
-    activePlaylist.value = playlist;
-
-    if (!playlist.applets.length) {
-      console.warn('[ListPage] Active playlist received but contains no applets');
-    }
-  } catch (error) {
-    activePlaylist.value = undefined;
-    if (isTransientControllerError(error)) {
-      loadError.value = 'Waiting for device controller...';
-      scheduleRetry();
-    } else {
-      loadError.value = error instanceof Error ? error.message : 'Failed to load active playlist';
-    }
-    console.error('[ListPage] Failed to load active playlist:', error);
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-onMounted(() => {
-  void loadActivePlaylist();
-});
-
-watch(isConnected, (connected) => {
-  console.log('[ListPage] Connection state changed:', connected);
-  if (!connected) {
-    clearRetryTimer();
-  }
-
-  if (connected && !activePlaylist.value) {
-    void loadActivePlaylist();
-  }
-}, { immediate: true });
-
-watch(state, (nextState) => {
-  console.log('[ListPage] Client state changed:', nextState, {
-    isConnected: isConnected.value,
-    lastError: lastError.value?.message ?? null
-  });
-});
-
-watch(lastError, (error) => {
-  if (!error) return;
-  console.error('[ListPage] Client error observed:', error);
-});
-
-onBeforeUnmount(() => {
-  clearRetryTimer();
-});
 </script>
 
 <template>
@@ -163,7 +75,12 @@ onBeforeUnmount(() => {
     </section>
 
     <div class="text-center m-4">
-      <router-link to="/store" class="btn btn-primary btn-wide" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">
+      <router-link
+        to="/store"
+        class="btn btn-primary btn-wide"
+        @touchstart="() => vibrateDevice(4)"
+        @touchend="() => vibrateDevice(1)"
+      >
         {{ $t('generic.add') }}
       </router-link>
     </div>

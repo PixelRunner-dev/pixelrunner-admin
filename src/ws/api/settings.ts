@@ -7,6 +7,17 @@
 
 import { ApiClientBase, type IRpcClient } from './client.ts';
 
+export interface SettingsRecord {
+  id?: number;
+  key: string;
+  value: string;
+}
+
+interface SettingsActionResponse<T> {
+  method: string;
+  data: T;
+}
+
 /**
  * SettingsAPI provides device settings management functionality.
  * Works with any client that implements IRpcClient (WebSocket or Trystero).
@@ -29,7 +40,12 @@ export class SettingsAPI extends ApiClientBase<IRpcClient> {
    * @param key - The setting key (e.g., 'display.brightness', 'wifi.ssid')
    */
   async get<T = unknown>(key: string): Promise<T> {
-    return this.request<T>('settings.action', { method: 'getValue', params: { key } });
+    const response = await this.request<SettingsActionResponse<SettingsRecord | undefined>>(
+      'settings.action',
+      { method: 'getValue', params: { key } }
+    );
+
+    return response.data?.value as T;
   }
 
   /**
@@ -37,18 +53,28 @@ export class SettingsAPI extends ApiClientBase<IRpcClient> {
    * @param key - The setting key
    * @param value - The value to set
    */
-  async set<T = unknown>(key: string, value: T): Promise<void> {
-    return this.request<void>('settings.action', {
-      method: 'setValue',
-      params: { key, value }
-    });
+  async set<T = unknown>(key: string, value: T): Promise<SettingsRecord | undefined> {
+    const response = await this.request<SettingsActionResponse<SettingsRecord | undefined>>(
+      'settings.action',
+      {
+        method: 'setValue',
+        params: { key, value }
+      }
+    );
+
+    return response.data;
   }
 
   /**
    * Get all settings
    */
-  async getAll(): Promise<Record<string, unknown>[]> {
-    return this.request<Record<string, unknown>[]>('settings.action', { method: 'getAll' });
+  async getAll(): Promise<SettingsRecord[]> {
+    const response = await this.request<SettingsActionResponse<SettingsRecord[]>>(
+      'settings.action',
+      { method: 'getAll' }
+    );
+
+    return response.data;
   }
 
   // /**

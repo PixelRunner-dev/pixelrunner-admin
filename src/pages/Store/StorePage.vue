@@ -10,7 +10,7 @@ import StoreSearch from '@/components/Store/StoreSearch.vue';
 import StoreSection from '@/components/Store/StoreSection.vue';
 import AppletCarousel from '@/components/Applet/AppletCarousel.vue';
 import AppletCard from '@/components/Applet/AppletCard.vue';
-import CategoryList from '@/components/CategoryList.vue';
+// import CategoryList from '@/components/CategoryList.vue';
 
 import {
   Button as DButton,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import i18next, { changeLanguage, t } from 'i18next';
 import type { Resource } from 'i18next';
 
@@ -24,10 +24,15 @@ import LocationSearch from '@/components/Form/SettingFields/LocationSearch.vue';
 
 import { toCamelCase, toCapitalizeWords, vibrateDevice } from '@/utils/generic.ts';
 
+import {
+  serializeSettingValue,
+  useSyncedControllerSettings,
+  type SyncedControllerSettingBinding
+} from '@/composables/useSyncedControllerSettings.ts';
 import { useClientApi } from '@/ws/index.ts';
 
 // Get WebSocket functionality
-const { device, isConnected, settings } = useClientApi();
+const { device, isConnected, lastError, settings, state } = useClientApi();
 
 function setLanguage(e: Event) {
   const target = e.target as HTMLSelectElement | null;
@@ -104,7 +109,7 @@ function deviceNameOnPaste(e: ClipboardEvent) {
   if (clipboardData) inputField.value = clipboardData.replace(/[^A-Za-z0-9_-]/, '');
 }
 
-const themesDark = computed<string[]>(() => ([
+const themesDark = computed<string[]>(() => [
   'dark',
   'business',
   'dracula',
@@ -117,9 +122,9 @@ const themesDark = computed<string[]>(() => ([
   'coffee',
   'luxury',
   'black'
-]));
+]);
 
-const themesLight = computed<string[]>(() => ([
+const themesLight = computed<string[]>(() => [
   'pixelrunner',
   'light',
   'emerald',
@@ -137,9 +142,9 @@ const themesLight = computed<string[]>(() => ([
   'silk',
   'lofi',
   'wireframe'
-]));
+]);
 
-const themesOther = computed<string[]>(() => ([
+const themesOther = computed<string[]>(() => [
   'synthwave',
   'aqua',
   'cyberpunk',
@@ -147,15 +152,20 @@ const themesOther = computed<string[]>(() => ([
   'valentine',
   'caramellatte',
   'lemonade'
-]));
+]);
 
-const securityOptions = computed<string[]>(() => ([
-  'none', 'wep', 'wpa', 'wpa23', 'wpa3', 'wpae', 'wpa2e', 'wpa3e'
-]));
+const securityOptions = computed<string[]>(() => [
+  'none',
+  'wep',
+  'wpa',
+  'wpa23',
+  'wpa3',
+  'wpae',
+  'wpa2e',
+  'wpa3e'
+]);
 
-const proxyOptions = computed<string[]>(() => ([
-  'none', 'manual', 'auto-config'
-]));
+const proxyOptions = computed<string[]>(() => ['none', 'manual', 'auto-config']);
 
 const languages = computed(() => {
   const resource = i18next.options.resources as Resource | undefined;
@@ -191,37 +201,41 @@ const alarmClock = ref(false);
 const alarmTime = ref('08:00');
 const theme = ref(CookieStore.get('theme') || themesLight.value[0]);
 
-onMounted(async () => {
-  const allSettings = await settings?.getAll();
+const deviceSettingBindings: SyncedControllerSettingBinding[] = [
+    { key: 'deviceName', model: deviceName },
+  { key: 'date', model: date },
+  { key: 'time', model: time },
+  { key: 'location', model: location },
+  { key: 'ssid', model: ssid },
+  { key: 'security', model: security },
+  { key: 'password', model: password },
+  { key: 'hiddenNetwork', model: hiddenNetwork },
+  { key: 'dhcp', model: dhcp },
+  { key: 'ip', model: ip },
+  { key: 'subnet', model: subnet },
+  { key: 'gateway', model: gateway },
+  { key: 'dns', model: dns },
+  { key: 'primaryDns', model: primaryDns },
+  { key: 'secondaryDns', model: secondaryDns },
+  { key: 'proxy', model: proxy },
+  { key: 'proxyServer', model: proxyServer },
+  { key: 'proxyPort', model: proxyPort },
+  { key: 'proxyAutoConfig', model: proxyAutoConfig },
+  { key: 'brightness', model: brightness },
+  { key: 'dimAtSunset', model: dimAtSunset },
+  { key: 'nightMode', model: nightMode },
+  { key: 'nightModeStart', model: nightModeStart },
+  { key: 'nightModeEnd', model: nightModeEnd },
+  { key: 'alarmClock', model: alarmClock },
+  { key: 'alarmTime', model: alarmTime }
+];
 
-  console.log('allSettings', allSettings);
-
-  if (isConnected.value) {
-    // allSettings.forEach((setting) => [setting.key].value = setting.value);
-    // deviceName
-    // ssid
-    // security
-    // password
-    // hiddenNetwork
-    // dhcp
-    // ip
-    // subnet
-    // gateway
-    // dns
-    // primaryDns
-    // secondaryDns
-    // proxy
-    // proxyServer
-    // proxyPort
-    // proxyAutoConfig
-    // brightness
-    // dimAtSunset
-    // nightMode
-    // nightModeStart
-    // nightModeEnd
-    // alarmClock
-    // alarmTime
-  }
+useSyncedControllerSettings({
+  settings,
+  isConnected,
+  state,
+  lastError,
+  bindings: deviceSettingBindings
 });
 
 watchEffect(() => {
@@ -235,12 +249,21 @@ watchEffect(() => {
     <DText is="h1" size="5xl" class="my-4">{{ toCapitalizeWords(String($route.name)) }}</DText>
 
     <DAlert info role="alert" class="my-4">
-      <svg role="img" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="h-6 w-6 shrink-0 stroke-current">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      <svg
+        role="img"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        class="h-6 w-6 shrink-0 stroke-current"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        ></path>
       </svg>
-      <DText>
-        [All changes are saved imidiatly.]
-      </DText>
+      <DText> [All changes are saved imidiatly.] </DText>
     </DAlert>
 
     <DFormControl class="my-4 gap-1">
@@ -255,7 +278,8 @@ watchEffect(() => {
         validator
         required
         @beforeinput="deviceNameOnBeforeInput"
-        @paste.prevent="deviceNameOnPaste" />
+        @paste.prevent="deviceNameOnPaste"
+      />
       <DText is="p" size="xs">{{ $t('settingsPage.deviceName.description') }}</DText>
     </DFormControl>
 
@@ -263,24 +287,14 @@ watchEffect(() => {
       <DFormControl class="gap-1">
         <DLabel label>
           <DText>{{ $t('settingsPage.dateAndTime.date.label') }}</DText>
-          <DInput
-            class="input font-mono"
-            type="date"
-            name="current-date"
-            v-model="date"
-            disabled />
+          <DInput class="input font-mono" type="date" name="current-date" v-model="date" disabled />
         </DLabel>
       </DFormControl>
 
       <DFormControl class="gap-1">
         <DLabel label>
           <DText>{{ $t('settingsPage.dateAndTime.time.label') }}</DText>
-          <DInput
-            class="input font-mono"
-            type="time"
-            name="current-time"
-            v-model="time"
-            disabled />
+          <DInput class="input font-mono" type="time" name="current-time" v-model="time" disabled />
         </DLabel>
       </DFormControl>
     </DFieldset>
@@ -290,8 +304,19 @@ watchEffect(() => {
         <DLabel for="language">
           <DText size="sm">{{ $t('settingsPage.localization.language.label') }}</DText>
         </DLabel>
-        <select id="language" class="select" name="language" v-model="language" @change="setLanguage">
-          <option v-for="l in languages" :key="'l-' + l" :value="l" :selected="l === $i18next.language">
+        <select
+          id="language"
+          class="select"
+          name="language"
+          v-model="language"
+          @change="setLanguage"
+        >
+          <option
+            v-for="l in languages"
+            :key="'l-' + l"
+            :value="l"
+            :selected="l === $i18next.language"
+          >
             {{ $t('language.' + l) }}
           </option>
         </select>
@@ -301,7 +326,12 @@ watchEffect(() => {
         <DLabel for="location">
           <DText size="sm">{{ $t('settingsPage.localization.location.label') }}</DText>
         </DLabel>
-        <LocationSearch id="location" v-model="location" />
+        <LocationSearch
+          :key="serializeSettingValue(location)"
+          id="location"
+          v-model="location"
+          :default="location"
+        />
       </DFormControl>
     </DFieldset>
 
@@ -310,7 +340,15 @@ watchEffect(() => {
         <DLabel for="ssid">
           <DText size="sm">{{ $t('settingsPage.wifiNetwork.ssid.label') }}</DText>
         </DLabel>
-        <DInput id="ssid" type="text" name="ssid" v-model="ssid" :placeholder="$t('settingsPage.wifiNetwork.ssid.placeholder')" validator required />
+        <DInput
+          id="ssid"
+          type="text"
+          name="ssid"
+          v-model="ssid"
+          :placeholder="$t('settingsPage.wifiNetwork.ssid.placeholder')"
+          validator
+          required
+        />
       </DFormControl>
 
       <DFormControl class="gap-1">
@@ -328,7 +366,15 @@ watchEffect(() => {
         <DLabel for="password">
           <DText size="sm">{{ $t('settingsPage.wifiNetwork.password.label') }}</DText>
         </DLabel>
-        <DInput id="password" type="password" name="password" v-model="password" :placeholder="$t('settingsPage.wifiNetwork.password.placeholder')" validator required />
+        <DInput
+          id="password"
+          type="password"
+          name="password"
+          v-model="password"
+          :placeholder="$t('settingsPage.wifiNetwork.password.placeholder')"
+          validator
+          required
+        />
       </DFormControl>
 
       <DCollapse variant="arrow" class="bg-base-100">
@@ -343,10 +389,15 @@ watchEffect(() => {
             </DLabel>
           </DFormControl>
 
-          <DFieldset :legend="$t('settingsPage.wifiNetwork.ipConfiguration.legend')" class="my-4 gap-4">
+          <DFieldset
+            :legend="$t('settingsPage.wifiNetwork.ipConfiguration.legend')"
+            class="my-4 gap-4"
+          >
             <DFormControl class="gap-1">
               <DLabel for="dhcp">
-                <DText size="sm">{{ $t('settingsPage.wifiNetwork.ipConfiguration.dhcp.label') }}</DText>
+                <DText size="sm">{{
+                  $t('settingsPage.wifiNetwork.ipConfiguration.dhcp.label')
+                }}</DText>
               </DLabel>
               <select id="dhcp" name="dhcp" class="select" v-model="dhcp">
                 <option value="dhcp">
@@ -360,32 +411,68 @@ watchEffect(() => {
 
             <DFormControl class="gap-1">
               <DLabel for="ip">
-                <DText size="sm">{{ $t('settingsPage.wifiNetwork.ipConfiguration.ip.label') }}</DText>
+                <DText size="sm">{{
+                  $t('settingsPage.wifiNetwork.ipConfiguration.ip.label')
+                }}</DText>
               </DLabel>
-              <DInput id="ip" type="number" name="ip" v-model="ip" :placeholder="$t('settingsPage.wifiNetwork.ipConfiguration.ip.placeholder')" :readonly="dhcp === 'dhcp'" validator required />
+              <DInput
+                id="ip"
+                type="number"
+                name="ip"
+                v-model="ip"
+                :placeholder="$t('settingsPage.wifiNetwork.ipConfiguration.ip.placeholder')"
+                :readonly="dhcp === 'dhcp'"
+                validator
+                required
+              />
             </DFormControl>
 
             <template v-if="dhcp === 'static'">
               <DFormControl class="gap-1">
                 <DLabel for="gateway">
-                  <DText size="sm">{{ $t('settingsPage.wifiNetwork.ipConfiguration.gateway.label') }}</DText>
+                  <DText size="sm">{{
+                    $t('settingsPage.wifiNetwork.ipConfiguration.gateway.label')
+                  }}</DText>
                 </DLabel>
-                <DInput id="gateway" type="number" name="gateway" v-model="gateway" :placeholder="$t('settingsPage.wifiNetwork.ipConfiguration.gateway.placeholder')" validator required />
+                <DInput
+                  id="gateway"
+                  type="number"
+                  name="gateway"
+                  v-model="gateway"
+                  :placeholder="$t('settingsPage.wifiNetwork.ipConfiguration.gateway.placeholder')"
+                  validator
+                  required
+                />
               </DFormControl>
 
               <DFormControl class="gap-1">
                 <DLabel for="subnet">
-                  <DText size="sm">{{ $t('settingsPage.wifiNetwork.ipConfiguration.subnet.label') }}</DText>
+                  <DText size="sm">{{
+                    $t('settingsPage.wifiNetwork.ipConfiguration.subnet.label')
+                  }}</DText>
                 </DLabel>
-                <DInput id="subnet" type="number" name="subnet" v-model="subnet" :placeholder="$t('settingsPage.wifiNetwork.ipConfiguration.subnet.placeholder')" validator required />
+                <DInput
+                  id="subnet"
+                  type="number"
+                  name="subnet"
+                  v-model="subnet"
+                  :placeholder="$t('settingsPage.wifiNetwork.ipConfiguration.subnet.placeholder')"
+                  validator
+                  required
+                />
               </DFormControl>
             </template>
           </DFieldset>
 
-          <DFieldset :legend="$t('settingsPage.wifiNetwork.dnsConfiguration.legend')" class="my-4 gap-4">
+          <DFieldset
+            :legend="$t('settingsPage.wifiNetwork.dnsConfiguration.legend')"
+            class="my-4 gap-4"
+          >
             <DFormControl class="gap-1">
               <DLabel for="dns">
-                <DText size="sm">{{ $t('settingsPage.wifiNetwork.dnsConfiguration.dns.label') }}</DText>
+                <DText size="sm">{{
+                  $t('settingsPage.wifiNetwork.dnsConfiguration.dns.label')
+                }}</DText>
               </DLabel>
               <select id="dns" name="dns" class="select" v-model="dns">
                 <option value="auto">
@@ -400,28 +487,59 @@ watchEffect(() => {
             <template v-if="dns === 'manual'">
               <DFormControl class="gap-1">
                 <DLabel for="primaryDns">
-                  <DText size="sm">{{ $t('settingsPage.wifiNetwork.dnsConfiguration.primaryDns.label') }}</DText>
+                  <DText size="sm">{{
+                    $t('settingsPage.wifiNetwork.dnsConfiguration.primaryDns.label')
+                  }}</DText>
                 </DLabel>
-                <DInput id="primaryDns" type="text" name="primaryDns" v-model="primaryDns" :placeholder="$t('settingsPage.wifiNetwork.dnsConfiguration.primaryDns.placeholder')" validator required />
+                <DInput
+                  id="primaryDns"
+                  type="text"
+                  name="primaryDns"
+                  v-model="primaryDns"
+                  :placeholder="
+                    $t('settingsPage.wifiNetwork.dnsConfiguration.primaryDns.placeholder')
+                  "
+                  validator
+                  required
+                />
               </DFormControl>
 
               <DFormControl class="gap-1">
                 <DLabel for="secondaryDns">
-                  <DText size="sm">{{ $t('settingsPage.wifiNetwork.dnsConfiguration.secondaryDns.label') }}</DText>
+                  <DText size="sm">{{
+                    $t('settingsPage.wifiNetwork.dnsConfiguration.secondaryDns.label')
+                  }}</DText>
                 </DLabel>
-                <DInput id="secondaryDns" type="text" name="secondaryDns" v-model="secondaryDns" :placeholder="$t('settingsPage.wifiNetwork.dnsConfiguration.secondaryDns.placeholder')" />
+                <DInput
+                  id="secondaryDns"
+                  type="text"
+                  name="secondaryDns"
+                  v-model="secondaryDns"
+                  :placeholder="
+                    $t('settingsPage.wifiNetwork.dnsConfiguration.secondaryDns.placeholder')
+                  "
+                />
               </DFormControl>
             </template>
           </DFieldset>
 
-          <DFieldset :legend="$t('settingsPage.wifiNetwork.proxyConfiguration.legend')" class="gap-4">
+          <DFieldset
+            :legend="$t('settingsPage.wifiNetwork.proxyConfiguration.legend')"
+            class="gap-4"
+          >
             <DFormControl class="gap-1">
               <DLabel for="proxy">
-                <DText size="sm">{{ $t('settingsPage.wifiNetwork.proxyConfiguration.proxy.label') }}</DText>
+                <DText size="sm">{{
+                  $t('settingsPage.wifiNetwork.proxyConfiguration.proxy.label')
+                }}</DText>
               </DLabel>
               <select id="proxy" name="proxy" class="select" v-model="proxy">
                 <option v-for="o in proxyOptions" :key="o" :value="o" :selected="o === proxy">
-                  {{ $t('settingsPage.wifiNetwork.proxyConfiguration.proxy.options.' + toCamelCase(o)) }}
+                  {{
+                    $t(
+                      'settingsPage.wifiNetwork.proxyConfiguration.proxy.options.' + toCamelCase(o)
+                    )
+                  }}
                 </option>
               </select>
             </DFormControl>
@@ -429,23 +547,49 @@ watchEffect(() => {
             <template v-if="proxy === 'manual'">
               <DFormControl class="gap-1">
                 <DLabel for="proxyServer">
-                  <DText size="sm">{{ $t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.label') }}</DText>
+                  <DText size="sm">{{
+                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.label')
+                  }}</DText>
                 </DLabel>
-                <DInput id="proxyServer" type="text" name="proxyServer" v-model="proxyServer" :placeholder="$t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.placeholder')" validator required />
+                <DInput
+                  id="proxyServer"
+                  type="text"
+                  name="proxyServer"
+                  v-model="proxyServer"
+                  :placeholder="
+                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.placeholder')
+                  "
+                  validator
+                  required
+                />
               </DFormControl>
 
               <DFormControl class="gap-1">
                 <DLabel for="proxyPort">
-                  <DText size="sm">{{ $t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.label') }}</DText>
+                  <DText size="sm">{{
+                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.label')
+                  }}</DText>
                 </DLabel>
-                <DInput id="proxyPort" type="number" name="proxyPort" v-model="proxyPort" :placeholder="$t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.placeholder')" validator required />
+                <DInput
+                  id="proxyPort"
+                  type="number"
+                  name="proxyPort"
+                  v-model="proxyPort"
+                  :placeholder="
+                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.placeholder')
+                  "
+                  validator
+                  required
+                />
               </DFormControl>
             </template>
 
             <template v-if="proxy === 'auto-config'">
               <DFormControl class="gap-1">
                 <DLabel for="proxyAutoConfig">
-                  <DText size="sm">{{ $t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.label') }}</DText>
+                  <DText size="sm">{{
+                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.label')
+                  }}</DText>
                 </DLabel>
                 <DInput
                   id="proxyAutoConfig"
@@ -453,9 +597,12 @@ watchEffect(() => {
                   name="proxyAutoConfig"
                   pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9-].*[a-zA-Z0-9])?.)+[a-zA-Z].*$"
                   v-model="proxyAutoConfig"
-                  :placeholder="$t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.placeholder')"
+                  :placeholder="
+                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.placeholder')
+                  "
                   validator
-                  required />
+                  required
+                />
               </DFormControl>
             </template>
           </DFieldset>
@@ -467,7 +614,16 @@ watchEffect(() => {
       <DLabel for="brightness">
         <DText size="sm">{{ $t('settingsPage.brightness.label') }} ({{ brightness }}%)</DText>
       </DLabel>
-      <DRange id="brightness" name="brightness" v-model="brightness" :min="1" :max="100" :step="1" size="sm" @input="setBrightness" />
+      <DRange
+        id="brightness"
+        name="brightness"
+        v-model="brightness"
+        :min="1"
+        :max="100"
+        :step="1"
+        size="sm"
+        @input="setBrightness"
+      />
       <div class="flex justify-between px-2.5 mt-2 text-xs w-80">
         <span>|</span>
         <span>|</span>
@@ -494,16 +650,28 @@ watchEffect(() => {
     <DFieldset :legend="$t('settingsPage.nightMode.legend')" class="my-4 gap-4">
       <DFormControl class="gap-1">
         <DLabel for="nightMode">
-          <DCheckbox id="nightMode" name="night-mode" v-model="nightMode" aria-describedby="night-mode-description" />
+          <DCheckbox
+            id="nightMode"
+            name="night-mode"
+            v-model="nightMode"
+            aria-describedby="night-mode-description"
+          />
           <DText size="sm">{{ $t('settingsPage.nightMode.label') }}</DText>
         </DLabel>
-        <DText is="p" id="night-mode-description">{{ $t('settingsPage.nightMode.description') }}</DText>
+        <DText is="p" id="night-mode-description">{{
+          $t('settingsPage.nightMode.description')
+        }}</DText>
       </DFormControl>
 
       <DFormControl class="gap-1">
         <DLabel input>
           <DText label size="sm">{{ $t('settingsPage.nightMode.nightModeStart.label') }}</DText>
-          <DInput type="time" name="night-mode-start" v-model="nightModeStart" :disabled="!nightMode" />
+          <DInput
+            type="time"
+            name="night-mode-start"
+            v-model="nightModeStart"
+            :disabled="!nightMode"
+          />
         </DLabel>
       </DFormControl>
 
@@ -514,18 +682,32 @@ watchEffect(() => {
         </DLabel>
       </DFormControl>
 
-      <DFieldset :legend="$t('settingsPage.nightMode.alarmClock.legend')" class="gap-4" style="background-color: var(--color-base-100);" :disabled="!nightMode">
+      <DFieldset
+        :legend="$t('settingsPage.nightMode.alarmClock.legend')"
+        class="gap-4"
+        style="background-color: var(--color-base-100)"
+        :disabled="!nightMode"
+      >
         <DFormControl class="gap-1">
           <DLabel for="alarmClock">
-            <DCheckbox id="alarmClock" name="alarm-clock" v-model="alarmClock" aria-describedby="alarm-clock-description" />
+            <DCheckbox
+              id="alarmClock"
+              name="alarm-clock"
+              v-model="alarmClock"
+              aria-describedby="alarm-clock-description"
+            />
             <DText size="sm">{{ $t('settingsPage.nightMode.alarmClock.label') }}</DText>
           </DLabel>
-          <DText is="p" id="alarm-clock-description">{{ $t('settingsPage.nightMode.alarmClock.description') }}</DText>
+          <DText is="p" id="alarm-clock-description">{{
+            $t('settingsPage.nightMode.alarmClock.description')
+          }}</DText>
         </DFormControl>
 
         <DFormControl class="gap-1">
           <DLabel input>
-            <DText label size="sm">{{ $t('settingsPage.nightMode.alarmClock.alarmTime.label') }}</DText>
+            <DText label size="sm">{{
+              $t('settingsPage.nightMode.alarmClock.alarmTime.label')
+            }}</DText>
             <DInput type="time" name="alarm-time" v-model="alarmTime" :disabled="!alarmClock" />
           </DLabel>
         </DFormControl>
@@ -559,19 +741,47 @@ watchEffect(() => {
 
     <DFieldset :legend="$t('settingsPage.actions.legend')" class="my-4">
       <DFlex is="div" wrap justifyCenter class="w-80 gap-4">
-        <DButton btn primary class="w-full" @click="doFirmwareUpdate" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">
+        <DButton
+          btn
+          primary
+          class="w-full"
+          @click="doFirmwareUpdate"
+          @touchstart="() => vibrateDevice(4)"
+          @touchend="() => vibrateDevice(1)"
+        >
           {{ $t('settingsPage.actions.update.button') }}
         </DButton>
 
-        <DButton btn secondary class="w-full" @click="doShutdown" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">
+        <DButton
+          btn
+          secondary
+          class="w-full"
+          @click="doShutdown"
+          @touchstart="() => vibrateDevice(4)"
+          @touchend="() => vibrateDevice(1)"
+        >
           {{ $t('settingsPage.actions.shutdown.button') }}
         </DButton>
 
-        <DButton btn accent class="w-full" @click="doReboot" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">
+        <DButton
+          btn
+          accent
+          class="w-full"
+          @click="doReboot"
+          @touchstart="() => vibrateDevice(4)"
+          @touchend="() => vibrateDevice(1)"
+        >
           {{ $t('settingsPage.actions.reboot.button') }}
         </DButton>
 
-        <DButton btn error dash @click="doFactoryReset" @touchstart="() => vibrateDevice(4)" @touchend="() => vibrateDevice(1)">
+        <DButton
+          btn
+          error
+          dash
+          @click="doFactoryReset"
+          @touchstart="() => vibrateDevice(4)"
+          @touchend="() => vibrateDevice(1)"
+        >
           {{ $t('settingsPage.actions.factoryReset.button') }}
         </DButton>
       </DFlex>
@@ -580,7 +790,7 @@ watchEffect(() => {
 </template>
 
 <style scoped>
-input[type="range"] {
+input[type='range'] {
   touch-action: pan-x;
 }
 </style>
