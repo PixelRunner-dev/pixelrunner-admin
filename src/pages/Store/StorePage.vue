@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed } from 'vue';
 
 import type { ICategory, IFullApplet } from 'pixelrunner-shared';
 
 import { useClientApi } from '@/ws/index.ts';
+import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { toCapitalizeWords } from '@/utils/generic.ts';
 
 import StoreSearch from '@/components/Store/StoreSearch.vue';
@@ -12,11 +13,7 @@ import AppletCarousel from '@/components/Applet/AppletCarousel.vue';
 import AppletCard from '@/components/Applet/AppletCard.vue';
 // import CategoryList from '@/components/CategoryList.vue';
 
-import {
-  Button as DButton,
-  Flex as DFlex,
-  Text as DText
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Button as DButton, Flex as DFlex, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 const categories: ICategory[] = [
   {
@@ -208,7 +205,13 @@ const newlyAddedItems: IFullApplet[] = [
       isOfficialApplet: false
     },
     isInstalled: false,
-    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[2] as ICategory, categories[3] as ICategory, categories[4] as ICategory]
+    categories: [
+      categories[0] as ICategory,
+      categories[1] as ICategory,
+      categories[2] as ICategory,
+      categories[3] as ICategory,
+      categories[4] as ICategory
+    ]
   },
   {
     fileName: 'file-name.webp',
@@ -493,7 +496,17 @@ const newlyAddedItems: IFullApplet[] = [
       isOfficialApplet: false
     },
     isInstalled: false,
-    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[2] as ICategory, categories[3] as ICategory, categories[4] as ICategory, categories[5] as ICategory, categories[6] as ICategory, categories[7] as ICategory, categories[8] as ICategory]
+    categories: [
+      categories[0] as ICategory,
+      categories[1] as ICategory,
+      categories[2] as ICategory,
+      categories[3] as ICategory,
+      categories[4] as ICategory,
+      categories[5] as ICategory,
+      categories[6] as ICategory,
+      categories[7] as ICategory,
+      categories[8] as ICategory
+    ]
   },
   {
     fileName: 'file-name.webp',
@@ -523,17 +536,41 @@ const starterPackItems = newlyAddedItems;
 const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'];
 
 const { isConnected, applets, isConnecting, lastError, connect, state } = useClientApi();
+const spotlightCategory = categories[0] as ICategory;
+const canLoadSpotlight = computed(() => isConnected.value);
 
-const spotlightItems = ref<IFullApplet[] | null>(null);
+const {
+  data: spotlightItems,
+  isLoading: isSpotlightLoading,
+  error: spotlightError,
+  isWaitingForPeer: isWaitingForSpotlightPeer,
+  reload: reloadSpotlight
+} = useControllerQuery<IFullApplet[]>({
+  label: 'StorePage spotlight',
+  enabled: canLoadSpotlight,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets),
+    category: spotlightCategory.name
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
 
-onMounted(async () => {
-  console.log('exxtra', isConnecting.value, isConnected.value, lastError.value);
-  if (isConnected.value) {
-    console.log('ik ben connected');
-    spotlightItems.value = await applets?.getAppletsByCategory(categories[0] as ICategory);
+    const categoryApplets = await applets.getAppletsByCategory(spotlightCategory);
+
+    return (categoryApplets ?? []) as IFullApplet[];
+  },
+  defaultErrorMessage: 'Failed to load spotlight applets',
+  onSuccess: (loadedApplets) => {
+    console.log('[StorePage] Spotlight applets loaded:', {
+      category: spotlightCategory.name,
+      count: loadedApplets.length
+    });
   }
-
-  console.log('spotlightItems', spotlightItems.value);
 });
 </script>
 
@@ -556,13 +593,14 @@ onMounted(async () => {
         <DFlex is="ul" wrap class="gap-1">
           <template v-for="term in mostSearchedTerms" :key="'search-' + term">
             <li>
-              <DButton size="xs" color="neutral" @click="() => (console.log(`click ${term}`))">{{ term }}</DButton>
+              <DButton size="xs" color="neutral" @click="() => console.log(`click ${term}`)">{{
+                term
+              }}</DButton>
             </li>
           </template>
         </DFlex>
       </section>
     </section>
-
 
     <!-- (spotlight)<br />
     Kleine tiles met plaatje links en op max 2 lijnen titel rechts.<br />
@@ -585,6 +623,14 @@ onMounted(async () => {
         </template>
       </AppletCarousel>
     </StoreSection>
+    <p v-else-if="isSpotlightLoading" class="m-4 text-center">Loading spotlight applets...</p>
+    <p v-else-if="isWaitingForSpotlightPeer" class="m-4 text-center">
+      Waiting for device connection...
+    </p>
+    <div v-else-if="spotlightError" class="m-4 text-center">
+      <p class="text-error">{{ spotlightError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadSpotlight">Retry</DButton>
+    </div>
 
     <StoreSection v-if="newlyAddedItems" title="[Newly Added]" payoff="[New applets added]">
       <AppletCarousel :applets="newlyAddedItems">
@@ -600,7 +646,11 @@ onMounted(async () => {
       <CategoryList :categories isInteractive />
     </StoreSection> -->
 
-    <StoreSection v-if="mostInstalledItems" title="[Most Installed]" payoff="[Most installed applets]">
+    <StoreSection
+      v-if="mostInstalledItems"
+      title="[Most Installed]"
+      payoff="[Most installed applets]"
+    >
       <AppletCarousel :applets="mostInstalledItems">
         <template #item="applet">
           <AppletCard view="preview" :applet>
