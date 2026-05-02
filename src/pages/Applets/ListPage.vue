@@ -5,6 +5,7 @@ import PlayList from '@/components/PlayList.vue';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
+import playlistMocks from '@/../test/mocks/playlists.json';
 
 import {
   Text as DText
@@ -13,6 +14,9 @@ import {
 import type { IPlaylist } from 'pixelrunner-shared';
 
 const { isConnected, state, lastError, playlists } = useClientApi();
+const shouldUsePlaylistMock = import.meta.env.DEV;
+const activePlaylistMock = playlistMocks[0] as IPlaylist | undefined;
+const canLoadActivePlaylist = computed(() => shouldUsePlaylistMock || isConnected.value);
 
 const {
   data: activePlaylist,
@@ -22,12 +26,23 @@ const {
   isWaitingForPeer
 } = useControllerQuery<IPlaylist>({
   label: 'ListPage',
-  enabled: isConnected,
+  enabled: canLoadActivePlaylist,
   state,
   lastError,
-  canLoad: () => Boolean(playlists),
-  skipContext: () => ({ hasPlaylistsApi: Boolean(playlists) }),
+  canLoad: () => shouldUsePlaylistMock || Boolean(playlists),
+  skipContext: () => ({
+    hasPlaylistsApi: Boolean(playlists),
+    isUsingPlaylistMock: shouldUsePlaylistMock
+  }),
   load: async () => {
+    if (shouldUsePlaylistMock) {
+      if (!activePlaylistMock) {
+        throw new Error('Playlist mock is empty');
+      }
+
+      return activePlaylistMock;
+    }
+
     if (!playlists) {
       throw new Error('Playlists API not available');
     }
@@ -52,7 +67,8 @@ const debugState = computed(() => ({
   loadError: loadError.value,
   lastClientError: lastError.value?.message ?? null,
   playlistName: activePlaylist.value?.name ?? null,
-  playlistAppletCount: activePlaylist.value?.applets.length ?? 0
+  playlistAppletCount: activePlaylist.value?.applets.length ?? 0,
+  isUsingPlaylistMock: shouldUsePlaylistMock
 }));
 </script>
 
@@ -76,6 +92,7 @@ const debugState = computed(() => ({
       <p>lastClientError: {{ debugState.lastClientError ?? 'null' }}</p>
       <p>playlistName: {{ debugState.playlistName ?? 'null' }}</p>
       <p>playlistAppletCount: {{ debugState.playlistAppletCount }}</p>
+      <p>isUsingPlaylistMock: {{ debugState.isUsingPlaylistMock }}</p>
     </section>
 
     <div class="text-center m-4">

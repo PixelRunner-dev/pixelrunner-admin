@@ -8,7 +8,7 @@ const { applets, dateCreated, dateModified }: IPlaylist = defineProps<IPlaylist>
 </script>
 
 <template>
-  <div class="component--playlist" :data-created="dateCreated" :data-modified="dateModified">
+  <div class="component--playlist my-4" :data-created="dateCreated" :data-modified="dateModified">
     <template v-if="applets.length">
       <AppletList :applets :isDragable="true" :classes="{ list: 'playlist list', item: 'playlist__item list-row' }">
         <template #item="applet">

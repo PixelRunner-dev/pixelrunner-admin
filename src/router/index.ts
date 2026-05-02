@@ -1,8 +1,16 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import {
+  createRouter,
+  createWebHistory,
+  isNavigationFailure,
+  NavigationFailureType
+} from 'vue-router';
+
+const APP_TITLE = document.title;
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: '/', redirect: '/applets' },
     {
       path: '/setup',
       name: 'setup',
@@ -63,28 +71,28 @@ const router = createRouter({
 
 const hasDeviceConfigured = true;
 
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to) => {
   if (to.name !== 'setup' && !hasDeviceConfigured) {
-    router.push('/setup');
+    return { name: 'setup' };
   }
 
   if (to.name === 'setup' && hasDeviceConfigured) {
-    router.push('/applets');
-  }
-
-  if (to.path === '/') {
-    router.push('/applets');
+    return { name: 'applet-list' };
   }
 
   if (to.meta.title) {
-    document.title = `${to.meta.title} - ${document.title}`;
+    document.title = `${to.meta.title} - ${APP_TITLE}`;
   }
-
-  next();
 });
 
 router.afterEach((_to, _from, failure) => {
-  if (failure) {
+  if (
+    failure &&
+    !isNavigationFailure(
+      failure,
+      NavigationFailureType.cancelled | NavigationFailureType.duplicated
+    )
+  ) {
     console.error('route failure', failure);
     // sendToAnalytics(to, from, failure)
   }

@@ -36,7 +36,10 @@ const appletImage = computed(() => {
 </script>
 
 <template>
-  <DFlex is="article" :class="['component--applet-card', `applet-card--${view}`]">
+  <DFlex is="article" :class="['component--applet-card', `applet-card--${view}`, {
+    'applet-card--is-hidden': applet.installationDetails?.isHidden,
+    'applet-card--is-pinned': applet.installationDetails?.isPinned
+  }]">
     <component
       :is="hasCallToAction ? 'div' : 'router-link'"
       :to="hasCallToAction ? undefined : `/store/applets/${applet.packageName}`">
@@ -87,5 +90,34 @@ const appletImage = computed(() => {
   left: 0;
   padding: 0.5rem 1rem;
   width: 100%;
+}
+
+.applet-card--is-hidden::after,
+.applet-card--is-pinned::after {
+  content: '';
+  height: 100%;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+[data-theme-mode="dark"] .applet-card--is-hidden::after {
+  background-color: rgba(0, 0, 0, 0.33);
+}
+
+[data-theme-mode="light"] .applet-card--is-hidden::after {
+  background-color: rgba(255, 255, 255, 0.33);
+}
+
+.applet-card--is-hidden::after {
+  backdrop-filter: grayscale(1);
+}
+
+.applet-card--is-pinned::after {
+  border: calc(var(--border) * 4) solid transparent;
+  border-radius: calc(var(--radius-box) * 1.2);
+  box-shadow: inset 0 0 0 3px var(--color-accent);
 }
 </style>

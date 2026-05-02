@@ -35,7 +35,7 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
       throw new Error('Must provide either uuid or packageName');
     }
 
-    if (packageName && uuid) {
+    if (uuid) {
       return this.request<IFullAppletRecord>('applets.action', {
         method: 'getInstalledAppletByUUID',
         params: { uuid }

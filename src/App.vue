@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref, inject, onMounted } from 'vue';
+import { computed, ref, inject, onMounted, watchEffect } from 'vue';
 
 import SiteHeader from '@/components/SiteHeader.vue';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import AccessWarning from '@/components/AccessWarning.vue';
 import { useAdminVersionCheck } from '@/composables/useAdminVersionCheck.ts';
 
+import { THEMES_DARK, THEME_DEFAULT } from '@/constants.ts';
+
 import { Alert as DAlert, Button as DButton, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
+
+import { CookieStore } from '@/utils/CookieStore.ts';
+import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
 
 import type { AccessMode } from '@/utils/access-detector.ts';
 
@@ -14,11 +19,25 @@ const accessMode = inject<AccessMode>('accessMode', 'unknown');
 const showAccessWarning = ref(true);
 const { hasUpdateAvailable, refreshPage } = useAdminVersionCheck();
 
+const selectedTheme = computed(() => {
+  return CookieStore.has('theme') ? CookieStore.get('theme') as string : THEME_DEFAULT;
+});
+
+const themeMode = computed(() => {
+  return THEMES_DARK.includes(selectedTheme.value) ? 'dark' : 'light';
+});
+
 onMounted(() => {
   if (accessMode === 'local') {
     showAccessWarning.value = false;
   }
 });
+
+watchEffect(() => {
+  document.documentElement.dataset.theme = selectedTheme.value;
+  document.documentElement.dataset.themeMode = themeMode.value;
+});
+
 </script>
 
 <template>
@@ -33,6 +52,15 @@ onMounted(() => {
       <DAlert warning role="alert" horizontal>
         <DText>[A new version of this page is available. Click refresh to continue.]</DText>
         <DButton btn sm primary @click="refreshPage">[Refresh]</DButton>
+      </DAlert>
+    </div>
+
+    <div v-if="controllerConnectionLost" class="site-wrapper mb-8">
+      <DAlert error role="alert" horizontal>
+        <DText>
+          [The connection with the controller of your Pixelrunner is lost. Please wait or refresh
+          the page.]
+        </DText>
       </DAlert>
     </div>
 
@@ -70,9 +98,9 @@ onMounted(() => {
   --color-base-200: #f7dbbf;
   --color-base-300: oklch(70% 0.213 47.604);
   --color-base-content: #4f2a07;
-  --color-primary: #4f2a07;
+  --color-primary: oklch(50% 0.213 27.518);
   --color-primary-content: oklch(98% 0.018 155.826);
-  --color-secondary: oklch(50% 0.213 27.518);
+  --color-secondary: #4f2a07;
   --color-secondary-content: oklch(98% 0.016 73.684);
   --color-accent: oklch(66% 0.179 58.318);
   --color-accent-content: oklch(98% 0.014 180.72);
@@ -95,6 +123,8 @@ onMounted(() => {
   --depth: 1;
   --noise: 1;
 }
+
+@custom-variant dark (&:where([data-theme-mode="dark"], [data-theme-mode="dark"] *));
 
 .page-enter-active,
 .page-leave-active {

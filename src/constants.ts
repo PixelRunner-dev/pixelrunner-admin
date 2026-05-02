@@ -77,3 +77,50 @@ export const DEFAULT_WEBSOCKET_CONFIG: Required<IWebSocketConfig> = {
   heartbeatInterval: DEFAULT_HEARTBEAT_INTERVAL, // 30 seconds
   debug: import.meta.env.DEV || false
 };
+
+export const THEMES_DARK = [
+  'dark',
+  'business',
+  'dracula',
+  'abyss',
+  'night',
+  'halloween',
+  'dim',
+  'sunset',
+  'forest',
+  'coffee',
+  'luxury',
+  'black'
+];
+
+export const THEMES_LIGHT = [
+  'pixelrunner',
+  'light',
+  'emerald',
+  'garden',
+  'pastel',
+  'autumn',
+  'cupcake',
+  'nord',
+  'bumblebee',
+  'corporate',
+  'fantasy',
+  'acid',
+  'cmyk',
+  'winter',
+  'silk',
+  'lofi',
+  'wireframe'
+];
+
+export const THEMES_OTHER = [
+  'synthwave',
+  'aqua',
+  'cyberpunk',
+  'retro',
+  'valentine',
+  'caramellatte',
+  'lemonade'
+];
+
+export const THEME_DEFAULT = 'pixelrunner';

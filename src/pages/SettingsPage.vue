@@ -30,6 +30,7 @@ import {
   type SyncedControllerSettingBinding
 } from '@/composables/useSyncedControllerSettings.ts';
 import { useClientApi } from '@/ws/index.ts';
+import { THEMES_DARK, THEMES_LIGHT, THEMES_OTHER } from '@/constants';
 
 // Get WebSocket functionality
 const { device, isConnected, lastError, settings, state } = useClientApi();
@@ -109,50 +110,9 @@ function deviceNameOnPaste(e: ClipboardEvent) {
   if (clipboardData) inputField.value = clipboardData.replace(/[^A-Za-z0-9_-]/, '');
 }
 
-const themesDark = computed<string[]>(() => [
-  'dark',
-  'business',
-  'dracula',
-  'abyss',
-  'night',
-  'halloween',
-  'dim',
-  'sunset',
-  'forest',
-  'coffee',
-  'luxury',
-  'black'
-]);
-
-const themesLight = computed<string[]>(() => [
-  'pixelrunner',
-  'light',
-  'emerald',
-  'garden',
-  'pastel',
-  'autumn',
-  'cupcake',
-  'nord',
-  'bumblebee',
-  'corporate',
-  'fantasy',
-  'acid',
-  'cmyk',
-  'winter',
-  'silk',
-  'lofi',
-  'wireframe'
-]);
-
-const themesOther = computed<string[]>(() => [
-  'synthwave',
-  'aqua',
-  'cyberpunk',
-  'retro',
-  'valentine',
-  'caramellatte',
-  'lemonade'
-]);
+const themesDark = computed<string[]>(() => THEMES_DARK);
+const themesLight = computed<string[]>(() => THEMES_LIGHT);
+const themesOther = computed<string[]>(() => THEMES_OTHER);
 
 const securityOptions = computed<string[]>(() => [
   'none',
