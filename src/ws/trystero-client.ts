@@ -17,6 +17,7 @@ import type {
   IErrorEvent
 } from 'pixelrunner-shared';
 import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
+import { resolveTrysteroRoomId } from '@/ws/room-id.ts';
 
 const ICE_SERVERS = [
   { urls: 'stun:stun.cloudflare.com:3478' },
@@ -62,6 +63,7 @@ interface TrysteroRoomLike {
  */
 export interface TrysteroConfig extends IWebSocketConfig {
   roomId?: string;
+  fallbackRoomId?: string;
   relayUrls?: string[];
   joinSecret?: string;
 }
@@ -199,7 +201,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   protected async connectTransport(): Promise<void> {
     console.log('[trystero-client] connectTransport() called');
     this.installRelaySocketDebugging();
-    this.installWebRtcDebugging();
+    // this.installWebRtcDebugging();
 
     if (!trystero) {
       console.log('[trystero-client] Loading trystero module...');
@@ -208,7 +210,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       console.log('[trystero-client] selfId:', trystero.selfId);
     }
 
-    const roomId = this.config.roomId || `${ROOM_PREFIX}-default`;
+    const roomId = await resolveTrysteroRoomId(this.config.roomId, {
+      fallbackRoomId: this.config.fallbackRoomId
+    });
     console.log('[trystero-client] Room ID:', roomId);
     console.log('[trystero-client] Relay URLs:', this.config.relayUrls);
     console.log('[trystero-client] APP_ID:', APP_ID);
@@ -254,10 +258,10 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         this.handleTransportError(error);
       }
     });
-    console.log(
-      '[trystero-client] joinRoom() returned, room object created',
-      Object.keys(this.room)
-    );
+    // console.log(
+    //   '[trystero-client] joinRoom() returned, room object created',
+    //   Object.keys(this.room)
+    // );
 
     this.setupRoomHandlers();
     this.startPeerMonitoring();
@@ -282,12 +286,6 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         this.handleNoPeersDetected('Peer left');
       });
     } else console.log('[trystero-client] No onPeerLeave event found');
-    if (this.room.onError) {
-      this.room.onError((error: Error) => {
-        console.error('[trystero-client] Room error:', error);
-        this.handleTransportError(error);
-      });
-    } else console.log('[trystero-client] No onError event found');
     if (this.room.getPeers) {
       const existingPeerCount = this.getPeerCount();
       console.log('[trystero-client] Existing peers:', this.room.getPeers());
@@ -683,13 +681,13 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
           console.log('[trystero-client] Relay socket error:', normalizedUrl);
         });
 
-        this.addEventListener('message', (event) => {
-          console.log(
-            '[trystero-client] Relay socket message:',
-            normalizedUrl,
-            String(event.data).slice(0, 300)
-          );
-        });
+        // this.addEventListener('message', (event) => {
+        //   console.log(
+        //     '[trystero-client] Relay socket message:',
+        //     normalizedUrl,
+        //     String(event.data).slice(0, 300)
+        //   );
+        // });
       }
 
       override send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {

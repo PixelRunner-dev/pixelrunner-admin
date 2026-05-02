@@ -7,8 +7,10 @@
     "src/components/AccessWarning.vue",
     "src/components/Icon/IconSprite.vue",
     "src/components/SiteHeader.vue",
+    "src/constants.ts",
     "src/composables/useAdminVersionCheck.ts",
     "src/utils/**/*.ts",
+    "src/ws/room-id.ts",
     "vendor/**/*.ts",
     "vendor/**/*.vue"
   ],

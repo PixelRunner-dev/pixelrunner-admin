@@ -62,7 +62,7 @@ i18next
       // The device will also connect via Trystero to establish P2P link
       console.log('[main] Using Trystero WebRTC client for proxy access');
       wsClient = new TrysteroWebRTCClient({
-        roomId: `${ROOM_PREFIX}-${CookieStore.get('deviceId') || 'default'}`,
+        fallbackRoomId: `${ROOM_PREFIX}-${CookieStore.get('deviceId') || 'default'}`,
         relayUrls: [...NOSTR_RELAYS],
         debug: import.meta.env.DEV,
         reconnect: true
@@ -107,8 +107,6 @@ i18next
     wsClient.connect().catch((err) => {
       console.error('Failed to connect to WebSocket:', err);
     });
-
-    console.log('DIT IS IN MAIN', wsClient, wsClient.state.value);
 
     const languageFromCookie = CookieStore.get('language');
     if (languageFromCookie) {
