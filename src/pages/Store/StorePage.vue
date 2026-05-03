@@ -49,7 +49,10 @@ const {
       throw new Error('Applets API not available');
     }
 
-    const loadedApplets = await applets.getAllApplets();
+    const loadedApplets = await applets.getAllApplets({
+      sortOrder: 'DESC',
+      limit: 10
+    });
 
     return (loadedApplets ?? []) as IFullApplet[];
   },

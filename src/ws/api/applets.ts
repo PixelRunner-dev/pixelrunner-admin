@@ -5,12 +5,17 @@
  * on the Pixelrunner device.
  */
 
-import type { ICategory, UUID, IFullAppletRecord } from 'pixelrunner-shared';
+import type { ICategory, UUID, IFullApplet, IFullAppletRecord } from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
 
 interface AppletActionResponse<T> {
   method: string;
   data: T;
+}
+
+interface AppletQueryOptions extends Record<string, unknown> {
+  sortOrder?: 'ASC' | 'DESC';
+  limit?: number;
 }
 
 /**
@@ -90,16 +95,16 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
     return this.request<void>('applets.setconfig', { uuid, config });
   }
 
-  async getAllApplets(): Promise<IFullAppletRecord[]> {
-    return this.action<IFullAppletRecord[]>('getAllApplets');
+  async getAllApplets(options: AppletQueryOptions = {}): Promise<IFullApplet[]> {
+    return this.action<IFullApplet[]>('getAllApplets', options);
   }
 
-  async getAppletsByCategory(category: ICategory): Promise<IFullAppletRecord[]> {
+  async getAppletsByCategory(category: ICategory): Promise<IFullApplet[]> {
     return this.getAppletsByCategoryName(category.name);
   }
 
-  async getAppletsByCategoryName(categoryName: string): Promise<IFullAppletRecord[]> {
-    return this.action<IFullAppletRecord[]>('getAppletsByCategoryName', { categoryName });
+  async getAppletsByCategoryName(categoryName: string): Promise<IFullApplet[]> {
+    return this.action<IFullApplet[]>('getAppletsByCategoryName', { categoryName });
   }
 
   private async action<T>(method: string, params?: Record<string, unknown>): Promise<T> {
