@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import type { ICategory, IFullApplet } from 'pixelrunner-shared';
+import type { IFullApplet } from 'pixelrunner-shared';
 
 import { useClientApi } from '@/ws/index.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
@@ -15,529 +15,51 @@ import AppletCard from '@/components/Applet/AppletCard.vue';
 
 import { Button as DButton, Flex as DFlex, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
-const categories: ICategory[] = [
-  {
-    name: 'Memes',
-    icon: {
-      iconId: 'icon--masks-theater',
-      alt: 'Memes'
-    }
-  },
-  {
-    name: 'Bitcoin',
-    icon: {
-      iconId: 'icon--bitcoin',
-      alt: 'Bitcoin'
-    }
-  },
-  {
-    name: 'Clock',
-    icon: {
-      iconId: 'icon--clock',
-      alt: 'Clock'
-    }
-  },
-  {
-    name: 'News',
-    icon: {
-      iconId: 'icon--newspaper',
-      alt: 'News'
-    }
-  },
-  {
-    name: 'Weather',
-    icon: {
-      iconId: 'icon--cloud-sun-rain',
-      alt: 'Weather'
-    }
-  },
-  {
-    name: 'Art',
-    icon: {
-      iconId: 'icon--paintbrush',
-      alt: 'Art'
-    }
-  },
-  {
-    name: 'Social',
-    icon: {
-      iconId: 'icon--',
-      alt: 'Social'
-    }
-  },
-  {
-    name: 'Pokémon',
-    icon: {
-      iconId: 'icon--pokemon',
-      alt: 'Pokémon'
-    }
-  },
-  {
-    name: 'Sport & Fitness',
-    icon: {
-      iconId: 'icon--heart-pusle',
-      alt: 'Sport'
-    }
-  },
-  {
-    name: 'Productivity',
-    icon: {
-      iconId: 'icon--handshake',
-      alt: 'Productivity'
-    }
-  },
-  {
-    name: 'Home automation',
-    icon: {
-      iconId: 'icon--home-laptop',
-      alt: 'Home automation'
-    }
-  },
-  {
-    name: 'Now playing',
-    icon: {
-      iconId: 'icon--music',
-      alt: 'Now'
-    }
-  },
-  {
-    name: 'Made for devs',
-    icon: {
-      iconId: 'icon--code',
-      alt: 'Made'
-    }
-  },
-  {
-    name: 'Gaming',
-    icon: {
-      iconId: 'icon--gamepad',
-      alt: 'Gaming'
-    }
-  },
-  {
-    name: 'Customization',
-    icon: {
-      iconId: 'icon--wand-magic-sparkles',
-      alt: 'Customization'
-    }
-  },
-  {
-    name: 'Religion',
-    icon: {
-      iconId: 'icon--person-praying',
-      alt: 'Religion'
-    }
-  }
-];
+const spotlightCategoryName = 'spotlight';
+const starterPackCategoryName = 'starter pack';
 
-const newlyAddedItems: IFullApplet[] = [
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/btcfagi.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 1',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: true
-    },
-    isInstalled: false,
-    categories: [categories[0] as ICategory, categories[1] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/amazing.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 2',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[1] as ICategory, categories[2] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/arcadeclassics.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 3',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[3] as ICategory, categories[2] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/bitcointicker.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 4',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [
-      categories[0] as ICategory,
-      categories[1] as ICategory,
-      categories[2] as ICategory,
-      categories[3] as ICategory,
-      categories[4] as ICategory
-    ]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/btcdifficulty.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 5',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: true
-    },
-    isInstalled: false,
-    categories: [categories[4] as ICategory, categories[5] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/usdebtclock.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 6',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[3] as ICategory, categories[5] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/btcmoscowtime.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 7',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[6] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/buienradar.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 8',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[5] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/daynightmap.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 9',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[0] as ICategory, categories[6] as ICategory, categories[7] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/homerhiding.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 10',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[7] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/knmialert.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 11',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[0] as ICategory, categories[6] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/lastfm.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 12',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[0] as ICategory, categories[1] as ICategory, categories[5] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/mempool.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 13',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[4] as ICategory, categories[5] as ICategory, categories[8] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/nos.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 14',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[6] as ICategory, categories[7] as ICategory, categories[8] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/nunl.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 15',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[3] as ICategory, categories[6] as ICategory, categories[7] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/nyancat.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 16',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[0] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/skynews.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 17',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[5] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/solaredgemonitor.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 18',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[1] as ICategory, categories[4] as ICategory]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/sonicthehedgehogclock.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 19',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [
-      categories[0] as ICategory,
-      categories[1] as ICategory,
-      categories[2] as ICategory,
-      categories[3] as ICategory,
-      categories[4] as ICategory,
-      categories[5] as ICategory,
-      categories[6] as ICategory,
-      categories[7] as ICategory,
-      categories[8] as ICategory
-    ]
-  },
-  {
-    fileName: 'file-name.webp',
-    packageName: 'myApp',
-    defaultImage: {
-      src: 'https://applets.pixelrunner.dev/starfield.webp',
-      alt: 'alt',
-      dateCreated: new Date()
-    },
-    details: {
-      name: 'name 20',
-      summary: 'bla die bla',
-      desc: 'nog meer bla die bla dus',
-      author: '@truus',
-      tags: ['tag 1', 'tag 2'],
-      isOfficialApplet: false
-    },
-    isInstalled: false,
-    categories: [categories[8] as ICategory]
-  }
-];
+// komt later...
+// const mostInstalledItems = newlyAddedItems;
 
-// const spotlightItems = newlyAddedItems;
-const mostInstalledItems = newlyAddedItems;
-const starterPackItems = newlyAddedItems;
+const isTimeOfTheYear = new Date().getMonth() === 11; // christmas + nye
+// const isTimeOfTheYear = (new Date()).getMonth() === 7; // zomer + wk voetbal?
 
 const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'];
 
 const { isConnected, applets, isConnecting, lastError, connect, state } = useClientApi();
-const spotlightCategory = categories[0] as ICategory;
-const canLoadSpotlight = computed(() => isConnected.value);
+const canLoadStoreApplets = computed(() => isConnected.value);
+
+const {
+  data: newlyAddedItems,
+  isLoading: isNewlyAddedLoading,
+  error: newlyAddedError,
+  isWaitingForPeer: isWaitingForNewlyAddedPeer,
+  reload: reloadNewlyAdded
+} = useControllerQuery<IFullApplet[]>({
+  label: 'StorePage newly added',
+  enabled: canLoadStoreApplets,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets)
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
+
+    const loadedApplets = await applets.getAllApplets();
+
+    return (loadedApplets ?? []) as IFullApplet[];
+  },
+  defaultErrorMessage: 'Failed to load newly added applets',
+  onSuccess: (loadedApplets) => {
+    console.log('[StorePage] Newly added applets loaded:', {
+      count: loadedApplets.length
+    });
+  }
+});
 
 const {
   data: spotlightItems,
@@ -547,31 +69,67 @@ const {
   reload: reloadSpotlight
 } = useControllerQuery<IFullApplet[]>({
   label: 'StorePage spotlight',
-  enabled: canLoadSpotlight,
+  enabled: canLoadStoreApplets,
   state,
   lastError,
   canLoad: () => Boolean(applets),
   skipContext: () => ({
     hasAppletsApi: Boolean(applets),
-    category: spotlightCategory.name
+    categoryName: spotlightCategoryName
   }),
   load: async () => {
     if (!applets) {
       throw new Error('Applets API not available');
     }
 
-    const categoryApplets = await applets.getAppletsByCategory(spotlightCategory);
+    const categoryApplets = await applets.getAppletsByCategoryName(spotlightCategoryName);
 
     return (categoryApplets ?? []) as IFullApplet[];
   },
   defaultErrorMessage: 'Failed to load spotlight applets',
   onSuccess: (loadedApplets) => {
     console.log('[StorePage] Spotlight applets loaded:', {
-      category: spotlightCategory.name,
+      categoryName: spotlightCategoryName,
       count: loadedApplets.length
     });
   }
 });
+
+const {
+  data: starterPackItems,
+  isLoading: isStarterPackLoading,
+  error: starterPackError,
+  isWaitingForPeer: isWaitingForStarterPackPeer,
+  reload: reloadStarterPack
+} = useControllerQuery<IFullApplet[]>({
+  label: 'StorePage starter pack',
+  enabled: canLoadStoreApplets,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets),
+    categoryName: starterPackCategoryName
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
+
+    const categoryApplets = await applets.getAppletsByCategoryName(starterPackCategoryName);
+
+    return (categoryApplets ?? []) as IFullApplet[];
+  },
+  defaultErrorMessage: 'Failed to load starter pack applets',
+  onSuccess: (loadedApplets) => {
+    console.log('[StorePage] Starter pack applets loaded:', {
+      categoryName: starterPackCategoryName,
+      count: loadedApplets.length
+    });
+  }
+});
+
+const themedItems = newlyAddedItems;
 </script>
 
 <template>
@@ -623,6 +181,7 @@ const {
         </template>
       </AppletCarousel>
     </StoreSection>
+
     <p v-else-if="isSpotlightLoading" class="m-4 text-center">Loading spotlight applets...</p>
     <p v-else-if="isWaitingForSpotlightPeer" class="m-4 text-center">
       Waiting for device connection...
@@ -631,6 +190,20 @@ const {
       <p class="text-error">{{ spotlightError }}</p>
       <DButton size="xs" color="neutral" @click="reloadSpotlight">Retry</DButton>
     </div>
+
+    <StoreSection
+      v-if="isTimeOfTheYear && themedItems"
+      title="[themed items]"
+      payoff="[themed applets]"
+    >
+      <AppletCarousel :applets="themedItems">
+        <template #item="applet">
+          <AppletCard view="preview" :applet>
+            <template #cta>[test]</template>
+          </AppletCard>
+        </template>
+      </AppletCarousel>
+    </StoreSection>
 
     <StoreSection v-if="newlyAddedItems" title="[Newly Added]" payoff="[New applets added]">
       <AppletCarousel :applets="newlyAddedItems">
@@ -642,11 +215,21 @@ const {
       </AppletCarousel>
     </StoreSection>
 
+    <p v-else-if="isNewlyAddedLoading" class="m-4 text-center">Loading newly added applets...</p>
+    <p v-else-if="isWaitingForNewlyAddedPeer" class="m-4 text-center">
+      Waiting for device connection...
+    </p>
+    <div v-else-if="newlyAddedError" class="m-4 text-center">
+      <p class="text-error">{{ newlyAddedError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadNewlyAdded">Retry</DButton>
+    </div>
+
     <!-- <StoreSection v-if="categories" title="Categories">
       <CategoryList :categories isInteractive />
     </StoreSection> -->
 
-    <StoreSection
+    <!-- mostInstalledItems komt later -->
+    <!-- <StoreSection
       v-if="mostInstalledItems"
       title="[Most Installed]"
       payoff="[Most installed applets]"
@@ -658,7 +241,7 @@ const {
           </AppletCard>
         </template>
       </AppletCarousel>
-    </StoreSection>
+    </StoreSection> -->
 
     <StoreSection
       v-if="starterPackItems"
@@ -673,6 +256,15 @@ const {
         </template>
       </AppletCarousel>
     </StoreSection>
+
+    <p v-else-if="isStarterPackLoading" class="m-4 text-center">Loading starter pack applets...</p>
+    <p v-else-if="isWaitingForStarterPackPeer" class="m-4 text-center">
+      Waiting for device connection...
+    </p>
+    <div v-else-if="starterPackError" class="m-4 text-center">
+      <p class="text-error">{{ starterPackError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadStarterPack">Retry</DButton>
+    </div>
 
     <section>[Build your own applet! Submit it via Github]</section>
   </main>

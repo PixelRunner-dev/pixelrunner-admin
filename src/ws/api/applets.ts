@@ -8,6 +8,11 @@
 import type { ICategory, UUID, IFullAppletRecord } from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
 
+interface AppletActionResponse<T> {
+  method: string;
+  data: T;
+}
+
 /**
  * AppletsAPI provides applet management functionality.
  * Works with any client that implements IRpcClient (WebSocket or Trystero).
@@ -17,10 +22,7 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
    * Get list of all installed applets
    */
   async listInstalled(): Promise<IFullAppletRecord[]> {
-    return this.request<IFullAppletRecord[]>('applets.action', {
-      method: 'getAllAppletsByPlaylistId',
-      params: { playlistId: 0 }
-    });
+    return this.action<IFullAppletRecord[]>('getAllAppletsByPlaylistId', { playlistId: 0 });
   }
 
   /**
@@ -36,16 +38,10 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
     }
 
     if (uuid) {
-      return this.request<IFullAppletRecord>('applets.action', {
-        method: 'getInstalledAppletByUUID',
-        params: { uuid }
-      });
+      return this.action<IFullAppletRecord>('getInstalledAppletByUUID', { uuid });
     }
 
-    return this.request<IFullAppletRecord>('applets.action', {
-      method: 'getAppletByPackageName',
-      params: { packageName }
-    });
+    return this.action<IFullAppletRecord>('getAppletByPackageName', { packageName });
   }
 
   /**
@@ -64,21 +60,13 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
     }
 
     if (uuid) {
-      return this.request<{ appID: string; config: Record<string, unknown> | null }>(
-        'applets.action',
-        {
-          method: 'getConfig',
-          params: { uuid }
-        }
-      );
+      return this.action<{ appID: string; config: Record<string, unknown> | null }>('getConfig', {
+        uuid
+      });
     }
-    return this.request<{ appID: string; config: Record<string, unknown> | null }>(
-      'applets.action',
-      {
-        method: 'getConfig',
-        params: { packageName }
-      }
-    );
+    return this.action<{ appID: string; config: Record<string, unknown> | null }>('getConfig', {
+      packageName
+    });
   }
 
   /**
@@ -88,9 +76,8 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
   async getSchema(
     packageName: string
   ): Promise<{ version: string; schema: Record<string, unknown>[] }> {
-    return this.request<{ version: string; schema: Record<string, unknown>[] }>('applets.action', {
-      method: 'getSchema',
-      params: { packageName }
+    return this.action<{ version: string; schema: Record<string, unknown>[] }>('getSchema', {
+      packageName
     });
   }
 
@@ -103,12 +90,25 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
     return this.request<void>('applets.setconfig', { uuid, config });
   }
 
+  async getAllApplets(): Promise<IFullAppletRecord[]> {
+    return this.action<IFullAppletRecord[]>('getAllApplets');
+  }
+
   async getAppletsByCategory(category: ICategory): Promise<IFullAppletRecord[]> {
-    console.log('ik ben in getAppletsByCategory');
-    return this.request<IFullAppletRecord[]>('applets.action', {
-      method: 'getAppletsByCategoryName',
-      params: { category: category.name }
+    return this.getAppletsByCategoryName(category.name);
+  }
+
+  async getAppletsByCategoryName(categoryName: string): Promise<IFullAppletRecord[]> {
+    return this.action<IFullAppletRecord[]>('getAppletsByCategoryName', { categoryName });
+  }
+
+  private async action<T>(method: string, params?: Record<string, unknown>): Promise<T> {
+    const response = await this.request<AppletActionResponse<T>>('applets.action', {
+      method,
+      ...(params && { params })
     });
+
+    return response.data;
   }
 
   // /**
