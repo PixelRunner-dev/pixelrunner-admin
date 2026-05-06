@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, inject, onMounted, watchEffect } from 'vue';
+import { computed, ref, inject, onMounted, provide, watchEffect } from 'vue';
 
 import SiteHeader from '@/components/SiteHeader.vue';
 import IconSprite from '@/components/Icon/IconSprite.vue';
@@ -8,16 +8,38 @@ import { useAdminVersionCheck } from '@/composables/useAdminVersionCheck.ts';
 
 import { THEMES_DARK, THEME_DEFAULT } from '@/constants.ts';
 
-import { Alert as DAlert, Button as DButton, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
+import { Alert as DAlert, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 import { CookieStore } from '@/utils/CookieStore.ts';
 import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
 
 import type { AccessMode } from '@/utils/access-detector.ts';
 
+interface Notification {
+  type: 'error' | 'warning' | 'info' | 'success';
+  message: string;
+  timeoutToClose?: number;
+  hasCloseButton?: boolean;
+}
+
 const accessMode = inject<AccessMode>('accessMode', 'unknown');
 const showAccessWarning = ref(true);
-const { hasUpdateAvailable, refreshPage } = useAdminVersionCheck();
+const { hasUpdateAvailable } = useAdminVersionCheck();
+
+const notifications = ref<Notification[]>([]);
+if (hasUpdateAvailable) {
+  notifications.value?.push({
+    type: 'warning',
+    message: '[A new version of this page is available. Click refresh to continue.]'
+  });
+}
+if (controllerConnectionLost) {
+  notifications.value?.push({
+    type: 'error',
+    message: '[The connection with the controller of your Pixelrunner is lost. Please wait or refresh the page.]'
+  });
+}
+provide('notifications', notifications);
 
 const selectedTheme = computed(() => {
   return CookieStore.has('theme') ? CookieStore.get('theme') as string : THEME_DEFAULT;
@@ -48,20 +70,14 @@ watchEffect(() => {
       </div>
     </header>
 
-    <div v-if="hasUpdateAvailable" class="site-wrapper mb-8">
-      <DAlert warning role="alert" horizontal>
-        <DText>[A new version of this page is available. Click refresh to continue.]</DText>
-        <DButton btn sm primary @click="refreshPage">[Refresh]</DButton>
-      </DAlert>
-    </div>
-
-    <div v-if="controllerConnectionLost" class="site-wrapper mb-8">
-      <DAlert error role="alert" horizontal>
-        <DText>
-          [The connection with the controller of your Pixelrunner is lost. Please wait or refresh
-          the page.]
-        </DText>
-      </DAlert>
+    <div v-if="notifications?.length" class="site-wrapper my-8">
+      <div v-for="notification in notifications" :key="notification.message" class="my-4">
+        <DAlert :type="notification.type" role="alert" horizontal>
+          <DText>
+            {{ notification.message }}
+          </DText>
+        </DAlert>
+      </div>
     </div>
 
     <router-view v-slot="{ Component }">

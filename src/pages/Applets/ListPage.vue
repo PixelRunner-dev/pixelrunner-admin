@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, inject, ref, type Ref } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
@@ -13,6 +13,14 @@ import {
 import type { IPlaylist, UUID } from 'pixelrunner-shared';
 
 const { isConnected, state, lastError, playlists } = useClientApi();
+interface Notification {
+  type: 'error' | 'warning' | 'info' | 'success';
+  message: string;
+  timeoutToClose?: number;
+  hasCloseButton?: boolean;
+}
+
+const notifications = inject<Ref<Notification[]>>('notifications');
 
 const {
   data: activePlaylist,
@@ -50,6 +58,17 @@ const {
 const isSavingOrder = ref(false);
 const saveOrderError = ref<string | null>(null);
 
+function pushNotification(notification: Notification) {
+  if (!notifications) {
+    return;
+  }
+
+  notifications.value = [
+    notification,
+    ...notifications.value.filter((item) => item.message !== notification.message)
+  ];
+}
+
 function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
   return applet.installationDetails?.uuid ?? null;
 }
@@ -85,6 +104,11 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
   } catch (error) {
     activePlaylist.value = previousPlaylist;
     saveOrderError.value = error instanceof Error ? error.message : 'Failed to save playlist order';
+    pushNotification({
+      type: 'error',
+      message: `[Could not save playlist order. ${saveOrderError.value}]`,
+      hasCloseButton: true
+    });
     await reload();
   } finally {
     isSavingOrder.value = false;

@@ -359,10 +359,14 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
 
     // Handle error response
     if (response.error) {
+      const rpcError =
+        typeof response.error === 'string'
+          ? { code: response.error, message: response.error, data: undefined }
+          : response.error;
       const error = new JsonRpcError(
-        response.error.message,
-        response.error.code,
-        response.error.data
+        rpcError.message || rpcError.code || 'JSON-RPC request failed',
+        rpcError.code || 'rpc_error',
+        rpcError.data
       );
       pending.reject(error);
       return;
