@@ -12,7 +12,7 @@ import {
 
 import type { IPlaylist, UUID } from 'pixelrunner-shared';
 
-const PLAYLIST_ORDER_SAVE_TIMEOUT_MS = 5000;
+const PLAYLIST_ORDER_FAILED_ROLLBACK_DELAY_MS = 5000;
 
 const { isConnected, state, lastError, playlists } = useClientApi();
 interface Notification {
@@ -86,7 +86,7 @@ function getErrorMessage(error: unknown): string {
 
 async function waitForRollbackWindow(startedAt: number): Promise<void> {
   const elapsedMs = Date.now() - startedAt;
-  const remainingMs = Math.max(0, PLAYLIST_ORDER_SAVE_TIMEOUT_MS - elapsedMs);
+  const remainingMs = Math.max(0, PLAYLIST_ORDER_FAILED_ROLLBACK_DELAY_MS - elapsedMs);
 
   if (remainingMs > 0) {
     await wait(remainingMs);
@@ -116,16 +116,9 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
   saveOrderError.value = null;
   const requestId = ++saveOrderRequestId;
   const saveStartedAt = Date.now();
-  const abortController = new AbortController();
-  const timeout = setTimeout(() => {
-    abortController.abort();
-  }, PLAYLIST_ORDER_SAVE_TIMEOUT_MS);
 
   try {
-    await playlists.updateOrder(appletUuids as UUID[], {
-      signal: abortController.signal,
-      timeout: PLAYLIST_ORDER_SAVE_TIMEOUT_MS
-    });
+    await playlists.updateOrder(appletUuids as UUID[]);
 
     if (requestId !== saveOrderRequestId) {
       return;
@@ -141,11 +134,6 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
     }
 
     const caughtErrorMessage = getErrorMessage(error);
-    const rollbackBecauseTimeout =
-      abortController.signal.aborted || caughtErrorMessage.toLowerCase().includes('timeout');
-    const errorMessage = abortController.signal.aborted
-      ? 'Saving playlist order timed out after 5 seconds'
-      : caughtErrorMessage;
 
     await waitForRollbackWindow(saveStartedAt);
 
@@ -154,19 +142,13 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
     }
 
     activePlaylist.value = previousPlaylist;
-    saveOrderError.value = errorMessage;
+    saveOrderError.value = caughtErrorMessage;
     pushNotification({
       type: 'error',
       message: `[Could not save playlist order. ${saveOrderError.value}]`,
       hasCloseButton: true
     });
-
-    if (!rollbackBecauseTimeout) {
-      await reload();
-    }
   } finally {
-    clearTimeout(timeout);
-
     if (requestId === saveOrderRequestId) {
       isSavingOrder.value = false;
     }
