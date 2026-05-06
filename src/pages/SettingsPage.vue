@@ -429,20 +429,23 @@ watchEffect(() => {
           {{ wifiIsScanning ? '[Scanning...]' : '[Refresh networks]' }}
         </DButton>
 
-        <div id="wifi-networks" class="wifi-network-list">
-          <button
+        <div
+          id="wifi-networks"
+          class="grid gap-2 w-80 max-h-[21lh] overflow-y-auto"
+          style="scrollbar-width: thin;">
+          <DButton
             v-for="network in wifiNetworks"
             :key="network.bssid"
             type="button"
-            class="wifi-network-button"
-            :class="{ 'wifi-network-button--active': network.ssid === ssid }"
+            class="btn-xs items-center bg-base-100 border border-base-300 rounded-field cursor-pointer flex justify-between w-full text-left"
+            :class="{ 'btn-accent': network.ssid === ssid }"
             @click="selectWifiNetwork(network)"
           >
-            <span class="wifi-network-button__name">{{ network.ssid }}</span>
-            <span class="wifi-network-button__meta">
+            <span class="font-bold overflow-hidden text-ellipsis whitespace-nowrap">{{ network.ssid }}</span>
+            <span class="text-base-content flex-[0_0_auto] text-xs pl-1 opacity-70">
               {{ network.security || 'open' }} · {{ network.signal ?? '?' }}%
             </span>
-          </button>
+          </DButton>
 
           <DText v-if="!wifiIsScanning && wifiNetworks.length === 0" is="p" size="sm">
             [No visible WiFi networks found.]
@@ -923,43 +926,5 @@ watchEffect(() => {
 <style scoped>
 input[type='range'] {
   touch-action: pan-x;
-}
-
-.wifi-network-list {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.wifi-network-button {
-  align-items: center;
-  background: var(--color-base-100);
-  border: 1px solid var(--color-base-300);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  min-height: 2.75rem;
-  padding: 0.5rem 0.75rem;
-  text-align: left;
-  width: 100%;
-}
-
-.wifi-network-button--active {
-  border-color: var(--color-primary);
-}
-
-.wifi-network-button__name {
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.wifi-network-button__meta {
-  color: var(--color-base-content);
-  flex: 0 0 auto;
-  font-size: 0.75rem;
-  opacity: 0.7;
-  padding-left: 0.75rem;
 }
 </style>

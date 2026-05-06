@@ -12,7 +12,7 @@ import { CookieStore } from '@/utils/CookieStore.ts';
 import { WebSocketClient, WS_INJECTION_KEY } from '@/ws/index.ts';
 import { TrysteroWebRTCClient } from '@/ws/trystero-client.ts';
 import { NOSTR_RELAYS } from './constants.ts';
-import { getFallbackRoomId } from '@/ws/room-id.ts';
+import { fetchProxyRoomConfig, getFallbackRoomId } from '@/ws/room-id.ts';
 import {
   detectAccessMode,
   requiresProxyConnection,
@@ -40,7 +40,7 @@ i18next
       fr: { [NAMESPACE]: fr }
     }
   })
-  .then(() => {
+  .then(async () => {
     const app = createApp(App);
 
     // Detect access mode
@@ -62,8 +62,10 @@ i18next
       // When accessed via local IP/proxy, use Trystero for P2P connection
       // The device will also connect via Trystero to establish P2P link
       console.log('[main] Using Trystero WebRTC client for proxy access');
+      const proxyRoomConfig = await fetchProxyRoomConfig();
       wsClient = new TrysteroWebRTCClient({
-        fallbackRoomId: getFallbackRoomId(),
+        roomId: proxyRoomConfig?.roomId,
+        fallbackRoomId: proxyRoomConfig?.fallbackRoomId ?? getFallbackRoomId(),
         relayUrls: [...NOSTR_RELAYS],
         debug: import.meta.env.DEV,
         reconnect: true

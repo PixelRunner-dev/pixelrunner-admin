@@ -17,6 +17,14 @@ const roomIdentity = {
   password: ROOM_PASSWORD,
   roomPrefix: ROOM_PREFIX
 };
+const PROXY_CONFIG_PATH = '/.pixelrunner/proxy-config';
+
+export interface ProxyRoomConfig {
+  appId?: string;
+  deviceId?: string;
+  roomId?: string;
+  fallbackRoomId?: string;
+}
 
 function withBrowserDefaults(
   options: ResolveTrysteroRoomIdOptions = {}
@@ -58,6 +66,35 @@ export function getFallbackRoomId(): string {
     createFallbackRoomIdFromDeviceId(import.meta.env.VITE_DEVICE_ID) ??
     `${ROOM_PREFIX}-${DEFAULT_DEVICE_ID}`
   );
+}
+
+function readStringProperty(value: unknown, key: keyof ProxyRoomConfig): string | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+
+  const property = (value as Record<string, unknown>)[key];
+  return typeof property === 'string' && property.trim() ? property : undefined;
+}
+
+export async function fetchProxyRoomConfig(): Promise<ProxyRoomConfig | null> {
+  try {
+    const response = await fetch(PROXY_CONFIG_PATH, { cache: 'no-store' });
+    if (!response.ok) {
+      return null;
+    }
+
+    const body = await response.json() as unknown;
+    return {
+      appId: readStringProperty(body, 'appId'),
+      deviceId: readStringProperty(body, 'deviceId'),
+      roomId: readStringProperty(body, 'roomId'),
+      fallbackRoomId: readStringProperty(body, 'fallbackRoomId')
+    };
+  } catch (error) {
+    console.warn('[trystero-client] Failed to read proxy room config:', error);
+    return null;
+  }
 }
 
 export async function createRoomIdFromPublicIp(publicIp: string): Promise<string> {
