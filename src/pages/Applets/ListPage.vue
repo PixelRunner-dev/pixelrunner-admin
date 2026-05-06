@@ -12,6 +12,8 @@ import {
 
 import type { IPlaylist, UUID } from 'pixelrunner-shared';
 
+const PLAYLIST_ORDER_SAVE_TIMEOUT_MS = 5000;
+
 const { isConnected, state, lastError, playlists } = useClientApi();
 interface Notification {
   type: 'error' | 'warning' | 'info' | 'success';
@@ -57,6 +59,7 @@ const {
 
 const isSavingOrder = ref(false);
 const saveOrderError = ref<string | null>(null);
+let saveOrderRequestId = 0;
 
 function pushNotification(notification: Notification) {
   if (!notifications) {
@@ -71,6 +74,23 @@ function pushNotification(notification: Notification) {
 
 function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
   return applet.installationDetails?.uuid ?? null;
+}
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Failed to save playlist order';
+}
+
+async function waitForRollbackWindow(startedAt: number): Promise<void> {
+  const elapsedMs = Date.now() - startedAt;
+  const remainingMs = Math.max(0, PLAYLIST_ORDER_SAVE_TIMEOUT_MS - elapsedMs);
+
+  if (remainingMs > 0) {
+    await wait(remainingMs);
+  }
 }
 
 async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
@@ -94,24 +114,62 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
 
   isSavingOrder.value = true;
   saveOrderError.value = null;
+  const requestId = ++saveOrderRequestId;
+  const saveStartedAt = Date.now();
+  const abortController = new AbortController();
+  const timeout = setTimeout(() => {
+    abortController.abort();
+  }, PLAYLIST_ORDER_SAVE_TIMEOUT_MS);
 
   try {
-    await playlists.updateOrder(appletUuids as UUID[]);
+    await playlists.updateOrder(appletUuids as UUID[], {
+      signal: abortController.signal,
+      timeout: PLAYLIST_ORDER_SAVE_TIMEOUT_MS
+    });
+
+    if (requestId !== saveOrderRequestId) {
+      return;
+    }
+
     activePlaylist.value = {
       ...activePlaylist.value,
       dateModified: new Date()
     };
   } catch (error) {
+    if (requestId !== saveOrderRequestId) {
+      return;
+    }
+
+    const caughtErrorMessage = getErrorMessage(error);
+    const rollbackBecauseTimeout =
+      abortController.signal.aborted || caughtErrorMessage.toLowerCase().includes('timeout');
+    const errorMessage = abortController.signal.aborted
+      ? 'Saving playlist order timed out after 5 seconds'
+      : caughtErrorMessage;
+
+    await waitForRollbackWindow(saveStartedAt);
+
+    if (requestId !== saveOrderRequestId) {
+      return;
+    }
+
     activePlaylist.value = previousPlaylist;
-    saveOrderError.value = error instanceof Error ? error.message : 'Failed to save playlist order';
+    saveOrderError.value = errorMessage;
     pushNotification({
       type: 'error',
       message: `[Could not save playlist order. ${saveOrderError.value}]`,
       hasCloseButton: true
     });
-    await reload();
+
+    if (!rollbackBecauseTimeout) {
+      await reload();
+    }
   } finally {
-    isSavingOrder.value = false;
+    clearTimeout(timeout);
+
+    if (requestId === saveOrderRequestId) {
+      isSavingOrder.value = false;
+    }
   }
 }
 
