@@ -4,8 +4,14 @@
  * Provides methods for managing playlists on the Pixelrunner device.
  */
 
-import type { IPlaylist } from 'pixelrunner-shared';
+import type { IPlaylist, UUID } from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
+
+interface PlaylistOrderUpdateResult {
+  ok: boolean;
+  appletUuids: UUID[];
+  updatedCount: number;
+}
 
 /**
  * PlaylistsAPI provides playlist management functionality.
@@ -19,6 +25,10 @@ export class PlaylistsAPI extends ApiClientBase<IRpcClient> {
     return this.request<IPlaylist>('playlists.activePlaylist');
   }
 
+  async updateOrder(appletUuids: UUID[]): Promise<PlaylistOrderUpdateResult> {
+    return this.request<PlaylistOrderUpdateResult>('playlists.updateOrder', { appletUuids });
+  }
+
   // /**
   //  * Subscribe to device status change events
   //  * @param handler - Callback function when device status changes
@@ -28,5 +38,4 @@ export class PlaylistsAPI extends ApiClientBase<IRpcClient> {
   //   return this.client.on('message:device.status_changed', handler);
   // }
 
-  // order change
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
@@ -10,7 +10,7 @@ import {
   Text as DText
 } from '(vendor)/daisy-ui-kit/index.ts';
 
-import type { IPlaylist } from 'pixelrunner-shared';
+import type { IPlaylist, UUID } from 'pixelrunner-shared';
 
 const { isConnected, state, lastError, playlists } = useClientApi();
 
@@ -19,7 +19,8 @@ const {
   isLoading,
   error: loadError,
   hasAttempted: hasLoadAttempted,
-  isWaitingForPeer
+  isWaitingForPeer,
+  reload
 } = useControllerQuery<IPlaylist>({
   label: 'ListPage',
   enabled: isConnected,
@@ -46,6 +47,50 @@ const {
   }
 });
 
+const isSavingOrder = ref(false);
+const saveOrderError = ref<string | null>(null);
+
+function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
+  return applet.installationDetails?.uuid ?? null;
+}
+
+async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
+  if (!playlists || !activePlaylist.value || isSavingOrder.value) {
+    return;
+  }
+
+  const appletUuids = orderedApplets.map(getAppletUuid);
+
+  if (appletUuids.some((uuid) => !uuid)) {
+    saveOrderError.value = 'Cannot save playlist order: one or more applets are missing an installation UUID.';
+    await reload();
+    return;
+  }
+
+  const previousPlaylist = activePlaylist.value;
+  activePlaylist.value = {
+    ...previousPlaylist,
+    applets: orderedApplets
+  };
+
+  isSavingOrder.value = true;
+  saveOrderError.value = null;
+
+  try {
+    await playlists.updateOrder(appletUuids as UUID[]);
+    activePlaylist.value = {
+      ...activePlaylist.value,
+      dateModified: new Date()
+    };
+  } catch (error) {
+    activePlaylist.value = previousPlaylist;
+    saveOrderError.value = error instanceof Error ? error.message : 'Failed to save playlist order';
+    await reload();
+  } finally {
+    isSavingOrder.value = false;
+  }
+}
+
 const debugState = computed(() => ({
   clientState: state.value,
   isConnected: isConnected.value,
@@ -62,7 +107,9 @@ const debugState = computed(() => ({
   <main class="site-wrapper">
     <DText size="5xl" class="my-4">[Your Pixelrunner]</DText>
 
-    <PlayList v-if="activePlaylist" v-bind="activePlaylist" />
+    <PlayList v-if="activePlaylist" v-bind="activePlaylist" @reorder="handlePlaylistReorder" />
+    <p v-if="isSavingOrder" class="m-4 text-center text-sm">Saving playlist order...</p>
+    <p v-else-if="saveOrderError" class="m-4 text-center text-sm text-error">{{ saveOrderError }}</p>
     <p v-else-if="isLoading" class="m-4 text-center">Loading active playlist...</p>
     <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>
     <p v-else-if="loadError" class="m-4 text-center text-error">{{ loadError }}</p>

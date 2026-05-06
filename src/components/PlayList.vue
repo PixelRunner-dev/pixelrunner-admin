@@ -2,15 +2,27 @@
 import AppletList from './Applet/AppletList.vue';
 import AppletCard from './Applet/AppletCard.vue';
 
-import type { IPlaylist } from 'pixelrunner-shared';
+import type { IFullApplet, IPlaylist } from 'pixelrunner-shared';
 
 const { applets, dateCreated, dateModified }: IPlaylist = defineProps<IPlaylist>();
+const emit = defineEmits<{
+  reorder: [applets: IPlaylist['applets']];
+}>();
+
+function handleReordered(orderedApplets: IFullApplet[]) {
+  emit('reorder', orderedApplets as IPlaylist['applets']);
+}
 </script>
 
 <template>
   <div class="component--playlist my-4" :data-created="dateCreated" :data-modified="dateModified">
     <template v-if="applets.length">
-      <AppletList :applets :isDragable="true" :classes="{ list: 'playlist list', item: 'playlist__item list-row' }">
+      <AppletList
+        :applets
+        :isDragable="true"
+        :classes="{ list: 'playlist list', item: 'playlist__item list-row' }"
+        @reordered="handleReordered"
+      >
         <template #item="applet">
           <AppletCard :applet :hasCallToAction="true">
             <template #cta>[Configureer]</template>
