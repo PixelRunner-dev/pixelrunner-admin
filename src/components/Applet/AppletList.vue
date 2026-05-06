@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, nextTick, watch, /* TransitionGroup */ } from 'vue';
+import { computed, ref, nextTick, watch, /* TransitionGroup */ } from 'vue';
 import { useDraggable } from 'vue-draggable-plus';
 
 import AppletItem from './AppletItem.vue';
@@ -31,7 +31,9 @@ const drag = ref(false);
 const listElement = ref();
 let dragStartOrder: string[] = [];
 
-const sortableApplets = ref([...applets.slice(offset, offset + limit)]);
+const visibleApplets = ref([...applets.slice(offset, offset + limit)]);
+const draggableApplets = ref(visibleApplets.value.filter((applet) => !isPinned(applet)));
+const pinnedApplets = computed(() => visibleApplets.value.filter(isPinned));
 
 function getAppletKey(applet: IFullApplet): string {
   return applet.installationDetails?.uuid || applet.packageName;
@@ -41,38 +43,35 @@ function isPinned(applet: IFullApplet): boolean {
   return Boolean(applet.installationDetails?.isPinned);
 }
 
-function keepPinnedAppletsAtTop(orderedApplets: IFullApplet[]): IFullApplet[] {
-  return [
-    ...orderedApplets.filter(isPinned),
-    ...orderedApplets.filter((applet) => !isPinned(applet))
-  ];
+function setVisibleApplets(nextApplets: IFullApplet[]) {
+  visibleApplets.value = nextApplets;
+  draggableApplets.value = nextApplets.filter((applet) => !isPinned(applet));
 }
 
 watch(
   () => [applets, offset, limit] as const,
   () => {
     if (drag.value) return;
-    sortableApplets.value = [...applets.slice(offset, offset + limit)];
+    setVisibleApplets([...applets.slice(offset, offset + limit)]);
   },
   { deep: true }
 );
 
 if (isDragable) {
-  useDraggable(listElement, sortableApplets, {
+  useDraggable(listElement, draggableApplets, {
     animation: 150,
     draggable: '.draggable-applet',
     onStart() {
       drag.value = true;
-      dragStartOrder = sortableApplets.value.map(getAppletKey);
+      dragStartOrder = draggableApplets.value.map(getAppletKey);
       vibrateDevice(5);
     },
     onEnd() {
-      sortableApplets.value = keepPinnedAppletsAtTop(sortableApplets.value);
-      const nextOrder = sortableApplets.value.map(getAppletKey);
+      const nextOrder = draggableApplets.value.map(getAppletKey);
       const orderChanged = nextOrder.some((key, index) => key !== dragStartOrder[index]);
 
       if (orderChanged) {
-        emit('reordered', [...sortableApplets.value]);
+        emit('reordered', [...pinnedApplets.value, ...draggableApplets.value]);
       }
 
       vibrateDevice(2);
@@ -93,25 +92,16 @@ list item actief class toevoegen
 
 <template>
   <component
+    v-if="!isDragable"
     :is="hasSorting ? 'ol' : 'ul'"
-    :class="[{ 'is-dragable': isDragable }, classes?.list]"
-    ref="listElement">
-    <TransitionGroup type="transition" :name="!drag ? 'fade' : undefined">
+    :class="[classes?.list]"
+  >
+    <TransitionGroup type="transition" name="fade">
       <li
-        v-for="applet in sortableApplets"
+        v-for="applet in visibleApplets"
         :key="applet.installationDetails?.uuid || applet.packageName"
-        :class="[
-          'bg-base-200 rounded-box my-2 shadow-sm',
-          {
-            'draggable-applet': isDragable && !isPinned(applet),
-            'is-pinned': isPinned(applet)
-          },
-          classes?.item
-        ]"
+        :class="['bg-base-200 rounded-box my-2 shadow-sm', classes?.item]"
       >
-        <template v-if="isDragable && !isPinned(applet)">
-          <span class="self-center-safe w-3 h-6 inline-block overflow-hidden text-[10px] leading-[5px] tracking-[2px] text-base-content cursor-grab drag-indicator"></span>
-        </template>
         <AppletItem :applet>
           <template #item="applet">
             <slot name="item" v-bind="applet" />
@@ -120,6 +110,53 @@ list item actief class toevoegen
       </li>
     </TransitionGroup>
   </component>
+
+  <template v-else>
+    <component
+      v-if="pinnedApplets.length"
+      :is="hasSorting ? 'ol' : 'ul'"
+      :class="['is-dragable', classes?.list]"
+    >
+      <li
+        v-for="applet in pinnedApplets"
+        :key="applet.installationDetails?.uuid || applet.packageName"
+        :class="[
+          'bg-base-200 rounded-box my-2 shadow-sm is-pinned',
+          classes?.item
+        ]"
+      >
+        <AppletItem :applet>
+          <template #item="applet">
+            <slot name="item" v-bind="applet" />
+          </template>
+        </AppletItem>
+      </li>
+    </component>
+
+    <component
+      :is="hasSorting ? 'ol' : 'ul'"
+      :class="['is-dragable', classes?.list]"
+      ref="listElement"
+    >
+      <TransitionGroup type="transition" :name="!drag ? 'fade' : undefined">
+        <li
+          v-for="applet in draggableApplets"
+          :key="applet.installationDetails?.uuid || applet.packageName"
+          :class="[
+            'bg-base-200 rounded-box my-2 shadow-sm draggable-applet',
+            classes?.item
+          ]"
+        >
+          <span class="self-center-safe w-3 h-6 inline-block overflow-hidden text-[10px] leading-[5px] tracking-[2px] text-base-content cursor-grab drag-indicator"></span>
+          <AppletItem :applet>
+            <template #item="applet">
+              <slot name="item" v-bind="applet" />
+            </template>
+          </AppletItem>
+        </li>
+      </TransitionGroup>
+    </component>
+  </template>
 </template>
 
 <style scoped>
