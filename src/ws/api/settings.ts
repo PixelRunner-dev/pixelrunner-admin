@@ -13,6 +13,43 @@ export interface SettingsRecord {
   value: string;
 }
 
+export interface WifiConfigureInput {
+  ssid: string;
+  security?: 'none' | 'wep' | 'wpa' | 'wpa23' | 'wpa3' | 'wpae' | 'wpa2e' | 'wpa3e';
+  password?: string;
+  hiddenNetwork?: boolean;
+  dhcp?: 'dhcp' | 'static';
+  ip?: string;
+  subnet?: string;
+  gateway?: string;
+  dns?: 'auto' | 'manual';
+  primaryDns?: string;
+  secondaryDns?: string;
+}
+
+export interface WifiStatus {
+  interface: string;
+  configured: boolean;
+  mode: 'client' | 'access-point' | 'disconnected' | 'unknown';
+  activeConnection: string | null;
+  ssid: string;
+  security: WifiConfigureInput['security'] | 'unknown';
+  signal: number | null;
+  ipMode: WifiConfigureInput['dhcp'] | 'unknown';
+  addresses: string[];
+  gateway: string;
+  dnsServers: string[];
+  setupAccessPointSsid: string;
+}
+
+export interface WifiScanNetwork {
+  bssid: string;
+  ssid: string;
+  security: string;
+  signal: number | null;
+  active: boolean;
+}
+
 interface SettingsActionResponse<T> {
   method: string;
   data: T;
@@ -72,6 +109,33 @@ export class SettingsAPI extends ApiClientBase<IRpcClient> {
     const response = await this.request<SettingsActionResponse<SettingsRecord[]>>(
       'settings.action',
       { method: 'getAll' }
+    );
+
+    return response.data;
+  }
+
+  async getWifiStatus(): Promise<WifiStatus> {
+    const response = await this.request<SettingsActionResponse<WifiStatus>>(
+      'settings.action',
+      { method: 'getWifiStatus' }
+    );
+
+    return response.data;
+  }
+
+  async scanWifiNetworks(): Promise<WifiScanNetwork[]> {
+    const response = await this.request<SettingsActionResponse<WifiScanNetwork[]>>(
+      'settings.action',
+      { method: 'scanWifiNetworks' }
+    );
+
+    return response.data;
+  }
+
+  async configureWifi(input: WifiConfigureInput): Promise<WifiStatus> {
+    const response = await this.request<SettingsActionResponse<WifiStatus>>(
+      'settings.action',
+      { method: 'configureWifi', params: input }
     );
 
     return response.data;
