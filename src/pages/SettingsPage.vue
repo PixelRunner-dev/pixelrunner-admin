@@ -286,6 +286,10 @@ async function saveWifiNetwork() {
   }
 }
 
+const uniqueWifiNetworks = computed(() => {
+  return [...new Set(wifiNetworks.value)];
+});
+
 onMounted(() => {
   void loadWifiStatus();
   void loadWifiNetworks();
@@ -417,32 +421,22 @@ watchEffect(() => {
           <DText size="sm">[Visible WiFi networks]</DText>
         </DLabel>
 
-        <DButton
-          btn
-          secondary
-          wide
-          :disabled="wifiIsScanning || !isConnected"
-          @click="loadWifiNetworks"
-          @touchstart="() => vibrateDevice(4)"
-          @touchend="() => vibrateDevice(1)"
-        >
-          {{ wifiIsScanning ? '[Scanning...]' : '[Refresh networks]' }}
-        </DButton>
-
         <div
           id="wifi-networks"
           class="grid gap-2 w-80 max-h-[21lh] overflow-y-auto"
           style="scrollbar-width: thin;">
           <DButton
-            v-for="network in wifiNetworks"
+            v-for="network in uniqueWifiNetworks"
             :key="network.bssid"
             type="button"
-            class="btn-xs items-center bg-base-100 border border-base-300 rounded-field cursor-pointer flex justify-between w-full text-left"
+            class="btn-xs items-center cursor-pointer flex justify-between w-full text-left"
             :class="{ 'btn-accent': network.ssid === ssid }"
+            :title="network.ssid === ssid ? 'Connected network' : `Connect to network '${network.ssid}'`"
+            :disabled="network.ssid === ssid"
             @click="selectWifiNetwork(network)"
           >
             <span class="font-bold overflow-hidden text-ellipsis whitespace-nowrap">{{ network.ssid }}</span>
-            <span class="text-base-content flex-[0_0_auto] text-xs pl-1 opacity-70">
+            <span class="font-normal text-base-content flex-[0_0_auto] text-xs pl-1">
               {{ network.security || 'open' }} · {{ network.signal ?? '?' }}%
             </span>
           </DButton>
@@ -451,6 +445,19 @@ watchEffect(() => {
             [No visible WiFi networks found.]
           </DText>
         </div>
+
+        <DButton
+          btn
+          secondary
+          sm
+          class="w-80"
+          :disabled="wifiIsScanning || !isConnected"
+          @click="loadWifiNetworks"
+          @touchstart="() => vibrateDevice(4)"
+          @touchend="() => vibrateDevice(1)"
+        >
+          {{ wifiIsScanning ? '[Scanning...]' : '[Refresh networks]' }}
+        </DButton>
       </DFormControl>
 
       <DFormControl class="gap-1">
