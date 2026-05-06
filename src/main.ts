@@ -11,7 +11,8 @@ import router from './router/index.ts';
 import { CookieStore } from '@/utils/CookieStore.ts';
 import { WebSocketClient, WS_INJECTION_KEY } from '@/ws/index.ts';
 import { TrysteroWebRTCClient } from '@/ws/trystero-client.ts';
-import { NOSTR_RELAYS, ROOM_PREFIX } from './constants.ts';
+import { NOSTR_RELAYS } from './constants.ts';
+import { getFallbackRoomId } from '@/ws/room-id.ts';
 import {
   detectAccessMode,
   requiresProxyConnection,
@@ -62,7 +63,7 @@ i18next
       // The device will also connect via Trystero to establish P2P link
       console.log('[main] Using Trystero WebRTC client for proxy access');
       wsClient = new TrysteroWebRTCClient({
-        fallbackRoomId: `${ROOM_PREFIX}-${CookieStore.get('deviceId') || 'default'}`,
+        fallbackRoomId: getFallbackRoomId(),
         relayUrls: [...NOSTR_RELAYS],
         debug: import.meta.env.DEV,
         reconnect: true

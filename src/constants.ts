@@ -38,6 +38,12 @@ export const ACTION_NAME = 'rpc';
 export const ROOM_PREFIX = 'pixelrunner';
 
 /**
+ * Default device identifier used when no per-device identifier is available.
+ * Must match the device proxy fallback default.
+ */
+export const DEFAULT_DEVICE_ID = import.meta.env.VITE_DEVICE_ID || 'pxlr_f91a';
+
+/**
  * Default password for Trystero rooms.
  */
 export const ROOM_PASSWORD = import.meta.env.ROOM_PASSWORD || 'your-secure-password-change-me';
