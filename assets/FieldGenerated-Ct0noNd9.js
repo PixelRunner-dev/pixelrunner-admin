@@ -1,0 +1,1 @@
+import{_ as e,b as t,o as n}from"./index-CHKFe3N8.js";const o={},c={class:"component--field-generated"};function r(s,a){return n(),t("div",c," [not implemented yet] ")}const d=e(o,[["render",r]]);export{d as default};
