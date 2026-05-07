@@ -4,6 +4,8 @@
     "env.d.ts",
     "src/**/*",
     "src/**/*.vue",
+    "src/components/SiteNotifications.vue",
+    "src/composables/useNotifications.ts",
     "vendor/**/*.ts",
     "vendor/**/*.vue",
     "translations/*.json",

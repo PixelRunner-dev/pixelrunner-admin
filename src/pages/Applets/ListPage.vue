@@ -1,26 +1,20 @@
 <script setup lang="ts">
-import { computed, inject, ref, type Ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
+import { useNotifications } from '@/composables/useNotifications.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
+import type { Notification } from '@/utils/notifications.ts';
 
-import {
-  Text as DText
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 import type { IPlaylist, UUID } from 'pixelrunner-shared';
 
 const { isConnected, state, lastError, playlists } = useClientApi();
-interface Notification {
-  type: 'error' | 'warning' | 'info' | 'success';
-  message: string;
-  timeoutToClose?: number;
-  hasCloseButton?: boolean;
-}
 
-const notifications = inject<Ref<Notification[]>>('notifications');
+const notificationState = useNotifications();
 
 const {
   data: activePlaylist,
@@ -61,14 +55,7 @@ const SAVE_ORDER_TIMEOUT_MS = 5000;
 let saveOrderRequestId = 0;
 
 function pushNotification(notification: Notification) {
-  if (!notifications) {
-    return;
-  }
-
-  notifications.value = [
-    notification,
-    ...notifications.value.filter((item) => item.message !== notification.message)
-  ];
+  notificationState?.addNotification(notification);
 }
 
 function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
@@ -87,7 +74,8 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
   const appletUuids = orderedApplets.map(getAppletUuid);
 
   if (appletUuids.some((uuid) => !uuid)) {
-    saveOrderError.value = 'Cannot save playlist order: one or more applets are missing an installation UUID.';
+    saveOrderError.value =
+      'Cannot save playlist order: one or more applets are missing an installation UUID.';
     await reload();
     return;
   }
@@ -163,11 +151,13 @@ const debugState = computed(() => ({
       @reorder="handlePlaylistReorder"
     />
     <p v-if="isSavingOrder" class="m-4 text-center text-sm">Saving playlist order...</p>
-    <p v-else-if="saveOrderError" class="m-4 text-center text-sm text-error">{{ saveOrderError }}</p>
+    <p v-else-if="saveOrderError" class="m-4 text-center text-sm text-error">
+      {{ saveOrderError }}
+    </p>
     <p v-else-if="isLoading" class="m-4 text-center">Loading active playlist...</p>
     <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>
     <p v-else-if="loadError" class="m-4 text-center text-error">{{ loadError }}</p>
-    <p v-else class="m-4 text-center">No active playlist available.</p>
+    <p v-else-if="!activePlaylist" class="m-4 text-center">No active playlist available.</p>
 
     <section class="debug-panel m-4 p-3 rounded-box bg-base-200 text-xs font-mono">
       <h2 class="mb-2 text-sm font-bold">Connection Debug</h2>

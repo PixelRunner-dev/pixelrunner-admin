@@ -1,48 +1,55 @@
 <script setup lang="ts">
-import { computed, ref, inject, onMounted, provide, watchEffect } from 'vue';
+import { computed, ref, inject, onMounted, watch, watchEffect } from 'vue';
 
 import SiteHeader from '@/components/SiteHeader.vue';
+import SiteNotifications from '@/components/SiteNotifications.vue';
 import IconSprite from '@/components/Icon/IconSprite.vue';
 import AccessWarning from '@/components/AccessWarning.vue';
+import { provideNotifications } from '@/composables/useNotifications.ts';
 import { useAdminVersionCheck } from '@/composables/useAdminVersionCheck.ts';
 
 import { THEMES_DARK, THEME_DEFAULT } from '@/constants.ts';
-
-import { Alert as DAlert, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 import { CookieStore } from '@/utils/CookieStore.ts';
 import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
 
 import type { AccessMode } from '@/utils/access-detector.ts';
 
-interface Notification {
-  type: 'error' | 'warning' | 'info' | 'success';
-  message: string;
-  timeoutToClose?: number;
-  hasCloseButton?: boolean;
-}
-
 const accessMode = inject<AccessMode>('accessMode', 'unknown');
 const showAccessWarning = ref(true);
 const { hasUpdateAvailable } = useAdminVersionCheck();
 
-const notifications = ref<Notification[]>([]);
-if (hasUpdateAvailable) {
-  notifications.value?.push({
-    type: 'warning',
-    message: '[A new version of this page is available. Click refresh to continue.]'
-  });
-}
-if (controllerConnectionLost) {
-  notifications.value?.push({
-    type: 'error',
-    message: '[The connection with the controller of your Pixelrunner is lost. Please wait or refresh the page.]'
-  });
-}
-provide('notifications', notifications);
+const UPDATE_AVAILABLE_MESSAGE =
+  '[A new version of this page is available. Click refresh to continue.]';
+const CONTROLLER_CONNECTION_LOST_MESSAGE =
+  '[The connection with the controller of your Pixelrunner is lost. Please wait or refresh the page.]';
+
+const { notifications, setNotification } = provideNotifications();
+
+watch(
+  hasUpdateAvailable,
+  (isAvailable) => {
+    setNotification(isAvailable, {
+      type: 'warning',
+      message: UPDATE_AVAILABLE_MESSAGE
+    });
+  },
+  { immediate: true }
+);
+
+watch(
+  controllerConnectionLost,
+  (isConnectionLost) => {
+    setNotification(isConnectionLost, {
+      type: 'error',
+      message: CONTROLLER_CONNECTION_LOST_MESSAGE
+    });
+  },
+  { immediate: true }
+);
 
 const selectedTheme = computed(() => {
-  return CookieStore.has('theme') ? CookieStore.get('theme') as string : THEME_DEFAULT;
+  return CookieStore.has('theme') ? (CookieStore.get('theme') as string) : THEME_DEFAULT;
 });
 
 const themeMode = computed(() => {
@@ -59,7 +66,6 @@ watchEffect(() => {
   document.documentElement.dataset.theme = selectedTheme.value;
   document.documentElement.dataset.themeMode = themeMode.value;
 });
-
 </script>
 
 <template>
@@ -70,15 +76,7 @@ watchEffect(() => {
       </div>
     </header>
 
-    <div v-if="notifications?.length" class="site-wrapper my-8">
-      <div v-for="notification in notifications" :key="notification.message" class="my-4">
-        <DAlert :type="notification.type" role="alert" horizontal>
-          <DText>
-            {{ notification.message }}
-          </DText>
-        </DAlert>
-      </div>
-    </div>
+    <SiteNotifications :notifications />
 
     <router-view v-slot="{ Component }">
       <keep-alive>
