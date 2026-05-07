@@ -58,7 +58,10 @@ function setTheme(e: Event) {
 }
 
 function setBrightness(e: Event) {
-  console.log('brightness', brightness, e);
+  const target = e.target as HTMLInputElement | null;
+  if (!target) return;
+
+  brightness.value = Number(target.value);
 }
 
 async function doFirmwareUpdate() {
