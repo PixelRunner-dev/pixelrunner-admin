@@ -3,8 +3,12 @@ import { computed, ref, watch, onMounted } from 'vue';
 
 import type { IAppletImage } from 'pixelrunner-shared';
 
+interface Props extends IAppletImage {
+  showFrame: boolean;
+}
+
 const TIMESTAMP_DEVIATION = 100000;
-const { src, alt, dateCreated, dateModified }: IAppletImage = defineProps<IAppletImage>();
+const { src, alt, dateCreated, dateModified, showFrame = false }: Props = defineProps<Props>();
 
 const isBase64 = computed(() => src.startsWith('data:image/'));
 
@@ -33,8 +37,25 @@ watch(
 </script>
 
 <template>
-  <div class="component--applet-image">
+  <div class="component--applet-image" :class="{ 'is-showing-frame': showFrame }">
+    <div v-if="showFrame" class="image-frame frame__outer-bevel">
+      <div class="frame__flat-surface">
+        <div class="frame__inner-bevel">
+          <img
+            :key="imgSrc"
+            :src="imgSrc"
+            :alt
+            class="applet-image"
+            loading="lazy"
+            :data-created="dateCreated"
+            :data-modified="dateModified"
+          />
+        </div>
+      </div>
+    </div>
+
     <img
+      v-else
       :key="imgSrc"
       :src="imgSrc"
       :alt
@@ -49,7 +70,50 @@ watch(
 <style scoped>
 .component--applet-image {
   background-color: black;
+}
+
+.component--applet-image:not(.is-showing-frame) {
   overflow: hidden;
+}
+
+.is-showing-frame {
+  --s: 150px; /* adjust this to control the size */
+  --_d: calc(0.21 * var(--s));
+
+  aspect-ratio: 2 / 1;
+  margin-top: 4rem;
+  position: relative;
+}
+
+.is-showing-frame::before {
+  content: "";
+  clip-path: polygon(var(--_d) 0,100% 0,100% calc(100% - var(--_d)),calc(100% - var(--_d)) 100%,0 100%,0 var(--_d));
+  background:
+    conic-gradient(from -90deg at calc(100% - var(--_d)) var(--_d),
+     #703d15 135deg, #3b2805 0 270deg, transparent 0);
+  width: calc(100% + var(--_d));
+    height: calc(100% + var(--_d));
+    display: block;
+  position: absolute;
+  top: calc(var(--_d) * -1);
+  right: calc(var(--_d) * -1);
+  z-index: -1;
+}
+
+.image-frame {
+  border-color: rgb(109, 84, 58) rgb(24, 19, 13) rgb(24, 19, 13) rgb(109, 84, 58);
+	border-style: solid;
+	border-width: 5px;
+}
+
+.image-frame > div {
+  border: 12px solid rgb(65, 40, 16);
+}
+
+.image-frame > div > div {
+	border-color: rgb(24, 19, 13)	rgb(109, 84, 58) rgb(109, 84, 58) rgb(24, 19, 13);
+	border-style: solid;
+  border-width: 5px;
 }
 
 .applet-image {

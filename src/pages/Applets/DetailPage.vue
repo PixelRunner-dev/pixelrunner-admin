@@ -98,6 +98,7 @@ const debugState = computed(() => ({
               ? applet.installationDetails?.image
               : applet.defaultImage
           "
+          showFrame
         />
         <AppletDetails v-bind="applet.details" view="full-detail" />
         <CategoryList v-if="applet.categories" :categories="applet.categories" hasItemsInline />
