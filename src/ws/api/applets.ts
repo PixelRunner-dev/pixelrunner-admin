@@ -37,16 +37,16 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
    * @param packageName - The package name
    * @param uuid - The applet UUID
    */
-  async get(packageName?: string, uuid?: UUID): Promise<IFullAppletRecord> {
+  async get(packageName?: string, uuid?: UUID): Promise<IFullApplet | null> {
     if (!packageName && !uuid) {
       throw new Error('Must provide either uuid or packageName');
     }
 
     if (uuid) {
-      return this.action<IFullAppletRecord>('getInstalledAppletByUUID', { uuid });
+      return this.action<IFullApplet | null>('getInstalledAppletByUUID', { uuid });
     }
 
-    return this.action<IFullAppletRecord>('getAppletByPackageName', { packageName });
+    return this.action<IFullApplet | null>('getAppletByPackageName', { packageName });
   }
 
   /**

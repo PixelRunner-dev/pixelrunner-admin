@@ -38,9 +38,12 @@ const {
     <template v-if="view === 'full-detail'">
       <p class="text-xl">{{ summary }}</p>
 
-      <p>{{ desc }}</p>
+      <p class="max-w-[52ch]">{{ desc }}</p>
 
-      <ul class="flex flex-wrap gap-2">
+      <ul
+        v-if="tags.length"
+        class="flex flex-wrap gap-2"
+      >
         <li v-for="tag in tags" :key="tag" class="badge badge-neutral badge-sm">{{ tag }}</li>
       </ul>
     </template>
