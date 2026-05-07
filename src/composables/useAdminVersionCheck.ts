@@ -12,9 +12,26 @@ interface AdminVersionCheckOptions {
   intervalMs?: number;
 }
 
+export function isAdminUpdateAvailable(
+  manifest: AdminVersionManifest,
+  currentBuildId: string
+): boolean {
+  return Boolean(manifest.adminBuildId && manifest.adminBuildId !== currentBuildId);
+}
+
 function getVersionManifestUrl() {
   const baseUrl = import.meta.env.BASE_URL || '/';
   return `${baseUrl.replace(/\/$/, '')}/version.json`;
+}
+
+export function createCacheBustedUrl(url: URL, buildId?: string): string {
+  if (buildId) {
+    url.searchParams.set('adminBuildId', buildId);
+  }
+
+  url.searchParams.set('adminReloadAt', Date.now().toString());
+
+  return url.toString();
 }
 
 export function useAdminVersionCheck(options: AdminVersionCheckOptions = {}) {
@@ -39,17 +56,16 @@ export function useAdminVersionCheck(options: AdminVersionCheckOptions = {}) {
 
       const manifest = (await response.json()) as AdminVersionManifest;
       latestVersion.value = manifest;
-
-      if (manifest.adminBuildId && manifest.adminBuildId !== currentBuildId) {
-        hasUpdateAvailable.value = true;
-      }
+      hasUpdateAvailable.value = isAdminUpdateAvailable(manifest, currentBuildId);
     } catch {
       // Offline or stale deploy window. Keep current UI quiet.
     }
   }
 
   function refreshPage() {
-    window.location.reload();
+    window.location.replace(
+      createCacheBustedUrl(new URL(window.location.href), latestVersion.value?.adminBuildId)
+    );
   }
 
   function handleVisibilityChange() {

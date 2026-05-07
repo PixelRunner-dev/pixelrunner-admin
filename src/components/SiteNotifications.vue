@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Alert as DAlert, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
+import { Alert as DAlert, Button as DButton, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 import type { Notification } from '@/utils/notifications.ts';
 
@@ -15,6 +15,14 @@ defineProps<{
         <DText>
           {{ notification.message }}
         </DText>
+        <DButton
+          v-if="notification.actionLabel && notification.onAction"
+          type="button"
+          sm
+          @click="notification.onAction"
+        >
+          {{ notification.actionLabel }}
+        </DButton>
       </DAlert>
     </div>
   </div>
