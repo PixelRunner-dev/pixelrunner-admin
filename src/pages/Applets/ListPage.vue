@@ -12,8 +12,6 @@ import {
 
 import type { IPlaylist, UUID } from 'pixelrunner-shared';
 
-const PLAYLIST_ORDER_FAILED_ROLLBACK_DELAY_MS = 5000;
-
 const { isConnected, state, lastError, playlists } = useClientApi();
 interface Notification {
   type: 'error' | 'warning' | 'info' | 'success';
@@ -59,6 +57,7 @@ const {
 
 const isSavingOrder = ref(false);
 const saveOrderError = ref<string | null>(null);
+const SAVE_ORDER_TIMEOUT_MS = 5000;
 let saveOrderRequestId = 0;
 
 function pushNotification(notification: Notification) {
@@ -76,21 +75,8 @@ function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
   return applet.installationDetails?.uuid ?? null;
 }
 
-function wait(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Failed to save playlist order';
-}
-
-async function waitForRollbackWindow(startedAt: number): Promise<void> {
-  const elapsedMs = Date.now() - startedAt;
-  const remainingMs = Math.max(0, PLAYLIST_ORDER_FAILED_ROLLBACK_DELAY_MS - elapsedMs);
-
-  if (remainingMs > 0) {
-    await wait(remainingMs);
-  }
 }
 
 async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
@@ -115,10 +101,11 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
   isSavingOrder.value = true;
   saveOrderError.value = null;
   const requestId = ++saveOrderRequestId;
-  const saveStartedAt = Date.now();
 
   try {
-    await playlists.updateOrder(appletUuids as UUID[]);
+    await playlists.updateOrder(appletUuids as UUID[], {
+      timeout: SAVE_ORDER_TIMEOUT_MS
+    });
 
     if (requestId !== saveOrderRequestId) {
       return;
@@ -134,8 +121,6 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
     }
 
     const caughtErrorMessage = getErrorMessage(error);
-
-    await waitForRollbackWindow(saveStartedAt);
 
     if (requestId !== saveOrderRequestId) {
       return;
@@ -171,7 +156,12 @@ const debugState = computed(() => ({
   <main class="site-wrapper">
     <DText size="5xl" class="my-4">[Your Pixelrunner]</DText>
 
-    <PlayList v-if="activePlaylist" v-bind="activePlaylist" @reorder="handlePlaylistReorder" />
+    <PlayList
+      v-if="activePlaylist"
+      v-bind="activePlaylist"
+      :isSavingOrder
+      @reorder="handlePlaylistReorder"
+    />
     <p v-if="isSavingOrder" class="m-4 text-center text-sm">Saving playlist order...</p>
     <p v-else-if="saveOrderError" class="m-4 text-center text-sm text-error">{{ saveOrderError }}</p>
     <p v-else-if="isLoading" class="m-4 text-center">Loading active playlist...</p>

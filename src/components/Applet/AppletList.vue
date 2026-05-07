@@ -19,9 +19,19 @@ export interface Props {
   limit?: number;
   offset?: number;
   isDragable?: boolean;
+  isReorderPending?: boolean;
 }
 
-const { applets, classes, sort, order, limit = 20, offset = 0, isDragable = false }: Props = defineProps<Props>();
+const {
+  applets,
+  classes,
+  sort,
+  order,
+  limit = 20,
+  offset = 0,
+  isDragable = false,
+  isReorderPending = false
+}: Props = defineProps<Props>();
 const emit = defineEmits<{
   reordered: [applets: IFullApplet[]];
 }>();
@@ -30,6 +40,7 @@ const hasSorting = sort && order;
 const drag = ref(false);
 const listElement = ref();
 let dragStartOrder: string[] = [];
+const pendingReorderKeys = ref<string[] | null>(null);
 
 const visibleApplets = ref([...applets.slice(offset, offset + limit)]);
 const draggableApplets = ref(visibleApplets.value.filter((applet) => !isPinned(applet)));
@@ -48,11 +59,36 @@ function setVisibleApplets(nextApplets: IFullApplet[]) {
   draggableApplets.value = nextApplets.filter((applet) => !isPinned(applet));
 }
 
+function areAppletOrderKeysEqual(nextApplets: IFullApplet[], expectedKeys: string[]) {
+  if (nextApplets.length !== expectedKeys.length) return false;
+
+  return nextApplets.every((applet, index) => getAppletKey(applet) === expectedKeys[index]);
+}
+
+function getVisiblePropApplets() {
+  return [...applets.slice(offset, offset + limit)];
+}
+
 watch(
-  () => [applets, offset, limit] as const,
+  () => [applets, offset, limit, isReorderPending] as const,
   () => {
     if (drag.value) return;
-    setVisibleApplets([...applets.slice(offset, offset + limit)]);
+
+    const nextVisibleApplets = getVisiblePropApplets();
+
+    if (
+      isReorderPending &&
+      pendingReorderKeys.value &&
+      !areAppletOrderKeysEqual(nextVisibleApplets, pendingReorderKeys.value)
+    ) {
+      return;
+    }
+
+    setVisibleApplets(nextVisibleApplets);
+
+    if (!isReorderPending) {
+      pendingReorderKeys.value = null;
+    }
   },
   { deep: true }
 );
@@ -71,7 +107,10 @@ if (isDragable) {
       const orderChanged = nextOrder.some((key, index) => key !== dragStartOrder[index]);
 
       if (orderChanged) {
-        emit('reordered', [...pinnedApplets.value, ...draggableApplets.value]);
+        const orderedApplets = [...pinnedApplets.value, ...draggableApplets.value];
+        pendingReorderKeys.value = orderedApplets.map(getAppletKey);
+        setVisibleApplets(orderedApplets);
+        emit('reordered', orderedApplets);
       }
 
       vibrateDevice(2);

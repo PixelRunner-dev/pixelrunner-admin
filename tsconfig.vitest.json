@@ -4,6 +4,8 @@
     "test/unit/**/*",
     "env.d.ts",
     "src/App.vue",
+    "src/components/Applet/AppletItem.vue",
+    "src/components/Applet/AppletList.vue",
     "src/components/AccessWarning.vue",
     "src/components/Icon/IconSprite.vue",
     "src/components/SiteHeader.vue",

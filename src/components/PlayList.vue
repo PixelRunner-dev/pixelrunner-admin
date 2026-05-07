@@ -4,7 +4,11 @@ import AppletCard from './Applet/AppletCard.vue';
 
 import type { IFullApplet, IPlaylist } from 'pixelrunner-shared';
 
-const { applets, dateCreated, dateModified }: IPlaylist = defineProps<IPlaylist>();
+interface Props extends IPlaylist {
+  isSavingOrder?: boolean;
+}
+
+const { applets, dateCreated, dateModified, isSavingOrder = false }: Props = defineProps<Props>();
 const emit = defineEmits<{
   reorder: [applets: IPlaylist['applets']];
 }>();
@@ -20,6 +24,7 @@ function handleReordered(orderedApplets: IFullApplet[]) {
       <AppletList
         :applets
         :isDragable="true"
+        :isReorderPending="isSavingOrder"
         :classes="{ list: 'playlist list', item: 'playlist__item list-row' }"
         @reordered="handleReordered"
       >
