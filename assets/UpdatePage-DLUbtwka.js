@@ -1,1 +1,0 @@
-import{_ as t,b as a,k as n,o}from"./index--5vY20Zc.js";const r={};function s(c,e){return o(),a("main",null,[...e[0]||(e[0]=[n("h1",null,"Update",-1)])])}const _=t(r,[["render",s]]);export{_ as default};
