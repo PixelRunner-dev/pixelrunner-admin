@@ -14,10 +14,11 @@ import { CookieStore } from '@/utils/CookieStore.ts';
 import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
 
 import type { AccessMode } from '@/utils/access-detector.ts';
+import i18next from 'i18next';
 
 const accessMode = inject<AccessMode>('accessMode', 'unknown');
 const showAccessWarning = ref(true);
-const { hasUpdateAvailable } = useAdminVersionCheck();
+const { hasUpdateAvailable, refreshPage } = useAdminVersionCheck();
 
 const UPDATE_AVAILABLE_MESSAGE =
   '[A new version of this page is available. Click refresh to continue.]';
@@ -31,7 +32,9 @@ watch(
   (isAvailable) => {
     setNotification(isAvailable, {
       type: 'warning',
-      message: UPDATE_AVAILABLE_MESSAGE
+      message: UPDATE_AVAILABLE_MESSAGE,
+      actionLabel: i18next.t('generic.refresh'),
+      onAction: refreshPage
     });
   },
   { immediate: true }

@@ -17,6 +17,112 @@
     },
     "official": "official"
   },
+    "applet": {
+    "category": {
+      "starter_pack": {
+        "label": "Starter pack"
+      },
+      "spotlight": {
+        "label": "Spotlight"
+      },
+      "memes": {
+        "label": "Memes"
+      },
+      "bitcoin": {
+        "label": "Bitcoin"
+      },
+      "clock": {
+        "label": "Clock"
+      },
+      "news": {
+        "label": "News"
+      },
+      "weather": {
+        "label": "Weather"
+      },
+      "art": {
+        "label": "Art"
+      },
+      "social": {
+        "label": "Social"
+      },
+      "pokemon": {
+        "label": "Pokémon"
+      },
+      "sport": {
+        "label": "Sport & fitness"
+      },
+      "productivity": {
+        "label": "Productivity"
+      },
+      "smart_home": {
+        "label": "Home automation (smart home)"
+      },
+      "now_playing": {
+        "label": "Now playing"
+      },
+      "devs": {
+        "label": "Made for developers"
+      },
+      "gaming": {
+        "label": "Games"
+      },
+      "customization": {
+        "label": "Customization"
+      },
+      "religion": {
+        "label": "Religion"
+      },
+      "alert": {
+        "label": "Alerting"
+      },
+      "food": {
+        "label": "Food, drinks & cooking"
+      },
+      "transit": {
+        "label": "Transportation"
+      },
+      "education": {
+        "label": "Education"
+      },
+      "entertainment": {
+        "label": "Entertainment"
+      },
+      "finance": {
+        "label": "Finance"
+      },
+      "calendar": {
+        "label": "Calendar / Scheduler"
+      },
+      "animals": {
+        "label": "Animals"
+      },
+      "quotes": {
+        "label": "Quotes"
+      },
+      "shitcoins": {
+        "label": "Shitcoins"
+      },
+      "astronomy": {
+        "label": "Astronomy & space"
+      },
+      "health": {
+        "label": "Health"
+      },
+      "travel": {
+        "label": "Travel"
+      },
+      "fireworks": {
+        "label": "New years eve with fireworks"
+      },
+      "tracking": {
+        "label": "Tracking"
+      },
+      "nostr": {
+        "label": "Nostr"
+      }
+    }
+  },
   "settingsPage": {
     "deviceName": {
       "label": "Device name",

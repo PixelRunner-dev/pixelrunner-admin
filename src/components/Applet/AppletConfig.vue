@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, ref } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 
 import FormField from '../Form/FormField.vue';
 import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
 
 import { useClientApi } from '@/ws/index.ts';
-import { toPascalCase } from '@/utils/generic.ts';
 
-import type { IFullApplet, IAppletSchemaObject } from 'pixelrunner-shared';
+import type { Component } from 'vue';
+import type { IAppletSchema, IAppletSchemaObject, IFullApplet } from 'pixelrunner-shared';
 
 import {
   Button as DButton,
@@ -23,152 +23,144 @@ const { applet }: Props = defineProps<Props>();
 
 const { isConnected, applets } = useClientApi();
 
-const getFieldComponent = (item: { type: string }) => {
-  return defineAsyncComponent(() => import(`../Form/AppletFields/Field${toPascalCase(item.type)}.vue`));
+type AppletSchemaValue = IAppletSchemaObject['default'];
+type RawAppletSchemaItem = IAppletSchemaObject & {
+  desc?: string;
 };
 
-const appletSchema = ref<Record<string, unknown> | null>();
+const fieldComponents: Partial<Record<IAppletSchemaObject['type'], Component>> = {
+  color: defineAsyncComponent(() => import('../Form/AppletFields/FieldColor.vue')),
+  datetime: defineAsyncComponent(() => import('../Form/AppletFields/FieldDatetime.vue')),
+  dropdown: defineAsyncComponent(() => import('../Form/AppletFields/FieldDropdown.vue')),
+  generated: defineAsyncComponent(() => import('../Form/AppletFields/FieldGenerated.vue')),
+  location: defineAsyncComponent(() => import('../Form/AppletFields/FieldLocation.vue')),
+  locationbased: defineAsyncComponent(() => import('../Form/AppletFields/FieldLocationbased.vue')),
+  oauth2: defineAsyncComponent(() => import('../Form/AppletFields/FieldOauth2.vue')),
+  photoselect: defineAsyncComponent(() => import('../Form/AppletFields/FieldPhotoselect.vue')),
+  text: defineAsyncComponent(() => import('../Form/AppletFields/FieldText.vue')),
+  onoff: defineAsyncComponent(() => import('../Form/AppletFields/FieldOnoff.vue')),
+  typeahead: defineAsyncComponent(() => import('../Form/AppletFields/FieldTypeahead.vue'))
+};
 
-onMounted(async () => {
-  if (isConnected && isConnected.value && applets) {
-    appletSchema.value = await applets.getSchema(applet.packageName);
-    console.log('applet appletSchema via ws', appletSchema.value);
+const appletSchema = ref<IAppletSchema | null>(null);
+const schemaError = ref<string | null>(null);
+const isSchemaLoading = ref(false);
+
+const schemaItems = computed(() => appletSchema.value?.schema ?? []);
+const hasSchemaItems = computed(() => schemaItems.value.length > 0);
+
+const isAppletSchemaItem = (item: unknown): item is RawAppletSchemaItem => {
+  if (!item || typeof item !== 'object') return false;
+
+  const candidate = item as Partial<RawAppletSchemaItem>;
+  return (
+    typeof candidate.id === 'string' &&
+    typeof candidate.type === 'string' &&
+    candidate.type in fieldComponents
+  );
+};
+
+const getAppliedConfigurationValue = (item: IAppletSchemaObject): AppletSchemaValue | undefined => {
+  const appliedConfigurations = applet.installationDetails?.appliedConfigurations;
+
+  if (!applet.isInstalled || !appliedConfigurations) {
+    return undefined;
   }
 
-  console.log('onder connected');
+  const config = appliedConfigurations.config
+    ?? (appliedConfigurations as unknown as Record<string, AppletSchemaValue>);
 
-  appletSchema.value = {
-    version: '1',
-    notifications: [],
-    schema: [
-      {
-        "type": "color",
-        "id": "myColorField",
-        "name": "myColorFieldName",
-        "desc": "myColorFieldDescription",
-        "icon": "brush",
-        "default": "#000000",
-        "palette": ["#000000", "#777777", "#ffffff"]
-      },
-      {
-        "type": "datetime",
-        "id": "myDateTimeField",
-        "name": "myDateTimeFieldName",
-        "desc": "myDateTimeFieldDescription",
-        "icon": "clock"
-      },
-      {
-        "type": "dropdown",
-        "id": "myDropdownField",
-        "name": "myDropdownFieldName",
-        "desc": "myDropdownFieldDescription",
-        "icon": "arrowDown",
-        "options": [
-          {
-            "display": "myDropdownOption1Display",
-            "value": "myDropdownOption1Value"
-          },
-          {
-            "display": "myDropdownOption2Display",
-            "value": "myDropdownOption2Value"
-          }
-        ],
-        "default": "myDropdownOption1Value"
-      },
-      {
-        "type": "generated",
-        "id": "myGeneratedField",
-        "name": "myGeneratedFieldName",
-        "desc": "myGeneratedFieldDescription",
-        "icon": "gear",
-        "source": "myColorField",
-        "handler": "myGeneratedFieldHandler"
-      },
-      {
-        "type": "location",
-        "id": "myLocationField",
-        "name": "myLocationFieldName",
-        "desc": "myLocationFieldDescription",
-        "icon": "locationPin"
-      },
-      {
-        "type": "locationbased",
-        "id": "myLocationBasedField",
-        "name": "myLocationBasedFieldName",
-        "desc": "myLocationBasedFieldDescription",
-        "icon": "marker",
-        "handler": "myLocationBasedFieldHandler"
-      },
-      {
-        "type": "oauth2",
-        "id": "myOAuth2Field",
-        "name": "myOAuth2FieldName",
-        "desc": "myOAuth2FieldDescription",
-        "icon": "key",
-        "handler": "myOAuth2FieldHandler",
-        "client_id": "96065a61c9ce483fb76f122a150933b3",
-        "authorization_endpoint": "https://accounts.spotify.com/oauth2/v2/auth",
-        "scopes": ["user-read-currently-playing", "user-read-playback-state"]
-      },
-      {
-        "type": "photoselect",
-        "id": "myPhotoSelectField",
-        "name": "myPhotoSelectFieldName",
-        "desc": "myPhotoSelectFieldDescription",
-        "icon": "image"
-      },
-      {
-        "type": "text",
-        "id": "myTextField",
-        "name": "myTextFieldName",
-        "desc": "myTextFieldDescription",
-        "icon": "pen",
-        "default": "myTextFieldDefault",
-        "secret": false
-      },
-      {
-        "type": "onoff",
-        "id": "myToggleField",
-        "name": "myToggleFieldName",
-        "desc": "myToggleFieldDescription",
-        "icon": "sliders",
-        "default": false
-      },
-      {
-        "type": "typeahead",
-        "id": "myTypeaheadField",
-        "name": "myTypeaheadFieldName",
-        "desc": "myTypeaheadFieldDescription",
-        "icon": "text-width",
-        "handler": "myTypeaheadFieldHandler"
-      }
-    ]
-  }
+  return config[item.id] as AppletSchemaValue | undefined;
+};
+
+const normalizeDefaultValue = (
+  item: RawAppletSchemaItem,
+  value: AppletSchemaValue | undefined
+): AppletSchemaValue | undefined => {
+  if (item.type !== 'onoff') return value;
+  if (value === undefined) return false;
+  if (typeof value === 'string') return value.toLowerCase() === 'true';
+
+  return Boolean(value);
+};
+
+const normalizeSchemaItem = (item: RawAppletSchemaItem): IAppletSchemaObject => ({
+  ...item,
+  description: item.description ?? item.desc ?? '',
+  default: normalizeDefaultValue(item, getAppliedConfigurationValue(item) ?? item.default)
 });
 
-function fieldValue(item: IAppletSchemaObject) {
-  const itemWithAppliedConfigurations = { ...item };
-  if (applet.isInstalled && applet.installationDetails && applet.installationDetails.appliedConfigurations) {
-    itemWithAppliedConfigurations.default = applet.installationDetails.appliedConfigurations[item.id];
+const parseSchemaResponse = (schemaResponse: unknown): IAppletSchema | null => {
+  if (schemaResponse === null || schemaResponse === undefined || schemaResponse === 'null') {
+    return null;
   }
-  return itemWithAppliedConfigurations;
-}
+
+  if (typeof schemaResponse === 'string') {
+    try {
+      return parseSchemaResponse(JSON.parse(schemaResponse));
+    } catch {
+      return null;
+    }
+  }
+
+  if (typeof schemaResponse !== 'object' || !('schema' in schemaResponse)) {
+    return null;
+  }
+
+  const candidate = schemaResponse as { version?: unknown; notifications?: unknown; schema?: unknown };
+
+  return {
+    version: typeof candidate.version === 'string' ? candidate.version : '1',
+    notifications: [],
+    schema: Array.isArray(candidate.schema)
+      ? candidate.schema.filter(isAppletSchemaItem).map(normalizeSchemaItem)
+      : []
+  };
+};
+
+const getFieldComponent = (item: IAppletSchemaObject) => fieldComponents[item.type];
+
+const loadAppletSchema = async () => {
+  if (!isConnected.value || !applets) return;
+
+  isSchemaLoading.value = true;
+  schemaError.value = null;
+
+  try {
+    appletSchema.value = parseSchemaResponse(await applets.getSchema(applet.packageName));
+  } catch (error) {
+    appletSchema.value = null;
+    console.error('Failed to load applet schema', error);
+    schemaError.value = 'Configuration schema unavailable.';
+  } finally {
+    isSchemaLoading.value = false;
+  }
+};
+
+watch(
+  () => [isConnected.value, applet.packageName],
+  () => {
+    void loadAppletSchema();
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
 <div class="component--applet-config">
   <form>
-    <template v-if="appletSchema">
+    <template v-if="isSchemaLoading">...</template>
+    <template v-else-if="schemaError">
+      {{ schemaError }}
+    </template>
+    <template v-else-if="hasSchemaItems">
       <DDivider vertical />
-      <!-- <pre>[{{ appletSchema }}]</pre> -->
-      <!-- <pre>[{{ applet.installationDetails?.appliedConfigurations }}]</pre> -->
-      <template v-for="item in appletSchema.schema" :key="item.id">
-        <FormField :id="item.id" :label="item.name" :description="item.desc">
-          <component :is="getFieldComponent(item)" v-bind="fieldValue(item)" />
+      <template v-for="item in schemaItems" :key="item.id">
+        <FormField :id="item.id" :label="item.name" :description="item.description">
+          <component :is="getFieldComponent(item)" v-bind="item" />
         </FormField>
       </template>
     </template>
-    <template v-else>...</template>
 
     <DDivider vertical />
 

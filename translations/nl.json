@@ -10,6 +10,112 @@
     "prev": "Vorige",
     "next": "Volgende"
   },
+  "applet": {
+    "category": {
+      "starter_pack": {
+        "label": "Startpakket"
+      },
+      "spotlight": {
+        "label": "Uitgelicht"
+      },
+      "memes": {
+        "label": "Memes"
+      },
+      "bitcoin": {
+        "label": "Bitcoin"
+      },
+      "clock": {
+        "label": "Klok"
+      },
+      "news": {
+        "label": "Nieuws"
+      },
+      "weather": {
+        "label": "Weerbericht"
+      },
+      "art": {
+        "label": "Kunst"
+      },
+      "social": {
+        "label": "Sociaal"
+      },
+      "pokemon": {
+        "label": "Pokémon"
+      },
+      "sport": {
+        "label": "Sport & fitness"
+      },
+      "productivity": {
+        "label": "Productiviteit"
+      },
+      "smart_home": {
+        "label": "Thuisautomatisering (slimme huis)"
+      },
+      "now_playing": {
+        "label": "Speelt nu af"
+      },
+      "devs": {
+        "label": "Voor ontwikkelaars"
+      },
+      "gaming": {
+        "label": "Games"
+      },
+      "customization": {
+        "label": "Aanpasbaar"
+      },
+      "religion": {
+        "label": "Religie"
+      },
+      "alert": {
+        "label": "Waarschuwing"
+      },
+      "food": {
+        "label": "Eten, drinken & koken"
+      },
+      "transit": {
+        "label": "Vervoer"
+      },
+      "education": {
+        "label": "Educatie"
+      },
+      "entertainment": {
+        "label": "Entertainment"
+      },
+      "finance": {
+        "label": "Financiën"
+      },
+      "calendar": {
+        "label": "Kalender"
+      },
+      "animals": {
+        "label": "Dieren"
+      },
+      "quotes": {
+        "label": "Citaten"
+      },
+      "shitcoins": {
+        "label": "Shitcoins"
+      },
+      "astronomy": {
+        "label": "Astronomie & ruimte"
+      },
+      "health": {
+        "label": "Gezondheid"
+      },
+      "travel": {
+        "label": "Reizen"
+      },
+      "fireworks": {
+        "label": "Oud & nieuw met vuurwerk"
+      },
+      "tracking": {
+        "label": "Tracking"
+      },
+      "nostr": {
+        "label": "Nostr"
+      }
+    }
+  },
   "settingsPage": {
     "deviceName": {
       "label": "Naam van het apparaat",

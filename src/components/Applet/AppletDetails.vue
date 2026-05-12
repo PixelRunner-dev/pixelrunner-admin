@@ -12,7 +12,6 @@ const {
   summary,
   desc,
   author,
-  tags = [],
   isOfficialApplet = false,
   view = 'horizontal' as IAppletViews
 }: IAppletDetailsWithView = defineProps<IAppletDetailsWithView>();
@@ -39,13 +38,6 @@ const {
       <p class="text-xl">{{ summary }}</p>
 
       <p class="max-w-[52ch]">{{ desc }}</p>
-
-      <ul
-        v-if="tags.length"
-        class="flex flex-wrap gap-2"
-      >
-        <li v-for="tag in tags" :key="tag" class="badge badge-neutral badge-sm">{{ tag }}</li>
-      </ul>
     </template>
   </DFlex>
 </template>
