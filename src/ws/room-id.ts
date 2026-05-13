@@ -9,21 +9,30 @@ import {
   type ResolveTrysteroRoomIdOptions
 } from 'pixelrunner-shared';
 
-import { APP_ID, DEFAULT_DEVICE_ID, ROOM_PASSWORD, ROOM_PREFIX } from '@/constants.ts';
+import {
+  APP_ID,
+  DEFAULT_DEVICE_ID,
+  ROOM_PASSWORD as DEFAULT_ROOM_PASSWORD,
+  ROOM_PREFIX
+} from '@/constants.ts';
 import { CookieStore } from '@/utils/CookieStore.ts';
 
-const roomIdentity = {
-  appId: APP_ID,
-  password: ROOM_PASSWORD,
-  roomPrefix: ROOM_PREFIX
-};
 const PROXY_CONFIG_PATH = '/.pixelrunner/proxy-config';
 
 export interface ProxyRoomConfig {
   appId?: string;
   deviceId?: string;
   roomId?: string;
+  roomPassword?: string;
   fallbackRoomId?: string;
+}
+
+function createRoomIdentity(password = DEFAULT_ROOM_PASSWORD) {
+  return {
+    appId: APP_ID,
+    password,
+    roomPrefix: ROOM_PREFIX
+  };
 }
 
 function withBrowserDefaults(
@@ -84,11 +93,12 @@ export async function fetchProxyRoomConfig(): Promise<ProxyRoomConfig | null> {
       return null;
     }
 
-    const body = await response.json() as unknown;
+    const body = (await response.json()) as unknown;
     return {
       appId: readStringProperty(body, 'appId'),
       deviceId: readStringProperty(body, 'deviceId'),
       roomId: readStringProperty(body, 'roomId'),
+      roomPassword: readStringProperty(body, 'roomPassword'),
       fallbackRoomId: readStringProperty(body, 'fallbackRoomId')
     };
   } catch (error) {
@@ -98,12 +108,10 @@ export async function fetchProxyRoomConfig(): Promise<ProxyRoomConfig | null> {
 }
 
 export async function createRoomIdFromPublicIp(publicIp: string): Promise<string> {
-  return createTrysteroRoomIdFromPublicIp(publicIp, roomIdentity);
+  return createTrysteroRoomIdFromPublicIp(publicIp, createRoomIdentity());
 }
 
-export async function fetchPublicIp(
-  options: ResolveTrysteroRoomIdOptions = {}
-): Promise<string> {
+export async function fetchPublicIp(options: ResolveTrysteroRoomIdOptions = {}): Promise<string> {
   return fetchSharedPublicIp(withBrowserDefaults(options));
 }
 
@@ -113,7 +121,7 @@ export async function resolveTrysteroRoomId(
 ): Promise<string> {
   return resolveSharedTrysteroRoomId(configuredRoomId, {
     ...withBrowserDefaults(options),
-    ...roomIdentity,
+    ...createRoomIdentity(options.password),
     onLookupError: (error) => {
       console.warn('[trystero-client] Failed to derive room ID from public IP:', error);
       options.onLookupError?.(error);

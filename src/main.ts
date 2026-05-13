@@ -66,6 +66,7 @@ i18next
       wsClient = new TrysteroWebRTCClient({
         roomId: proxyRoomConfig?.roomId,
         fallbackRoomId: proxyRoomConfig?.fallbackRoomId ?? getFallbackRoomId(),
+        roomPassword: proxyRoomConfig?.roomPassword,
         relayUrls: [...NOSTR_RELAYS],
         debug: import.meta.env.DEV,
         reconnect: true

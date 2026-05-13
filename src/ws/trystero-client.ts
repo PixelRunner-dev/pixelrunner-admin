@@ -5,7 +5,7 @@ import {
   APP_ID,
   DEFAULT_TIMEOUT,
   ROOM_PREFIX,
-  ROOM_PASSWORD
+  ROOM_PASSWORD as DEFAULT_ROOM_PASSWORD
 } from '../constants.ts';
 import { BaseWebSocketClient } from './base-client.ts';
 
@@ -64,6 +64,7 @@ interface TrysteroRoomLike {
 export interface TrysteroConfig extends IWebSocketConfig {
   roomId?: string;
   fallbackRoomId?: string;
+  roomPassword?: string;
   relayUrls?: string[];
   joinSecret?: string;
 }
@@ -210,7 +211,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       console.log('[trystero-client] selfId:', trystero.selfId);
     }
 
+    const roomPassword = this.config.roomPassword ?? DEFAULT_ROOM_PASSWORD;
     const roomId = await resolveTrysteroRoomId(this.config.roomId, {
+      password: roomPassword,
       fallbackRoomId: this.config.fallbackRoomId
     });
     console.log('[trystero-client] Room ID:', roomId);
@@ -220,7 +223,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     const trysteroConfig: BaseRoomConfig & RelayConfig = {
       appId: APP_ID,
-      password: ROOM_PASSWORD,
+      password: roomPassword,
       // Add STUN servers for NAT traversal
       rtcConfig: {
         iceServers: ICE_SERVERS

@@ -44,7 +44,8 @@ export const ROOM_PREFIX = 'pixelrunner';
 export const DEFAULT_DEVICE_ID = import.meta.env.VITE_DEVICE_ID || 'pxlr_f91a';
 
 /**
- * Default password for Trystero rooms.
+ * Development fallback. Production devices return a per-device room password
+ * from /.pixelrunner/proxy-config when the admin UI is served through the proxy.
  */
 export const ROOM_PASSWORD = import.meta.env.ROOM_PASSWORD || 'your-secure-password-change-me';
 
