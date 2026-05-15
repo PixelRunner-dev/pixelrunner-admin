@@ -151,4 +151,10 @@ watchEffect(() => {
 .page-leave-to {
   opacity: 0;
 }
+
+@layer components {
+  .max-width-full-text {
+    max-width: 52ch;
+  }
+}
 </style>

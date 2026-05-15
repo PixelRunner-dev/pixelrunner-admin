@@ -7,6 +7,9 @@
 
 import { ApiClientBase, type IRpcClient } from './client.ts';
 import type { DeviceStatusResponse, DeviceUpdateResponse } from '../types.ts';
+import type { DatabaseMigrationResult } from '@/services/device-maintenance.ts';
+import type { SetupStatus } from '@/services/setup-status.ts';
+import type { IRequestOptions } from 'pixelrunner-shared';
 
 /**
  * DeviceAPI provides device management functionality.
@@ -18,6 +21,13 @@ export class DeviceAPI extends ApiClientBase<IRpcClient> {
    */
   async status(): Promise<DeviceStatusResponse> {
     return this.request<DeviceStatusResponse>('device.status');
+  }
+
+  /**
+   * Get first-time setup status.
+   */
+  async setupStatus(): Promise<SetupStatus> {
+    return this.request<SetupStatus>('device.setupStatus');
   }
 
   /**
@@ -46,6 +56,13 @@ export class DeviceAPI extends ApiClientBase<IRpcClient> {
    */
   async factoryReset(): Promise<void> {
     return this.request<void>('device.factoryReset');
+  }
+
+  /**
+   * Run database migrations on the device.
+   */
+  async migrateDatabase(options?: IRequestOptions): Promise<DatabaseMigrationResult> {
+    return this.request<DatabaseMigrationResult>('device.migrateDatabase', undefined, options);
   }
 
   // /**

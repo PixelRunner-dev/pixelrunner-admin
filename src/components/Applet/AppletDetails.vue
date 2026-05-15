@@ -37,7 +37,7 @@ const {
     <template v-if="view === 'full-detail'">
       <p class="text-xl">{{ summary }}</p>
 
-      <p class="max-w-[52ch]">{{ desc }}</p>
+      <p class="max-width-full-text">{{ desc }}</p>
     </template>
   </DFlex>
 </template>

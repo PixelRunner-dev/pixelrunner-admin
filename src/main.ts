@@ -9,6 +9,7 @@ import I18NextVue from 'i18next-vue';
 import App from './App.vue';
 import router from './router/index.ts';
 import { CookieStore } from '@/utils/CookieStore.ts';
+import { configureSetupStatusClient } from '@/services/setup-status.ts';
 import { WebSocketClient, WS_INJECTION_KEY } from '@/ws/index.ts';
 import { TrysteroWebRTCClient } from '@/ws/trystero-client.ts';
 import { NOSTR_RELAYS } from './constants.ts';
@@ -83,6 +84,7 @@ i18next
 
     // Provide WebSocket client to the app
     app.provide(WS_INJECTION_KEY, wsClient);
+    configureSetupStatusClient(wsClient);
 
     // Provide access mode to the app
     app.provide('accessMode', accessMode);

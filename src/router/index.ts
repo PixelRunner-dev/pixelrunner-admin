@@ -5,6 +5,8 @@ import {
   NavigationFailureType
 } from 'vue-router';
 
+import { isSetupRequired } from '@/services/setup-status.ts';
+
 const APP_TITLE = document.title;
 
 const router = createRouter({
@@ -14,7 +16,7 @@ const router = createRouter({
     {
       path: '/setup',
       name: 'setup',
-      component: () => import('@/pages/SettingsPage.vue'),
+      component: () => import('@/pages/SetupPage.vue'),
       meta: { title: 'Setup' }
     },
     {
@@ -69,14 +71,14 @@ const router = createRouter({
   ]
 });
 
-const hasDeviceConfigured = true;
+router.beforeEach(async (to) => {
+  const setupRequired = await isSetupRequired().catch(() => null);
 
-router.beforeEach((to) => {
-  if (to.name !== 'setup' && !hasDeviceConfigured) {
+  if (to.name !== 'setup' && setupRequired) {
     return { name: 'setup' };
   }
 
-  if (to.name === 'setup' && hasDeviceConfigured) {
+  if (to.name === 'setup' && setupRequired === false) {
     return { name: 'applet-list' };
   }
 

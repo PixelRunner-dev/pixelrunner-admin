@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
-import i18next, { changeLanguage, t } from 'i18next';
-import type { Resource } from 'i18next';
+import { t } from 'i18next';
 
 import {
   Alert as DAlert,
@@ -22,6 +21,7 @@ import {
 
 import { CookieStore } from '@/utils/CookieStore';
 import LocationSearch from '@/components/Form/SettingFields/LocationSearch.vue';
+import SetLanguage from '@/components/SetLanguage.vue';
 
 import { toCamelCase, toCapitalizeWords, vibrateDevice } from '@/utils/generic.ts';
 
@@ -38,15 +38,6 @@ import { THEMES_DARK, THEMES_LIGHT, THEMES_OTHER } from '@/constants';
 const { device, isConnected, lastError, settings, state } = useClientApi();
 const route = useRoute();
 const isFirstTimeSetup = computed(() => route.query['first-time'] === '1');
-
-function setLanguage(e: Event) {
-  const target = e.target as HTMLSelectElement | null;
-  const val = target?.value;
-  if (val) {
-    changeLanguage(val);
-    CookieStore.set('language', val);
-  }
-}
 
 function setTheme(e: Event) {
   const target = e.target as HTMLInputElement | null;
@@ -134,15 +125,9 @@ const securityOptions = computed<string[]>(() => [
 
 const proxyOptions = computed<string[]>(() => ['none', 'manual', 'auto-config']);
 
-const languages = computed(() => {
-  const resource = i18next.options.resources as Resource | undefined;
-  return resource ? Object.keys(resource) : [];
-});
-
 const deviceName = ref(`pxlr_${'f91a'}`);
 const date = ref(new Date().toISOString().slice(0, 10));
 const time = ref(new Date().toTimeString().slice(0, 5));
-const language = ref(CookieStore.get('language') || i18next.language || 'en');
 const location = ref();
 const ssid = ref('');
 const security = ref<WifiConfigureInput['security']>('none');
@@ -239,7 +224,7 @@ function selectWifiNetwork(network: WifiScanNetwork) {
   ssid.value = network.ssid;
   security.value = getSecurityFromScan(network);
   password.value = '';
-  wifiStatusMessage.value = `Selected ${network.ssid}`;
+  wifiStatusMessage.value = `[Selected ${network.ssid}]`;
   wifiStatusError.value = '';
 }
 
@@ -281,7 +266,8 @@ async function saveWifiNetwork() {
     });
 
     applyWifiStatus(status);
-    wifiStatusMessage.value = 'WiFi configured. Device may disconnect from setup network while it joins the target network.';
+    wifiStatusMessage.value =
+      '[WiFi configured. Device may disconnect from setup network while it joins the target network.]';
   } catch (error) {
     wifiStatusError.value = error instanceof Error ? error.message : 'Failed to configure WiFi';
   } finally {
@@ -372,22 +358,7 @@ watchEffect(() => {
           <DLabel for="language">
             <DText size="sm">{{ $t('settingsPage.localization.language.label') }}</DText>
           </DLabel>
-          <select
-            id="language"
-            class="select"
-            name="language"
-            v-model="language"
-            @change="setLanguage"
-          >
-            <option
-              v-for="l in languages"
-              :key="'l-' + l"
-              :value="l"
-              :selected="l === $i18next.language"
-            >
-              {{ $t('language.' + l) }}
-            </option>
-          </select>
+          <SetLanguage />
         </DFormControl>
 
         <DFormControl class="component--location-search gap-1">

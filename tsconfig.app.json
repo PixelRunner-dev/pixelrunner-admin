@@ -5,6 +5,7 @@
     "src/**/*",
     "src/**/*.vue",
     "src/components/SiteNotifications.vue",
+    "src/components/SetLanguage.vue",
     "src/composables/useNotifications.ts",
     "vendor/**/*.ts",
     "vendor/**/*.vue",
