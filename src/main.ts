@@ -60,18 +60,29 @@ i18next
     console.log('requiresProxyConnection', requiresProxyConnection());
 
     if (requiresProxyConnection()) {
-      // When accessed via local IP/proxy, use Trystero for P2P connection
-      // The device will also connect via Trystero to establish P2P link
-      console.log('[main] Using Trystero WebRTC client for proxy access');
+      // When served by the device proxy, prefer a same-origin WebSocket bridge.
+      // Trystero stays as the fallback for static/remote admin access.
       const proxyRoomConfig = await fetchProxyRoomConfig();
-      wsClient = new TrysteroWebRTCClient({
-        roomId: proxyRoomConfig?.roomId,
-        fallbackRoomId: proxyRoomConfig?.fallbackRoomId ?? getFallbackRoomId(),
-        roomPassword: proxyRoomConfig?.roomPassword,
-        relayUrls: [...NOSTR_RELAYS],
-        debug: import.meta.env.DEV,
-        reconnect: true
-      });
+      if (proxyRoomConfig?.controllerWebSocketPath) {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const url = `${protocol}//${window.location.host}${proxyRoomConfig.controllerWebSocketPath}`;
+        console.log('[main] Using device proxy WebSocket client:', url);
+        wsClient = new WebSocketClient({
+          url,
+          debug: import.meta.env.DEV,
+          reconnect: true
+        });
+      } else {
+        console.log('[main] Using Trystero WebRTC client for proxy access');
+        wsClient = new TrysteroWebRTCClient({
+          roomId: proxyRoomConfig?.roomId,
+          fallbackRoomId: proxyRoomConfig?.fallbackRoomId ?? getFallbackRoomId(),
+          roomPassword: proxyRoomConfig?.roomPassword,
+          relayUrls: [...NOSTR_RELAYS],
+          debug: import.meta.env.DEV,
+          reconnect: true
+        });
+      }
     } else {
       // Standard WebSocket for local development
       console.log('[main] Using standard WebSocket client');

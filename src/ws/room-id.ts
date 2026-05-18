@@ -25,6 +25,7 @@ export interface ProxyRoomConfig {
   roomId?: string;
   roomPassword?: string;
   fallbackRoomId?: string;
+  controllerWebSocketPath?: string;
 }
 
 function createRoomIdentity(password = DEFAULT_ROOM_PASSWORD) {
@@ -99,7 +100,8 @@ export async function fetchProxyRoomConfig(): Promise<ProxyRoomConfig | null> {
       deviceId: readStringProperty(body, 'deviceId'),
       roomId: readStringProperty(body, 'roomId'),
       roomPassword: readStringProperty(body, 'roomPassword'),
-      fallbackRoomId: readStringProperty(body, 'fallbackRoomId')
+      fallbackRoomId: readStringProperty(body, 'fallbackRoomId'),
+      controllerWebSocketPath: readStringProperty(body, 'controllerWebSocketPath')
     };
   } catch (error) {
     console.warn('[trystero-client] Failed to read proxy room config:', error);
