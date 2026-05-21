@@ -30,7 +30,7 @@ function handleReordered(orderedApplets: IFullApplet[]) {
       >
         <template #item="applet">
           <AppletCard :applet :hasCallToAction="true">
-            <template #cta>[Configureer]</template>
+            <template #cta>{{ $t('generic.configure') }}</template>
           </AppletCard>
         </template>
       </AppletList>

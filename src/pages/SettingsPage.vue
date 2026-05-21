@@ -5,6 +5,7 @@ import { t } from 'i18next';
 
 import {
   Alert as DAlert,
+  Badge as DBadge,
   Button as DButton,
   Checkbox as DCheckbox,
   Collapse as DCollapse,
@@ -16,12 +17,15 @@ import {
   Input as DInput,
   Label as DLabel,
   Range as DRange,
-  Text as DText
+  Text as DText,
+  Toggle as DToggle
 } from '(vendor)/daisy-ui-kit/index.ts';
 
 import { CookieStore } from '@/utils/CookieStore';
 import LocationSearch from '@/components/Form/SettingFields/LocationSearch.vue';
 import SetLanguage from '@/components/SetLanguage.vue';
+import FeatureToggle from '@/components/FeatureToggle.vue';
+import DebugSection from '@/components/DebugSection.vue';
 
 import { toCamelCase, toCapitalizeWords, vibrateDevice } from '@/utils/generic.ts';
 
@@ -30,9 +34,23 @@ import {
   useSyncedControllerSettings,
   type SyncedControllerSettingBinding
 } from '@/composables/useSyncedControllerSettings.ts';
+import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
 import type { WifiConfigureInput, WifiScanNetwork, WifiStatus } from '@/ws/api/settings.ts';
-import { THEMES_DARK, THEMES_LIGHT, THEMES_OTHER } from '@/constants';
+import {
+  EXPERIMENTAL_FEATURES_SETTING_KEY,
+  FEATURE_TOGGLE_LIST,
+  THEMES_DARK,
+  THEMES_LIGHT,
+  THEMES_OTHER,
+  type FeatureToggleKey,
+  type FeatureToggleItem
+} from '@/constants';
+import {
+  extractControllerVersionFromStatus,
+  getFeatureToggleSettingKey,
+  isFeatureSupportedByControllerVersion
+} from '@/utils/feature-toggles.ts';
 
 // Get WebSocket functionality
 const { device, isConnected, lastError, settings, state } = useClientApi();
@@ -152,12 +170,29 @@ const nightModeEnd = ref('07:00');
 const alarmClock = ref(false);
 const alarmTime = ref('08:00');
 const theme = ref(CookieStore.get('theme') || themesLight.value[0]);
+const experimentalFeatures = ref(false);
+const controllerVersion = ref<string | null>(null);
+const featureToggleModels = Object.fromEntries(
+  FEATURE_TOGGLE_LIST.map(({ key }) => [key, ref(false)])
+) as Record<FeatureToggleKey, ReturnType<typeof ref<boolean>>>;
+const featureToggleRenderKeys = ref(
+  Object.fromEntries(FEATURE_TOGGLE_LIST.map(({ key }) => [key, 0])) as Record<
+    FeatureToggleKey,
+    number
+  >
+);
 const wifiStatus = ref<WifiStatus | null>(null);
 const wifiNetworks = ref<WifiScanNetwork[]>([]);
 const wifiIsScanning = ref(false);
 const wifiIsSaving = ref(false);
 const wifiStatusMessage = ref('');
 const wifiStatusError = ref('');
+
+const availableFeatureToggleList = computed(() =>
+  FEATURE_TOGGLE_LIST.filter((feature) =>
+    isFeatureSupportedByControllerVersion(feature, controllerVersion.value)
+  )
+);
 
 const deviceSettingBindings: SyncedControllerSettingBinding[] = [
   { key: 'deviceName', model: deviceName },
@@ -174,16 +209,86 @@ const deviceSettingBindings: SyncedControllerSettingBinding[] = [
   { key: 'nightModeStart', model: nightModeStart },
   { key: 'nightModeEnd', model: nightModeEnd },
   { key: 'alarmClock', model: alarmClock },
-  { key: 'alarmTime', model: alarmTime }
+  { key: 'alarmTime', model: alarmTime },
+  { key: EXPERIMENTAL_FEATURES_SETTING_KEY, model: experimentalFeatures },
+  ...FEATURE_TOGGLE_LIST.map((feature) => ({
+    key: getFeatureToggleSettingKey(feature.key),
+    model: featureToggleModels[feature.key]
+  }))
 ];
 
-useSyncedControllerSettings({
+const { hasLoadedSettings: hasLoadedDeviceSettings } = useSyncedControllerSettings({
   settings,
   isConnected,
   state,
   lastError,
   bindings: deviceSettingBindings
 });
+
+const {
+  isLoading: isLoadingFeatureToggleStatus,
+  error: featureToggleStatusError,
+  isWaitingForPeer: isWaitingForFeatureToggleStatusPeer,
+  reload: reloadFeatureToggleStatus
+} = useControllerQuery({
+  label: 'SettingsPage - feature toggles',
+  enabled: isConnected,
+  state,
+  lastError,
+  canLoad: () => Boolean(device),
+  skipContext: () => ({ hasDeviceApi: Boolean(device) }),
+  load: async () => {
+    if (!device) {
+      throw new Error('Device API not available');
+    }
+
+    return device.status({ full: true });
+  },
+  defaultErrorMessage: 'Failed to load controller version',
+  onSuccess: (status) => {
+    controllerVersion.value = extractControllerVersionFromStatus(status);
+  }
+});
+
+async function confirmPermanentFeature(feature: FeatureToggleItem): Promise<boolean> {
+  const ask = window.ask ?? window.confirm;
+  const message = `Feature: '${feature.key}' - ${feature.label}\n\nThis experimental feature is marked PERMANENT. Enable it only if you understand it. This feature can change device behavior in a way that cannot be undone from this screen.`;
+
+  return Boolean(await ask(message));
+}
+
+function resetFeatureToggleInput(featureKey: FeatureToggleKey): void {
+  featureToggleRenderKeys.value[featureKey] += 1;
+}
+
+async function setFeatureToggle(feature: FeatureToggleItem, enabled: boolean): Promise<void> {
+  const featureKey = feature.key as FeatureToggleKey;
+  const model = featureToggleModels[featureKey];
+
+  if (feature.isPermanent && model.value && !enabled) {
+    model.value = true;
+    resetFeatureToggleInput(featureKey);
+    console.warn('[SettingsPage] Permanent feature cannot be disabled:', feature.key);
+    return;
+  }
+
+  if (!enabled) {
+    model.value = false;
+    return;
+  }
+
+  if (feature.isPermanent) {
+    resetFeatureToggleInput(featureKey);
+
+    if (!(await confirmPermanentFeature(feature))) {
+      model.value = false;
+      resetFeatureToggleInput(featureKey);
+      return;
+    }
+  }
+
+  model.value = true;
+}
 
 function applyWifiStatus(status: WifiStatus) {
   wifiStatus.value = status;
@@ -624,89 +729,91 @@ watchEffect(() => {
             </template>
           </DFieldset>
 
-          <DFieldset
-            :legend="$t('settingsPage.wifiNetwork.proxyConfiguration.legend')"
-            class="gap-4"
-          >
-            <DFormControl class="gap-1">
-              <DLabel for="proxy">
-                <DText size="sm">{{
-                  $t('settingsPage.wifiNetwork.proxyConfiguration.proxy.label')
-                }}</DText>
-              </DLabel>
-              <select id="proxy" name="proxy" class="select" v-model="proxy">
-                <option v-for="o in proxyOptions" :key="o" :value="o" :selected="o === proxy">
-                  {{
-                    $t(
-                      'settingsPage.wifiNetwork.proxyConfiguration.proxy.options.' + toCamelCase(o)
-                    )
-                  }}
-                </option>
-              </select>
-            </DFormControl>
-
-            <template v-if="proxy === 'manual'">
+          <FeatureToggle features="networkProxy">
+            <DFieldset
+              :legend="$t('settingsPage.wifiNetwork.proxyConfiguration.legend')"
+              class="gap-4"
+            >
               <DFormControl class="gap-1">
-                <DLabel for="proxyServer">
+                <DLabel for="proxy">
                   <DText size="sm">{{
-                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.label')
+                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxy.label')
                   }}</DText>
                 </DLabel>
-                <DInput
-                  id="proxyServer"
-                  type="text"
-                  name="proxyServer"
-                  v-model="proxyServer"
-                  :placeholder="
-                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.placeholder')
-                  "
-                  validator
-                  required
-                />
+                <select id="proxy" name="proxy" class="select" v-model="proxy">
+                  <option v-for="o in proxyOptions" :key="o" :value="o" :selected="o === proxy">
+                    {{
+                      $t(
+                        'settingsPage.wifiNetwork.proxyConfiguration.proxy.options.' + toCamelCase(o)
+                      )
+                    }}
+                  </option>
+                </select>
               </DFormControl>
 
-              <DFormControl class="gap-1">
-                <DLabel for="proxyPort">
-                  <DText size="sm">{{
-                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.label')
-                  }}</DText>
-                </DLabel>
-                <DInput
-                  id="proxyPort"
-                  type="number"
-                  name="proxyPort"
-                  v-model="proxyPort"
-                  :placeholder="
-                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.placeholder')
-                  "
-                  validator
-                  required
-                />
-              </DFormControl>
-            </template>
+              <template v-if="proxy === 'manual'">
+                <DFormControl class="gap-1">
+                  <DLabel for="proxyServer">
+                    <DText size="sm">{{
+                      $t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.label')
+                    }}</DText>
+                  </DLabel>
+                  <DInput
+                    id="proxyServer"
+                    type="text"
+                    name="proxyServer"
+                    v-model="proxyServer"
+                    :placeholder="
+                      $t('settingsPage.wifiNetwork.proxyConfiguration.proxyServer.placeholder')
+                    "
+                    validator
+                    required
+                  />
+                </DFormControl>
 
-            <template v-if="proxy === 'auto-config'">
-              <DFormControl class="gap-1">
-                <DLabel for="proxyAutoConfig">
-                  <DText size="sm">{{
-                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.label')
-                  }}</DText>
-                </DLabel>
-                <DInput
-                  id="proxyAutoConfig"
-                  type="url"
-                  name="proxyAutoConfig"
-                  pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9-].*[a-zA-Z0-9])?.)+[a-zA-Z].*$"
-                  v-model="proxyAutoConfig"
-                  :placeholder="
-                    $t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.placeholder')
-                  "
-                  validator
-                  required
-                />
-              </DFormControl>
-            </template>
-          </DFieldset>
+                <DFormControl class="gap-1">
+                  <DLabel for="proxyPort">
+                    <DText size="sm">{{
+                      $t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.label')
+                    }}</DText>
+                  </DLabel>
+                  <DInput
+                    id="proxyPort"
+                    type="number"
+                    name="proxyPort"
+                    v-model="proxyPort"
+                    :placeholder="
+                      $t('settingsPage.wifiNetwork.proxyConfiguration.proxyPort.placeholder')
+                    "
+                    validator
+                    required
+                  />
+                </DFormControl>
+              </template>
+
+              <template v-if="proxy === 'auto-config'">
+                <DFormControl class="gap-1">
+                  <DLabel for="proxyAutoConfig">
+                    <DText size="sm">{{
+                      $t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.label')
+                    }}</DText>
+                  </DLabel>
+                  <DInput
+                    id="proxyAutoConfig"
+                    type="url"
+                    name="proxyAutoConfig"
+                    pattern="^(https?://)?([a-zA-Z0-9]([a-zA-Z0-9-].*[a-zA-Z0-9])?.)+[a-zA-Z].*$"
+                    v-model="proxyAutoConfig"
+                    :placeholder="
+                      $t('settingsPage.wifiNetwork.proxyConfiguration.proxyAutoConfig.placeholder')
+                    "
+                    validator
+                    required
+                  />
+                </DFormControl>
+              </template>
+            </DFieldset>
+          </FeatureToggle>
         </DCollapseContent>
       </DCollapse>
 
@@ -754,79 +861,85 @@ watchEffect(() => {
         </div>
       </DFormControl>
 
-      <DFormControl class="my-4 gap-1">
-        <DLabel for="dimAtSunset">
-          <DCheckbox id="dimAtSunset" name="dim-at-sunset" v-model="dimAtSunset" />
-          <DText size="sm">{{ $t('settingsPage.dimAtSunset.label') }}</DText>
-        </DLabel>
-      </DFormControl>
-
-      <DFieldset :legend="$t('settingsPage.nightMode.legend')" class="my-4 gap-4">
-        <DFormControl class="gap-1">
-          <DLabel for="nightMode">
-            <DCheckbox
-              id="nightMode"
-              name="night-mode"
-              v-model="nightMode"
-              aria-describedby="night-mode-description"
-            />
-            <DText size="sm">{{ $t('settingsPage.nightMode.label') }}</DText>
-          </DLabel>
-          <DText is="p" id="night-mode-description">{{
-            $t('settingsPage.nightMode.description')
-          }}</DText>
-        </DFormControl>
-
-        <DFormControl class="gap-1">
-          <DLabel input>
-            <DText label size="sm">{{ $t('settingsPage.nightMode.nightModeStart.label') }}</DText>
-            <DInput
-              type="time"
-              name="night-mode-start"
-              v-model="nightModeStart"
-              :disabled="!nightMode"
-            />
+      <FeatureToggle features="dimAtSunset">
+        <DFormControl class="my-4 gap-1">
+          <DLabel for="dimAtSunset">
+            <DCheckbox id="dimAtSunset" name="dim-at-sunset" v-model="dimAtSunset" />
+            <DText size="sm">{{ $t('settingsPage.dimAtSunset.label') }}</DText>
           </DLabel>
         </DFormControl>
+      </FeatureToggle>
 
-        <DFormControl class="gap-1">
-          <DLabel input>
-            <DText label size="sm">{{ $t('settingsPage.nightMode.nightModeEnd.label') }}</DText>
-            <DInput type="time" name="night-mode-end" v-model="nightModeEnd" :disabled="!nightMode" />
-          </DLabel>
-        </DFormControl>
-
-        <DFieldset
-          :legend="$t('settingsPage.nightMode.alarmClock.legend')"
-          class="gap-4"
-          style="background-color: var(--color-base-100)"
-          :disabled="!nightMode"
-        >
+      <FeatureToggle features="nightMode">
+        <DFieldset :legend="$t('settingsPage.nightMode.legend')" class="my-4 gap-4">
           <DFormControl class="gap-1">
-            <DLabel for="alarmClock">
+            <DLabel for="nightMode">
               <DCheckbox
-                id="alarmClock"
-                name="alarm-clock"
-                v-model="alarmClock"
-                aria-describedby="alarm-clock-description"
+                id="nightMode"
+                name="night-mode"
+                v-model="nightMode"
+                aria-describedby="night-mode-description"
               />
-              <DText size="sm">{{ $t('settingsPage.nightMode.alarmClock.label') }}</DText>
+              <DText size="sm">{{ $t('settingsPage.nightMode.label') }}</DText>
             </DLabel>
-            <DText is="p" id="alarm-clock-description">{{
-              $t('settingsPage.nightMode.alarmClock.description')
+            <DText is="p" id="night-mode-description">{{
+              $t('settingsPage.nightMode.description')
             }}</DText>
           </DFormControl>
 
           <DFormControl class="gap-1">
             <DLabel input>
-              <DText label size="sm">{{
-                $t('settingsPage.nightMode.alarmClock.alarmTime.label')
-              }}</DText>
-              <DInput type="time" name="alarm-time" v-model="alarmTime" :disabled="!alarmClock" />
+              <DText label size="sm">{{ $t('settingsPage.nightMode.nightModeStart.label') }}</DText>
+              <DInput
+                type="time"
+                name="night-mode-start"
+                v-model="nightModeStart"
+                :disabled="!nightMode"
+              />
             </DLabel>
           </DFormControl>
+
+          <DFormControl class="gap-1">
+            <DLabel input>
+              <DText label size="sm">{{ $t('settingsPage.nightMode.nightModeEnd.label') }}</DText>
+              <DInput type="time" name="night-mode-end" v-model="nightModeEnd" :disabled="!nightMode" />
+            </DLabel>
+          </DFormControl>
+
+          <FeatureToggle :features="['nightMode', 'alarmClock']">
+            <DFieldset
+              :legend="$t('settingsPage.nightMode.alarmClock.legend')"
+              class="gap-4"
+              style="background-color: var(--color-base-100)"
+              :disabled="!nightMode"
+            >
+              <DFormControl class="gap-1">
+                <DLabel for="alarmClock">
+                  <DCheckbox
+                    id="alarmClock"
+                    name="alarm-clock"
+                    v-model="alarmClock"
+                    aria-describedby="alarm-clock-description"
+                  />
+                  <DText size="sm">{{ $t('settingsPage.nightMode.alarmClock.label') }}</DText>
+                </DLabel>
+                <DText is="p" id="alarm-clock-description">{{
+                  $t('settingsPage.nightMode.alarmClock.description')
+                }}</DText>
+              </DFormControl>
+
+              <DFormControl class="gap-1">
+                <DLabel input>
+                  <DText label size="sm">{{
+                    $t('settingsPage.nightMode.alarmClock.alarmTime.label')
+                  }}</DText>
+                  <DInput type="time" name="alarm-time" v-model="alarmTime" :disabled="!alarmClock" />
+                </DLabel>
+              </DFormControl>
+            </DFieldset>
+          </FeatureToggle>
         </DFieldset>
-      </DFieldset>
+      </FeatureToggle>
 
       <DFormControl class="my-4">
         <DFormControl class="gap-1">
@@ -852,20 +965,92 @@ watchEffect(() => {
           </select>
         </DFormControl>
       </DFormControl>
+
+      <DFormControl class="my-4 gap-1">
+        <DLabel for="experimentalFeatures">
+          <DCheckbox
+            id="experimentalFeatures"
+            name="experimental-features"
+            v-model="experimentalFeatures"
+            :disabled="!hasLoadedDeviceSettings"
+          />
+          <DText size="sm">{{ $t('settingsPage.experimentalFeatures.label') }}</DText>
+        </DLabel>
+      </DFormControl>
+
+      <DFieldset
+        v-if="experimentalFeatures"
+        :legend="$t('settingsPage.experimentalFeatures.list.legend')"
+        class="gap-4 p-4 border-5 border-warning"
+        style="background-color: var(--color-base-100)"
+      >
+        <DAlert type="warning">
+          <DText is="h3" class="font-bold">{{
+            $t('settingsPage.experimentalFeatures.list.warning.title')
+          }}</DText>
+          <DText is="p">{{ $t('settingsPage.experimentalFeatures.list.warning.body') }}</DText>
+        </DAlert>
+
+        <DFormControl class="gap-1">
+          <dl class="divide-y divide-base-200 text-sm">
+            <div v-if="isLoadingFeatureToggleStatus" class="py-2">
+              <DText is="p">Loading feature toggles...</DText>
+            </div>
+            <div v-else-if="isWaitingForFeatureToggleStatusPeer" class="py-2">
+              <DText is="p">Waiting for device connection...</DText>
+            </div>
+            <div v-else-if="featureToggleStatusError" class="flex items-center gap-2 py-2">
+              <DText is="p" class="flex-1 text-error">{{ featureToggleStatusError }}</DText>
+              <DButton size="xs" color="neutral" @click="reloadFeatureToggleStatus">Retry</DButton>
+            </div>
+            <div v-else-if="availableFeatureToggleList.length === 0" class="py-2">
+              <DText is="p">No experimental features available for this controller version.</DText>
+            </div>
+            <div
+              v-for="feature in availableFeatureToggleList"
+              :key="'feature-toggle-' + feature.key"
+              class="flex items-center gap-2 py-2"
+            >
+              <dt class="flex-1">
+                <DText is="p">
+                  {{ feature.label }}
+                  <DBadge v-if="feature.isPermanent" xs warning>PERMANENT</DBadge>
+                </DText>
+                <DText is="p" size="xs">Since controller {{ feature.sinceVersion }}</DText>
+              </dt>
+              <dd class="w-12">
+                <DToggle
+                  :key="'feature-toggle-input-' + feature.key + '-' + featureToggleRenderKeys[feature.key]"
+                  :model-value="featureToggleModels[feature.key].value"
+                  :disabled="
+                    !hasLoadedDeviceSettings ||
+                    (feature.isPermanent && featureToggleModels[feature.key].value)
+                  "
+                  :success="!feature.isPermanent"
+                  :error="feature.isPermanent"
+                  @update:model-value="(enabled) => setFeatureToggle(feature, Boolean(enabled))"
+                />
+              </dd>
+            </div>
+          </dl>
+        </DFormControl>
+      </DFieldset>
     </template>
 
     <DFieldset :legend="$t('settingsPage.actions.legend')" class="my-4">
       <DFlex is="div" wrap justifyCenter class="w-80 gap-4">
-        <DButton
-          btn
-          primary
-          class="w-full"
-          @click="doFirmwareUpdate"
-          @touchstart="() => vibrateDevice(4)"
-          @touchend="() => vibrateDevice(1)"
-        >
-          {{ $t('settingsPage.actions.update.button') }}
-        </DButton>
+        <FeatureToggle features="updateDevice">
+          <DButton
+            btn
+            primary
+            class="w-full"
+            @click="doFirmwareUpdate"
+            @touchstart="() => vibrateDevice(4)"
+            @touchend="() => vibrateDevice(1)"
+          >
+            {{ $t('settingsPage.actions.update.button') }}
+          </DButton>
+        </FeatureToggle>
 
         <DButton
           btn
@@ -889,18 +1074,50 @@ watchEffect(() => {
           {{ $t('settingsPage.actions.reboot.button') }}
         </DButton>
 
-        <DButton
-          btn
-          error
-          dash
-          @click="doFactoryReset"
-          @touchstart="() => vibrateDevice(4)"
-          @touchend="() => vibrateDevice(1)"
-        >
-          {{ $t('settingsPage.actions.factoryReset.button') }}
-        </DButton>
+        <FeatureToggle features="factoryReset">
+          <DButton
+            btn
+            error
+            dash
+            @click="doFactoryReset"
+            @touchstart="() => vibrateDevice(4)"
+            @touchend="() => vibrateDevice(1)"
+          >
+            {{ $t('settingsPage.actions.factoryReset.button') }}
+          </DButton>
+        </FeatureToggle>
       </DFlex>
     </DFieldset>
+
+    <FeatureToggle features="debug">
+      <DebugSection :data="{
+        isConnected,
+        lastError,
+        featureConnection: {
+          isLoadingFeatureToggleStatus,
+          featureToggleStatusError,
+          isWaitingForFeatureToggleStatusPeer
+        },
+        isFirstTimeSetup,
+        controllerVersion
+      }" />
+      <DebugSection :data="{
+        deviceName,
+        date, time,
+        location,
+        ssid, security, password,
+        hiddenNetwork, dhcp, ip, subnet, gateway,
+        dns, primaryDns, secondaryDns,
+        proxy, proxyServer, proxyPort, proxyAutoConfig,
+        brightness, dimAtSunset,
+        nightMode, nightModeStart, nightModeEnd,
+        alarmClock, alarmTime,
+        theme,
+        experimentalFeatures, featureToggleModels,
+        wifiStatus, wifiNetworks, wifiIsScanning, wifiIsSaving, wifiStatusMessage, wifiStatusError
+      }" />
+      <DebugSection :data="featureToggleModels" />
+    </FeatureToggle>
   </main>
 </template>
 

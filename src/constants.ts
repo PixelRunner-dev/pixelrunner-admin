@@ -131,3 +131,112 @@ export const THEMES_OTHER = [
 ];
 
 export const THEME_DEFAULT = 'pixelrunner';
+
+export const EXPERIMENTAL_FEATURES_SETTING_KEY = 'experimentalFeatures';
+export const FEATURE_TOGGLE_SETTING_PREFIX = 'featureToggle.';
+
+export interface FeatureToggleItem {
+  key: string;
+  label: string;
+  isPermanent: boolean;
+  sinceVersion: string;
+}
+
+export const FEATURE_TOGGLE_LIST = [
+  {
+    key: 'debug',
+    label: 'Enable debug tool',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'networkProxy',
+    label: 'Enable proxy for system network',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'dimAtSunset',
+    label: 'Enable option "dim at sunset"',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'nightMode',
+    label: 'Enable "night mode" what reduce brightness between sunset and sunrise',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'alarmClock',
+    label: 'Enable functionality of an alarm clock (enabling nightMode is required)',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'updateDevice',
+    label: 'Enable functionality to update the device via scripts instead of reinstalling the OS',
+    isPermanent: true,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'factoryReset',
+    label:
+      'Enable functionality to do a factory reset of the device via the admin interface or via long pressing the button',
+    isPermanent: true,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'appletScheduler',
+    label:
+      'Enable the possibility to schedule an applet to be enabled between certain time and date configurations',
+    isPermanent: true,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'currentAppletInLogo',
+    label:
+      'Enable to show the current active applet on matrix screen in the logo in the admin interface',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'search',
+    label:
+      'Enable search of applets in the library by text search in name, author, summary, description and categories',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'topSearchQueries',
+    label: 'Enable search tracking and show popular search queries (enabling search is required)',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'updateSystemClock',
+    label: 'Enable functionality to set the system clock via the admin interface',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'enableOauthApplets',
+    label: 'Enable OAuth2 enabled applets',
+    isPermanent: true,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'fancyCarousel',
+    label: 'Enable a fancy carousel instead of the current one',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'konami',
+    label: 'Enable Konami',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  }
+] as const satisfies readonly FeatureToggleItem[];
+
+export type FeatureToggleKey = (typeof FEATURE_TOGGLE_LIST)[number]['key'];

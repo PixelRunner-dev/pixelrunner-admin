@@ -3,6 +3,7 @@ import { computed, defineAsyncComponent, ref, watch } from 'vue';
 
 import FormField from '../Form/FormField.vue';
 import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
+import FeatureToggle from '../FeatureToggle.vue';
 
 import { useClientApi } from '@/ws/index.ts';
 
@@ -164,7 +165,9 @@ watch(
 
     <DDivider vertical />
 
-    <FieldSchedule />
+    <FeatureToggle features="appletScheduler">
+      <FieldSchedule />
+    </FeatureToggle>
 
     <DFlex class="gap-4">
       <DButton type="submit" primary wide>{{ (applet.isInstalled) ? $t('generic.save') : $t('generic.install') }}</DButton>

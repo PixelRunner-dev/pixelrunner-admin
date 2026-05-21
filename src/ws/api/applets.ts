@@ -100,11 +100,11 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
   }
 
   async getAppletsByCategory(category: ICategory): Promise<IFullApplet[]> {
-    return this.getAppletsByCategoryName(category.key);
+    return this.getAppletsByCategoryKey(category.key);
   }
 
-  async getAppletsByCategoryName(categoryName: string): Promise<IFullApplet[]> {
-    return this.action<IFullApplet[]>('getAppletsByCategoryName', { categoryName });
+  async getAppletsByCategoryKey(categoryKey: string): Promise<IFullApplet[]> {
+    return this.action<IFullApplet[]>('getAppletsByCategoryKey', { categoryKey });
   }
 
   private async action<T>(method: string, params?: Record<string, unknown>): Promise<T> {

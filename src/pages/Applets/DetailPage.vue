@@ -10,6 +10,8 @@ import AppletConfig from '@/components/Applet/AppletConfig.vue';
 import AppletDetails from '@/components/Applet/AppletDetails.vue';
 import AppletImage from '@/components/Applet/AppletImage.vue';
 import CategoryList from '@/components/CategoryList.vue';
+import DebugSection from '@/components/DebugSection.vue';
+import FeatureToggle from '@/components/FeatureToggle.vue';
 
 import type { IFullApplet, UUID } from 'pixelrunner-shared';
 
@@ -111,18 +113,8 @@ const debugState = computed(() => ({
     <p v-else-if="loadError" class="m-4 text-center text-error">{{ loadError }}</p>
     <h1 v-else class="m-4">Applet not found</h1>
 
-    <section class="debug-panel m-4 p-3 rounded-box bg-base-200 text-xs font-mono">
-      <h2 class="mb-2 text-sm font-bold">Connection Debug</h2>
-      <p>clientState: {{ debugState.clientState }}</p>
-      <p>isConnected: {{ debugState.isConnected }}</p>
-      <p>isLoading: {{ debugState.isLoading }}</p>
-      <p>hasLoadAttempted: {{ debugState.hasLoadAttempted }}</p>
-      <p>loadError: {{ debugState.loadError ?? 'null' }}</p>
-      <p>lastClientError: {{ debugState.lastClientError ?? 'null' }}</p>
-      <p>packageName: {{ debugState.packageName ?? 'null' }}</p>
-      <p>uuid: {{ debugState.uuid ?? 'null' }}</p>
-      <p>loadedPackageName: {{ debugState.loadedPackageName ?? 'null' }}</p>
-      <p>loadedUuid: {{ debugState.loadedUuid ?? 'null' }}</p>
-    </section>
+    <FeatureToggle features="debug">
+      <DebugSection :data="debugState" />
+    </FeatureToggle>
   </main>
 </template>

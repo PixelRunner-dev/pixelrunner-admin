@@ -9,6 +9,9 @@ import {
 } from '(vendor)/daisy-ui-kit/index.ts';
 
 import SetLanguage from '@/components/SetLanguage.vue';
+import FeatureToggle from '@/components/FeatureToggle.vue';
+import DebugSection from '@/components/DebugSection.vue';
+
 import {
   useSyncedControllerSettings,
   type SyncedControllerSettingBinding
@@ -97,6 +100,18 @@ useSyncedControllerSettings({
         </DButton>
       </section>
     </Transition>
+
+    <FeatureToggle features="debug">
+      <DebugSection :data="{
+        isConnected,
+        lastError,
+        state,
+        language,
+        isMigratingDatabase,
+        setupError,
+        canContinue
+      }" />
+    </FeatureToggle>
   </main>
 </template>
 

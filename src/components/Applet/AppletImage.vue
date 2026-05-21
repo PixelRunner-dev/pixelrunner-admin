@@ -4,7 +4,7 @@ import { computed, ref, watch, onMounted } from 'vue';
 import type { IAppletImage } from 'pixelrunner-shared';
 
 interface Props extends IAppletImage {
-  showFrame: boolean;
+  showFrame?: boolean;
 }
 
 const TIMESTAMP_DEVIATION = 100000;

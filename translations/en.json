@@ -10,6 +10,7 @@
     "prev": "Previous",
     "next": "Next",
     "loading": "Loading...",
+    "configure": "Configure",
     "accessWarning": {
       "title": "Access Via Device IP",
       "message": "You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device's local IP address.",
@@ -17,7 +18,7 @@
     },
     "official": "official"
   },
-    "applet": {
+  "applet": {
     "category": {
       "starter_pack": {
         "label": "Starter pack"
@@ -268,6 +269,16 @@
     "theme": {
       "label": "Theme (Admin Interface)"
     },
+    "experimentalFeatures": {
+      "label": "Enable experimental features",
+      "list": {
+        "legend": "Experimental features",
+        "warning": {
+          "title": "WARNING:",
+          "body": "ALL FEATURES ARE STILL IN DEVELOPMENT OR IN TEST PHASE. ENABLING A FEATURE COULD BRICK YOUR DEVICE! Some features are permanent and cannot be toggled off, other features could do no harm at all. Only toggle a feature if you know what you are doing. There is NO SUPPORT for all experimental features in this list."
+        }
+      }
+    },
     "actions": {
       "legend": "Actions",
       "update": {
@@ -285,6 +296,29 @@
         "button": "Factory Reset",
         "confirm": "This will erase all data on the device. Are you sure you want to factory reset this device?"
       }
+    }
+  },
+  "listPage": {
+    "pageTitle": "Pixel Runner",
+    "playlist": {
+      "noActivePlaylist": "There are no applets yet added to the playlist. Add one via the store."
+    },
+    "cta": {
+      "goToStore": "Applets Library"
+    }
+  },
+  "storePage": {
+    "pageTitle": "Applets Library",
+    "spotlight": {
+      "title": "Spotlight"
+    },
+    "new": {
+      "title": "Newly Added",
+      "payoff": "Recent added applets"
+    },
+    "starterPack": {
+      "title": "Starter Pack",
+      "payoff": "Start with these applets"
     }
   }
 }

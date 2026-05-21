@@ -54,7 +54,7 @@ const appletImage = computed(() => {
           <router-link
             v-if="hasCallToAction && applet.isInstalled"
             :to="`/applets/${applet.installationDetails?.uuid}`"
-            class="btn btn-secondary">
+            class="btn btn-secondary btn-sm">
             <slot name="cta" />
           </router-link>
         </figcaption>

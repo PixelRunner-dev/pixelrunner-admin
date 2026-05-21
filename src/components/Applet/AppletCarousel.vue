@@ -8,9 +8,10 @@ import type { IFullApplet } from 'pixelrunner-shared';
 
 interface Props {
   applets: IFullApplet[];
+  itemWidth?: 'default' | 'wide' | 'full';
 }
 
-const { applets }: Props = defineProps<Props>();
+const { applets, itemWidth = 'default' }: Props = defineProps<Props>();
 
 const carousel = ref();
 let carouselInstance: Carousel | null = null;
@@ -25,7 +26,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="component--carousel" ref="carousel">
-    <AppletList :applets :classes="{ list: 'carousel__track', item: 'carousel__track__item' }">
+    <AppletList :applets :classes="{ list: 'carousel__track', item: `carousel__track__item carousel__item-width--${itemWidth}` }">
       <template #item="applet">
         <slot name="item" v-bind="applet" />
       </template>
@@ -59,6 +60,14 @@ onBeforeUnmount(() => {
 
 .component--carousel .carousel__track::-webkit-scrollbar {
   display: none;
+}
+
+.carousel__item-width--default {
+  width: 15rem;
+}
+
+.carousel__item-width--wide {
+  width: 25rem;
 }
 
 /* .component--carousel .scroll__track._grabbing,

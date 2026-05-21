@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 
 import PlayList from '@/components/PlayList.vue';
+import DebugSection from '@/components/DebugSection.vue';
+import FeatureToggle from '@/components/FeatureToggle.vue';
 import { useNotifications } from '@/composables/useNotifications.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
@@ -52,11 +54,8 @@ const {
 const isSavingOrder = ref(false);
 const saveOrderError = ref<string | null>(null);
 const SAVE_ORDER_TIMEOUT_MS = 5000;
+const NOTIFICATION_DELAY_MS = 500;
 let saveOrderRequestId = 0;
-
-function pushNotification(notification: Notification) {
-  notificationState?.addNotification(notification);
-}
 
 function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
   return applet.installationDetails?.uuid ?? null;
@@ -116,17 +115,58 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
 
     activePlaylist.value = previousPlaylist;
     saveOrderError.value = caughtErrorMessage;
-    pushNotification({
-      type: 'error',
-      message: `[Could not save playlist order. ${saveOrderError.value}]`,
-      hasCloseButton: true
-    });
   } finally {
     if (requestId === saveOrderRequestId) {
       isSavingOrder.value = false;
     }
   }
 }
+
+const activeStatusNotification = computed<Notification | null>(() => {
+  if (isSavingOrder.value) {
+    return { type: 'info', message: 'Saving playlist order...' };
+  }
+
+  if (saveOrderError.value) {
+    return { type: 'error', message: saveOrderError.value, hasCloseButton: true };
+  }
+
+  if (isLoading.value) {
+    return { type: 'info', message: 'Loading active playlist...' };
+  }
+
+  if (isWaitingForPeer.value) {
+    return { type: 'info', message: 'Waiting for device connection...' };
+  }
+
+  if (loadError.value) {
+    return { type: 'error', message: loadError.value, hasCloseButton: true };
+  }
+
+  return null;
+});
+
+watch(
+  activeStatusNotification,
+  (notification, previousNotification) => {
+    if (previousNotification) {
+      notificationState?.setNotification(false, previousNotification);
+    }
+
+    if (!notification) return;
+
+    notificationState?.setNotification(true, notification, {
+      delay: NOTIFICATION_DELAY_MS
+    });
+  },
+  { immediate: true }
+);
+
+onBeforeUnmount(() => {
+  if (activeStatusNotification.value) {
+    notificationState?.setNotification(false, activeStatusNotification.value);
+  }
+});
 
 const debugState = computed(() => ({
   clientState: state.value,
@@ -136,13 +176,16 @@ const debugState = computed(() => ({
   loadError: loadError.value,
   lastClientError: lastError.value?.message ?? null,
   playlistName: activePlaylist.value?.name ?? null,
-  playlistAppletCount: activePlaylist.value?.applets.length ?? 0
+  playlistAppletCount: activePlaylist.value?.applets.length ?? 0,
+  isSavingOrder,
+  saveOrderError,
+  isWaitingForPeer
 }));
 </script>
 
 <template>
   <main class="site-wrapper">
-    <DText size="5xl" class="my-4">[Your Pixelrunner]</DText>
+    <DText is="h1" size="5xl" class="my-4">{{ $t('listPage.pageTitle') }}</DText>
 
     <PlayList
       v-if="activePlaylist"
@@ -150,26 +193,12 @@ const debugState = computed(() => ({
       :isSavingOrder
       @reorder="handlePlaylistReorder"
     />
-    <p v-if="isSavingOrder" class="m-4 text-center text-sm">Saving playlist order...</p>
-    <p v-else-if="saveOrderError" class="m-4 text-center text-sm text-error">
-      {{ saveOrderError }}
-    </p>
-    <p v-else-if="isLoading" class="m-4 text-center">Loading active playlist...</p>
-    <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>
-    <p v-else-if="loadError" class="m-4 text-center text-error">{{ loadError }}</p>
-    <p v-else-if="!activePlaylist" class="m-4 text-center">No active playlist available.</p>
 
-    <section class="debug-panel m-4 p-3 rounded-box bg-base-200 text-xs font-mono">
-      <h2 class="mb-2 text-sm font-bold">Connection Debug</h2>
-      <p>clientState: {{ debugState.clientState }}</p>
-      <p>isConnected: {{ debugState.isConnected }}</p>
-      <p>isLoading: {{ debugState.isLoading }}</p>
-      <p>hasLoadAttempted: {{ debugState.hasLoadAttempted }}</p>
-      <p>loadError: {{ debugState.loadError ?? 'null' }}</p>
-      <p>lastClientError: {{ debugState.lastClientError ?? 'null' }}</p>
-      <p>playlistName: {{ debugState.playlistName ?? 'null' }}</p>
-      <p>playlistAppletCount: {{ debugState.playlistAppletCount }}</p>
-    </section>
+    <div v-else class="bg-base-200 rounded-box my-4 p-4 shadow-sm">
+      <DText is="p">
+        {{ $t('listPage.playlist.noActivePlaylist') }}
+      </DText>
+    </div>
 
     <div class="text-center m-4">
       <router-link
@@ -178,9 +207,13 @@ const debugState = computed(() => ({
         @touchstart="() => vibrateDevice(4)"
         @touchend="() => vibrateDevice(1)"
       >
-        {{ $t('generic.add') }}
+        {{ $t('listPage.cta.goToStore') }}
       </router-link>
     </div>
+
+    <FeatureToggle features="debug">
+      <DebugSection :data="debugState" />
+    </FeatureToggle>
   </main>
 </template>
 

@@ -50,7 +50,7 @@ const router = createRouter({
       meta: { title: 'Store' }
     },
     {
-      path: '/store/categories/:name',
+      path: '/store/categories/:key',
       name: 'store-category',
       component: () => import('@/pages/Store/SearchPage.vue'),
       meta: { title: 'Store Search' }

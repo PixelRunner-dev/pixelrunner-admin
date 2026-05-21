@@ -1,33 +1,60 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import type { IFullApplet } from 'pixelrunner-shared';
 
 import { useClientApi } from '@/ws/index.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
-import { toCapitalizeWords } from '@/utils/generic.ts';
 
 import StoreSearch from '@/components/Store/StoreSearch.vue';
 import StoreSection from '@/components/Store/StoreSection.vue';
 import AppletCarousel from '@/components/Applet/AppletCarousel.vue';
 import AppletCard from '@/components/Applet/AppletCard.vue';
 // import CategoryList from '@/components/CategoryList.vue';
+import DebugSection from '@/components/DebugSection.vue';
+import FeatureToggle from '@/components/FeatureToggle.vue';
 
 import { Button as DButton, Flex as DFlex, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
-
-const spotlightCategoryName = 'spotlight';
-const starterPackCategoryName = 'starter pack';
-
-// komt later...
-// const mostInstalledItems = newlyAddedItems;
 
 const isTimeOfTheYear = new Date().getMonth() === 11; // christmas + nye
 // const isTimeOfTheYear = (new Date()).getMonth() === 7; // zomer + wk voetbal?
 
 const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'];
 
-const { isConnected, applets, isConnecting, lastError, connect, state } = useClientApi();
-const canLoadStoreApplets = computed(() => isConnected.value);
+const { isConnected, applets, isConnecting, lastError, state } = useClientApi();
+
+const spotlightCategoryKey = 'spotlight';
+const {
+  data: spotlightItems,
+  isLoading: isSpotlightLoading,
+  error: spotlightError,
+  isWaitingForPeer: isWaitingForSpotlightPeer,
+  reload: reloadSpotlight
+} = useControllerQuery<IFullApplet[]>({
+  label: 'StorePage - spotlight',
+  enabled: isConnected,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets),
+    categoryKey: spotlightCategoryKey
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
+
+    const categoryApplets = await applets.getAppletsByCategoryKey(spotlightCategoryKey);
+
+    return (categoryApplets ?? []) as IFullApplet[];
+  },
+  defaultErrorMessage: 'Failed to load spotlight applets',
+  onSuccess: (loadedApplets) => {
+    console.log('[StorePage] Spotlight applets loaded:', {
+      categoryKey: spotlightCategoryKey,
+      count: loadedApplets.length
+    });
+  }
+});
 
 const {
   data: newlyAddedItems,
@@ -36,8 +63,8 @@ const {
   isWaitingForPeer: isWaitingForNewlyAddedPeer,
   reload: reloadNewlyAdded
 } = useControllerQuery<IFullApplet[]>({
-  label: 'StorePage newly added',
-  enabled: canLoadStoreApplets,
+  label: 'StorePage - newlyAdded',
+  enabled: isConnected,
   state,
   lastError,
   canLoad: () => Boolean(applets),
@@ -64,40 +91,7 @@ const {
   }
 });
 
-const {
-  data: spotlightItems,
-  isLoading: isSpotlightLoading,
-  error: spotlightError,
-  isWaitingForPeer: isWaitingForSpotlightPeer,
-  reload: reloadSpotlight
-} = useControllerQuery<IFullApplet[]>({
-  label: 'StorePage spotlight',
-  enabled: canLoadStoreApplets,
-  state,
-  lastError,
-  canLoad: () => Boolean(applets),
-  skipContext: () => ({
-    hasAppletsApi: Boolean(applets),
-    categoryName: spotlightCategoryName
-  }),
-  load: async () => {
-    if (!applets) {
-      throw new Error('Applets API not available');
-    }
-
-    const categoryApplets = await applets.getAppletsByCategoryName(spotlightCategoryName);
-
-    return (categoryApplets ?? []) as IFullApplet[];
-  },
-  defaultErrorMessage: 'Failed to load spotlight applets',
-  onSuccess: (loadedApplets) => {
-    console.log('[StorePage] Spotlight applets loaded:', {
-      categoryName: spotlightCategoryName,
-      count: loadedApplets.length
-    });
-  }
-});
-
+const starterPackCategoryKey = 'starter_pack';
 const {
   data: starterPackItems,
   isLoading: isStarterPackLoading,
@@ -105,28 +99,28 @@ const {
   isWaitingForPeer: isWaitingForStarterPackPeer,
   reload: reloadStarterPack
 } = useControllerQuery<IFullApplet[]>({
-  label: 'StorePage starter pack',
-  enabled: canLoadStoreApplets,
+  label: 'StorePage - starterPack',
+  enabled: isConnected,
   state,
   lastError,
   canLoad: () => Boolean(applets),
   skipContext: () => ({
     hasAppletsApi: Boolean(applets),
-    categoryName: starterPackCategoryName
+    categoryKey: starterPackCategoryKey
   }),
   load: async () => {
     if (!applets) {
       throw new Error('Applets API not available');
     }
 
-    const categoryApplets = await applets.getAppletsByCategoryName(starterPackCategoryName);
+    const categoryApplets = await applets.getAppletsByCategoryKey(starterPackCategoryKey);
 
     return (categoryApplets ?? []) as IFullApplet[];
   },
   defaultErrorMessage: 'Failed to load starter pack applets',
   onSuccess: (loadedApplets) => {
     console.log('[StorePage] Starter pack applets loaded:', {
-      categoryName: starterPackCategoryName,
+      categoryKey: starterPackCategoryKey,
       count: loadedApplets.length
     });
   }
@@ -137,30 +131,26 @@ const themedItems = newlyAddedItems;
 
 <template>
   <main class="site-wrapper">
-    <div class="border">
-      <pre>connection: {{ isConnected ? 'connected' : 'not connected' }}</pre>
-      <pre>state: {{ state }}</pre>
-      <pre v-if="isConnecting">connecting</pre>
-      <pre v-if="lastError">{{ lastError }}</pre>
-      <button v-if="!isConnected" class="btn" @click="connect">connect</button>
-    </div>
-
-    <DText is="h1" size="5xl" class="my-4">{{ toCapitalizeWords(String($route.name)) }}</DText>
+    <DText is="h1" size="5xl" class="my-4">{{ $t('storePage.pageTitle') }}</DText>
 
     <section class="search my-4">
-      <StoreSearch />
+      <FeatureToggle features="search">
+        <StoreSearch />
 
-      <section class="my-2">
-        <DFlex is="ul" wrap class="gap-1">
-          <template v-for="term in mostSearchedTerms" :key="'search-' + term">
-            <li>
-              <DButton size="xs" color="neutral" @click="() => console.log(`click ${term}`)">{{
-                term
-              }}</DButton>
-            </li>
-          </template>
-        </DFlex>
-      </section>
+        <FeatureToggle :features="['search', 'topSearchQueries']">
+          <section class="my-2">
+            <DFlex is="ul" wrap class="gap-1">
+              <template v-for="term in mostSearchedTerms" :key="'search-' + term">
+                <li>
+                  <DButton size="xs" color="neutral" @click="() => console.log(`click ${term}`)">{{
+                    term
+                  }}</DButton>
+                </li>
+              </template>
+            </DFlex>
+          </section>
+        </FeatureToggle>
+      </FeatureToggle>
     </section>
 
     <!-- (spotlight)<br />
@@ -175,12 +165,10 @@ const themedItems = newlyAddedItems;
       </div>
     </section> -->
 
-    <StoreSection v-if="spotlightItems" title="[Spotlight]">
+    <StoreSection v-if="spotlightItems" :title="$t('storePage.spotlight.title')">
       <AppletCarousel :applets="spotlightItems">
         <template #item="applet">
-          <AppletCard view="vertical" :applet hasCategories>
-            <template #cta>[test]</template>
-          </AppletCard>
+          <AppletCard view="vertical" :applet hasCategories />
         </template>
       </AppletCarousel>
     </StoreSection>
@@ -201,19 +189,15 @@ const themedItems = newlyAddedItems;
     >
       <AppletCarousel :applets="themedItems">
         <template #item="applet">
-          <AppletCard view="preview" :applet>
-            <template #cta>[test]</template>
-          </AppletCard>
+          <AppletCard view="preview" :applet />
         </template>
       </AppletCarousel>
     </StoreSection>
 
-    <StoreSection v-if="newlyAddedItems" title="[Newly Added]" payoff="[New applets added]">
-      <AppletCarousel :applets="newlyAddedItems">
+    <StoreSection v-if="newlyAddedItems" :title="$t('storePage.new.title')" :payoff="$t('storePage.new.payoff')">
+      <AppletCarousel itemWidth="wide" :applets="newlyAddedItems">
         <template #item="applet">
-          <AppletCard view="preview" :applet>
-            <template #cta>[test]</template>
-          </AppletCard>
+          <AppletCard view="preview" :applet />
         </template>
       </AppletCarousel>
     </StoreSection>
@@ -248,21 +232,19 @@ const themedItems = newlyAddedItems;
 
     <StoreSection
       v-if="starterPackItems"
-      title="[Starter Pack]"
-      payoff="[Start here with these applets]"
+      :title="$t('storePage.starterPack.title')"
+      :payoff="$t('storePage.starterPack.payoff')"
     >
       <AppletCarousel :applets="starterPackItems">
         <template #item="applet">
-          <AppletCard view="vertical" :applet>
-            <template #cta>[test]</template>
-          </AppletCard>
+          <AppletCard view="vertical" :applet />
         </template>
       </AppletCarousel>
     </StoreSection>
 
     <p v-else-if="isStarterPackLoading" class="m-4 text-center">Loading starter pack applets...</p>
     <p v-else-if="isWaitingForStarterPackPeer" class="m-4 text-center">
-      Waiting for device connection...
+      [Waiting for device connection...]
     </p>
     <div v-else-if="starterPackError" class="m-4 text-center">
       <p class="text-error">{{ starterPackError }}</p>
@@ -270,7 +252,33 @@ const themedItems = newlyAddedItems;
     </div>
 
     <section>[Build your own applet! Submit it via Github]</section>
+
+    <FeatureToggle features="debug">
+      <DebugSection :data="{
+        isConnecting,
+        isConnected,
+        lastError,
+        spotlight: {
+          spotlightItems: spotlightItems?.length,
+          isSpotlightLoading,
+          spotlightError,
+          isWaitingForSpotlightPeer,
+          spotlightCategoryKey
+        },
+        newlyAdded: {
+          newlyAddedItems: newlyAddedItems?.length,
+          isNewlyAddedLoading,
+          newlyAddedError,
+          isWaitingForNewlyAddedPeer
+        },
+        starterPack: {
+          starterPackItems: starterPackItems?.length,
+          isStarterPackLoading,
+          starterPackError,
+          isWaitingForStarterPackPeer,
+          starterPackCategoryKey
+        }
+      }" />
+    </FeatureToggle>
   </main>
 </template>
-
-<style scoped></style>
