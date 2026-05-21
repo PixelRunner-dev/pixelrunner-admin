@@ -202,12 +202,12 @@ const debugState = computed(() => ({
 
     <div class="text-center m-4">
       <router-link
-        to="/store"
+        to="/library"
         class="btn btn-primary btn-wide"
         @touchstart="() => vibrateDevice(4)"
         @touchend="() => vibrateDevice(1)"
       >
-        {{ $t('listPage.cta.goToStore') }}
+        {{ $t('listPage.cta.goToLibrary') }}
       </router-link>
     </div>
 

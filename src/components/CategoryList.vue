@@ -10,7 +10,12 @@ export interface Props {
   hasSorting?: boolean;
 }
 
-const { categories, hasItemsInline = false, isInteractive = false, hasSorting = false }: Props = defineProps<Props>();
+const {
+  categories,
+  hasItemsInline = false,
+  isInteractive = false,
+  hasSorting = false
+}: Props = defineProps<Props>();
 </script>
 
 <template>
@@ -21,7 +26,8 @@ const { categories, hasItemsInline = false, isInteractive = false, hasSorting = 
     <li v-for="category in categories" :key="category.key">
       <component
         :is="isInteractive ? 'router-link' : 'span'"
-        :to="isInteractive ? `/store/categories/${category.key}` : undefined">
+        :to="isInteractive ? `/library/categories/${category.key}` : undefined"
+      >
         <IconImage v-bind="category.icon" />
         {{ $t(`applet.category.${category.key}.label`) }}
       </component>

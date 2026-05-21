@@ -46,12 +46,12 @@ watch(query, (newQuery) => {
     delete routeQuery.q;
   }
 
-  router.replace({ name: 'store-search', query: routeQuery });
+  router.replace({ name: 'library-search', query: routeQuery });
 });
 </script>
 
 <template>
-  <DJoin class="component--store-search">
+  <DJoin class="component--library-search">
     <DFormControl>
       <label class="input input-lg join-item">
         <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

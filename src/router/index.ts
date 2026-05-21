@@ -44,27 +44,27 @@ const router = createRouter({
       meta: { title: 'Applet' }
     },
     {
-      path: '/store',
-      name: 'store',
-      component: () => import('@/pages/Store/StorePage.vue'),
-      meta: { title: 'Store' }
+      path: '/library',
+      name: 'library',
+      component: () => import('@/pages/Library/LibraryPage.vue'),
+      meta: { title: 'Library' }
     },
     {
-      path: '/store/categories/:key',
-      name: 'store-category',
-      component: () => import('@/pages/Store/SearchPage.vue'),
-      meta: { title: 'Store Search' }
+      path: '/library/categories/:key',
+      name: 'library-category',
+      component: () => import('@/pages/Library/SearchPage.vue'),
+      meta: { title: 'Library Search' }
     },
     {
-      path: '/store/search',
-      name: 'store-search',
-      component: () => import('@/pages/Store/SearchPage.vue'),
-      meta: { title: 'Store Search' }
+      path: '/library/search',
+      name: 'library-search',
+      component: () => import('@/pages/Library/SearchPage.vue'),
+      meta: { title: 'Library Search' }
     },
-    { path: '/store/applets', redirect: '/store' },
+    { path: '/library/applets', redirect: '/library' },
     {
-      path: '/store/applets/:packageName',
-      name: 'store-detail',
+      path: '/library/applets/:packageName',
+      name: 'library-detail',
       component: () => import('@/pages/Applets/DetailPage.vue'),
       meta: { title: 'Applet' }
     }

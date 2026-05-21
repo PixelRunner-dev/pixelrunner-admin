@@ -4,8 +4,8 @@ import type { ICategory, IFullApplet } from 'pixelrunner-shared';
 import { useClientApi } from '@/ws/index.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 
-import StoreSearch from '@/components/Store/StoreSearch.vue';
-import StoreSection from '@/components/Store/StoreSection.vue';
+import LibrarySearch from '@/components/Library/LibrarySearch.vue';
+import LibrarySection from '@/components/Library/LibrarySection.vue';
 import AppletCarousel from '@/components/Applet/AppletCarousel.vue';
 import AppletCard from '@/components/Applet/AppletCard.vue';
 import CategoryList from '@/components/CategoryList.vue';
@@ -29,7 +29,7 @@ const {
   isWaitingForPeer: isWaitingForSpotlightPeer,
   reload: reloadSpotlight
 } = useControllerQuery<IFullApplet[]>({
-  label: 'StorePage - spotlight',
+  label: 'LibraryPage - spotlight',
   enabled: isConnected,
   state,
   lastError,
@@ -49,7 +49,7 @@ const {
   },
   defaultErrorMessage: 'Failed to load spotlight applets',
   onSuccess: (loadedApplets) => {
-    console.log('[StorePage] Spotlight applets loaded:', {
+    console.log('[LibraryPage] Spotlight applets loaded:', {
       categoryKey: spotlightCategoryKey,
       count: loadedApplets.length
     });
@@ -63,7 +63,7 @@ const {
   isWaitingForPeer: isWaitingForNewlyAddedPeer,
   reload: reloadNewlyAdded
 } = useControllerQuery<IFullApplet[]>({
-  label: 'StorePage - newlyAdded',
+  label: 'LibraryPage - newlyAdded',
   enabled: isConnected,
   state,
   lastError,
@@ -85,7 +85,7 @@ const {
   },
   defaultErrorMessage: 'Failed to load newly added applets',
   onSuccess: (loadedApplets) => {
-    console.log('[StorePage] Newly added applets loaded:', {
+    console.log('[LibraryPage] Newly added applets loaded:', {
       count: loadedApplets.length
     });
   }
@@ -99,7 +99,7 @@ const {
   isWaitingForPeer: isWaitingForStarterPackPeer,
   reload: reloadStarterPack
 } = useControllerQuery<IFullApplet[]>({
-  label: 'StorePage - starterPack',
+  label: 'LibraryPage - starterPack',
   enabled: isConnected,
   state,
   lastError,
@@ -119,7 +119,7 @@ const {
   },
   defaultErrorMessage: 'Failed to load starter pack applets',
   onSuccess: (loadedApplets) => {
-    console.log('[StorePage] Starter pack applets loaded:', {
+    console.log('[LibraryPage] Starter pack applets loaded:', {
       categoryKey: starterPackCategoryKey,
       count: loadedApplets.length
     });
@@ -133,7 +133,7 @@ const {
   isWaitingForPeer: isWaitingForCategoriesPeer,
   reload: reloadCategories
 } = useControllerQuery<ICategory[]>({
-  label: 'StorePage - categories',
+  label: 'LibraryPage - categories',
   enabled: isConnected,
   state,
   lastError,
@@ -152,7 +152,7 @@ const {
   },
   defaultErrorMessage: 'Failed to load categories',
   onSuccess: (loadedCategories) => {
-    console.log('[StorePage] Categories loaded:', {
+    console.log('[LibraryPage] Categories loaded:', {
       count: loadedCategories.length
     });
   }
@@ -163,11 +163,11 @@ const themedItems = newlyAddedItems;
 
 <template>
   <main class="site-wrapper">
-    <DText is="h1" size="5xl" class="my-4">{{ $t('storePage.pageTitle') }}</DText>
+    <DText is="h1" size="5xl" class="my-4">{{ $t('libraryPage.pageTitle') }}</DText>
 
     <section class="search my-4">
       <FeatureToggle features="search">
-        <StoreSearch />
+        <LibrarySearch />
 
         <FeatureToggle :features="['search', 'topSearchQueries']">
           <section class="my-2">
@@ -197,13 +197,13 @@ const themedItems = newlyAddedItems;
       </div>
     </section> -->
 
-    <StoreSection v-if="spotlightItems" :title="$t('storePage.spotlight.title')">
+    <LibrarySection v-if="spotlightItems" :title="$t('libraryPage.spotlight.title')">
       <AppletCarousel :applets="spotlightItems">
         <template #item="applet">
           <AppletCard view="vertical" :applet hasCategories />
         </template>
       </AppletCarousel>
-    </StoreSection>
+    </LibrarySection>
 
     <p v-else-if="isSpotlightLoading" class="m-4 text-center">Loading spotlight applets...</p>
     <p v-else-if="isWaitingForSpotlightPeer" class="m-4 text-center">
@@ -214,7 +214,7 @@ const themedItems = newlyAddedItems;
       <DButton size="xs" color="neutral" @click="reloadSpotlight">Retry</DButton>
     </div>
 
-    <StoreSection
+    <LibrarySection
       v-if="isTimeOfTheYear && themedItems"
       title="[themed items]"
       payoff="[themed applets]"
@@ -224,19 +224,19 @@ const themedItems = newlyAddedItems;
           <AppletCard view="preview" :applet />
         </template>
       </AppletCarousel>
-    </StoreSection>
+    </LibrarySection>
 
-    <StoreSection
+    <LibrarySection
       v-if="newlyAddedItems"
-      :title="$t('storePage.new.title')"
-      :payoff="$t('storePage.new.payoff')"
+      :title="$t('libraryPage.new.title')"
+      :payoff="$t('libraryPage.new.payoff')"
     >
       <AppletCarousel itemWidth="wide" :applets="newlyAddedItems">
         <template #item="applet">
           <AppletCard view="preview" :applet />
         </template>
       </AppletCarousel>
-    </StoreSection>
+    </LibrarySection>
 
     <p v-else-if="isNewlyAddedLoading" class="m-4 text-center">Loading newly added applets...</p>
     <p v-else-if="isWaitingForNewlyAddedPeer" class="m-4 text-center">
@@ -247,9 +247,9 @@ const themedItems = newlyAddedItems;
       <DButton size="xs" color="neutral" @click="reloadNewlyAdded">Retry</DButton>
     </div>
 
-    <StoreSection v-if="categories" :title="$t('storePage.categories.title')">
+    <LibrarySection v-if="categories" :title="$t('libraryPage.categories.title')">
       <CategoryList :categories isInteractive />
-    </StoreSection>
+    </LibrarySection>
 
     <p v-else-if="isCategoriesLoading" class="m-4 text-center">Loading categories...</p>
     <p v-else-if="isWaitingForCategoriesPeer" class="m-4 text-center">
@@ -261,7 +261,7 @@ const themedItems = newlyAddedItems;
     </div>
 
     <!-- mostInstalledItems komt later -->
-    <!-- <StoreSection
+    <!-- <LibrarySection
       v-if="mostInstalledItems"
       title="[Most Installed]"
       payoff="[Most installed applets]"
@@ -273,19 +273,19 @@ const themedItems = newlyAddedItems;
           </AppletCard>
         </template>
       </AppletCarousel>
-    </StoreSection> -->
+    </LibrarySection> -->
 
-    <StoreSection
+    <LibrarySection
       v-if="starterPackItems"
-      :title="$t('storePage.starterPack.title')"
-      :payoff="$t('storePage.starterPack.payoff')"
+      :title="$t('libraryPage.starterPack.title')"
+      :payoff="$t('libraryPage.starterPack.payoff')"
     >
       <AppletCarousel :applets="starterPackItems">
         <template #item="applet">
           <AppletCard view="vertical" :applet />
         </template>
       </AppletCarousel>
-    </StoreSection>
+    </LibrarySection>
 
     <p v-else-if="isStarterPackLoading" class="m-4 text-center">Loading starter pack applets...</p>
     <p v-else-if="isWaitingForStarterPackPeer" class="m-4 text-center">

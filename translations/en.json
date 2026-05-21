@@ -125,6 +125,9 @@
     }
   },
   "settingsPage": {
+    "notification": {
+      "saveInfo": "All changes are saved immediately"
+    },
     "deviceName": {
       "label": "Device name",
       "placeholder": "Enter device name",
@@ -301,13 +304,13 @@
   "listPage": {
     "pageTitle": "Pixel Runner",
     "playlist": {
-      "noActivePlaylist": "There are no applets yet added to the playlist. Add one via the store."
+      "noActivePlaylist": "There are no applets yet added to the playlist. Add one via the library."
     },
     "cta": {
-      "goToStore": "Applets Library"
+      "goToLibrary": "Applets Library"
     }
   },
-  "storePage": {
+  "libraryPage": {
     "pageTitle": "Applets Library",
     "spotlight": {
       "title": "Spotlight"

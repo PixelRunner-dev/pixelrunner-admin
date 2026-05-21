@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import StoreSearch from '@/components/Store/StoreSearch.vue';
+import LibrarySearch from '@/components/Library/LibrarySearch.vue';
 </script>
 
 <template>
   <main>
-    <h1>Store Search</h1>
-    <StoreSearch />
+    <h1>Library Search</h1>
+    <LibrarySearch />
     <p>Searching for: {{ $route.query.q }}</p>
   </main>
 </template>

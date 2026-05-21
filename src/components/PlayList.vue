@@ -35,6 +35,6 @@ function handleReordered(orderedApplets: IFullApplet[]) {
         </template>
       </AppletList>
     </template>
-    <template v-else> [Add applets from the Store to start] </template>
+    <template v-else> [Add applets from the Library to start] </template>
   </div>
 </template>

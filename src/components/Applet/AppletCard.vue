@@ -7,9 +7,7 @@ import CategoryList from '@/components/CategoryList.vue';
 
 import type { IAppletViews, IFullApplet } from 'pixelrunner-shared';
 
-import {
-  Flex as DFlex
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Flex as DFlex } from '(vendor)/daisy-ui-kit/index.ts';
 
 export interface Props {
   applet: IFullApplet;
@@ -32,17 +30,25 @@ const appletImage = computed(() => {
     return applet.installationDetails.image;
   }
   return applet.defaultImage;
-})
+});
 </script>
 
 <template>
-  <DFlex is="article" :class="['component--applet-card', `applet-card--${view}`, {
-    'applet-card--is-hidden': applet.installationDetails?.isHidden,
-    'applet-card--is-pinned': applet.installationDetails?.isPinned
-  }]">
+  <DFlex
+    is="article"
+    :class="[
+      'component--applet-card',
+      `applet-card--${view}`,
+      {
+        'applet-card--is-hidden': applet.installationDetails?.isHidden,
+        'applet-card--is-pinned': applet.installationDetails?.isPinned
+      }
+    ]"
+  >
     <component
       :is="hasCallToAction ? 'div' : 'router-link'"
-      :to="hasCallToAction ? undefined : `/store/applets/${applet.packageName}`">
+      :to="hasCallToAction ? undefined : `/library/applets/${applet.packageName}`"
+    >
       <figure class="w-full">
         <AppletImage v-bind="appletImage" />
 
@@ -54,7 +60,8 @@ const appletImage = computed(() => {
           <router-link
             v-if="hasCallToAction && applet.isInstalled"
             :to="`/applets/${applet.installationDetails?.uuid}`"
-            class="btn btn-secondary btn-sm">
+            class="btn btn-secondary btn-sm"
+          >
             <slot name="cta" />
           </router-link>
         </figcaption>
@@ -103,11 +110,11 @@ const appletImage = computed(() => {
   width: 100%;
 }
 
-[data-theme-mode="dark"] .applet-card--is-hidden::after {
+[data-theme-mode='dark'] .applet-card--is-hidden::after {
   background-color: rgba(0, 0, 0, 0.33);
 }
 
-[data-theme-mode="light"] .applet-card--is-hidden::after {
+[data-theme-mode='light'] .applet-card--is-hidden::after {
   background-color: rgba(255, 255, 255, 0.33);
 }
 
