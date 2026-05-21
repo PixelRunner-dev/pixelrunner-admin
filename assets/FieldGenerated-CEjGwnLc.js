@@ -1,0 +1,1 @@
+import{m as e,a as t,o as n}from"./index-BJ234oJL.js";const o={},c={class:"component--field-generated"};function r(s,a){return n(),t("div",c," [not implemented yet] ")}const _=e(o,[["render",r]]);export{_ as default};
