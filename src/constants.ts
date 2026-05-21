@@ -236,6 +236,12 @@ export const FEATURE_TOGGLE_LIST = [
     label: 'Enable Konami',
     isPermanent: false,
     sinceVersion: '0.0.1'
+  },
+  {
+    key: 'appletStats',
+    label: 'Enable statistics of installed applets, likes and such',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
   }
 ] as const satisfies readonly FeatureToggleItem[];
 
