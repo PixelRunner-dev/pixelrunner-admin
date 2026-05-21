@@ -58,6 +58,7 @@ export function isFeatureSupportedByControllerVersion(
   feature: Pick<FeatureToggleItem, 'sinceVersion'>,
   controllerVersion: string | null
 ): boolean {
+  console.log('controllerVersion', controllerVersion);
   if (!controllerVersion) {
     return false;
   }

@@ -194,12 +194,6 @@ const debugState = computed(() => ({
       @reorder="handlePlaylistReorder"
     />
 
-    <div v-else class="bg-base-200 rounded-box my-4 p-4 shadow-sm">
-      <DText is="p">
-        {{ $t('listPage.playlist.noActivePlaylist') }}
-      </DText>
-    </div>
-
     <div class="text-center m-4">
       <router-link
         to="/library"

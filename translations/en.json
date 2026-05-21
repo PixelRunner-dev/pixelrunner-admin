@@ -16,7 +16,12 @@
       "message": "You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device's local IP address.",
       "instruction": "Find your device's IP address in your router's connected devices list, then access this admin interface via: http://[device-ip]"
     },
-    "official": "official"
+    "official": "official",
+    "install": "Install",
+    "save": "Save",
+    "edit": "Edit",
+    "close": "Close",
+    "cancel": "Cancel"
   },
   "applet": {
     "category": {
@@ -304,7 +309,7 @@
   "listPage": {
     "pageTitle": "Pixel Runner",
     "playlist": {
-      "noActivePlaylist": "There are no applets yet added to the playlist. Add one via the library."
+      "noAppletsInPlaylist": "There are no applets yet added to the playlist. Add one via the Applets Library."
     },
     "cta": {
       "goToLibrary": "Applets Library"

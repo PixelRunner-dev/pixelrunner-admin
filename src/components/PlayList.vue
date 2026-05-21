@@ -20,21 +20,23 @@ function handleReordered(orderedApplets: IFullApplet[]) {
 
 <template>
   <div class="component--playlist my-4" :data-created="dateCreated" :data-modified="dateModified">
-    <template v-if="applets.length">
-      <AppletList
-        :applets
-        :isDragable="true"
-        :isReorderPending="isSavingOrder"
-        :classes="{ list: 'playlist list', item: 'playlist__item list-row' }"
-        @reordered="handleReordered"
-      >
-        <template #item="applet">
-          <AppletCard :applet :hasCallToAction="true">
-            <template #cta>{{ $t('generic.configure') }}</template>
-          </AppletCard>
-        </template>
-      </AppletList>
-    </template>
-    <template v-else> [Add applets from the Library to start] </template>
+    <AppletList
+      v-if="applets.length"
+      :applets
+      :isDragable="true"
+      :isReorderPending="isSavingOrder"
+      :classes="{ list: 'playlist list', item: 'playlist__item list-row' }"
+      @reordered="handleReordered"
+    >
+      <template #item="applet">
+        <AppletCard :applet :hasCallToAction="true">
+          <template #cta>{{ $t('generic.configure') }}</template>
+        </AppletCard>
+      </template>
+    </AppletList>
+
+    <div v-else class="bg-base-200 rounded-box my-4 p-4 shadow-sm">
+      <p>{{ $t('listPage.playlist.noAppletsInPlaylist') }}</p>
+    </div>
   </div>
 </template>
