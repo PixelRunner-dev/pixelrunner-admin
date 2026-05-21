@@ -7,7 +7,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const isDev = import.meta.env.DEV ?? false;
 const randKey = Math.ceil(Math.random() * 10_000);
 const pre = ref<HTMLPreElement | null>(null);
 
@@ -74,7 +73,9 @@ watch(
 </script>
 
 <template>
-  <section v-if="isDev" class="debug-panel my-4 p-4 rounded-box border-5 border-red-500 bg-red-100 text-neutral-900">
+  <section
+    class="debug-panel my-4 p-4 rounded-box border-5 border-red-500 bg-red-100 text-neutral-900"
+  >
     <h2 class="mb-2 text-lg font-bold">Debug</h2>
     <template v-if="props.data">
       <dl class="divide-y divide-base-200 text-xs">
@@ -108,7 +109,13 @@ pre {
 }
 
 pre.hasLineNumbers {
-  background: linear-gradient(to bottom, transparent 0%, transparent calc(50% - 1px), rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1) 100%);
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent calc(50% - 1px),
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
   background-repeat: repeat-y;
   background-attachment: local;
   background-size: 100% 2lh;

@@ -261,6 +261,21 @@ function resetFeatureToggleInput(featureKey: FeatureToggleKey): void {
   featureToggleRenderKeys.value[featureKey] += 1;
 }
 
+async function saveFeatureToggleSetting(
+  featureKey: FeatureToggleKey,
+  enabled: boolean
+): Promise<void> {
+  if (!settings || !isConnected.value) {
+    return;
+  }
+
+  try {
+    await settings.set(getFeatureToggleSettingKey(featureKey), serializeSettingValue(enabled));
+  } catch (error) {
+    console.error('[SettingsPage] Failed to save feature toggle:', featureKey, error);
+  }
+}
+
 async function setFeatureToggle(feature: FeatureToggleItem, enabled: boolean): Promise<void> {
   const featureKey = feature.key as FeatureToggleKey;
   const model = featureToggleModels[featureKey];
@@ -274,6 +289,7 @@ async function setFeatureToggle(feature: FeatureToggleItem, enabled: boolean): P
 
   if (!enabled) {
     model.value = false;
+    await saveFeatureToggleSetting(featureKey, false);
     return;
   }
 
@@ -288,6 +304,7 @@ async function setFeatureToggle(feature: FeatureToggleItem, enabled: boolean): P
   }
 
   model.value = true;
+  await saveFeatureToggleSetting(featureKey, true);
 }
 
 function applyWifiStatus(status: WifiStatus) {
