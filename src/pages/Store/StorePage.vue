@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IFullApplet } from 'pixelrunner-shared';
+import type { ICategory, IFullApplet } from 'pixelrunner-shared';
 
 import { useClientApi } from '@/ws/index.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
@@ -8,7 +8,7 @@ import StoreSearch from '@/components/Store/StoreSearch.vue';
 import StoreSection from '@/components/Store/StoreSection.vue';
 import AppletCarousel from '@/components/Applet/AppletCarousel.vue';
 import AppletCard from '@/components/Applet/AppletCard.vue';
-// import CategoryList from '@/components/CategoryList.vue';
+import CategoryList from '@/components/CategoryList.vue';
 import DebugSection from '@/components/DebugSection.vue';
 import FeatureToggle from '@/components/FeatureToggle.vue';
 
@@ -126,6 +126,38 @@ const {
   }
 });
 
+const {
+  data: categories,
+  isLoading: isCategoriesLoading,
+  error: categoriesError,
+  isWaitingForPeer: isWaitingForCategoriesPeer,
+  reload: reloadCategories
+} = useControllerQuery<ICategory[]>({
+  label: 'StorePage - categories',
+  enabled: isConnected,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets)
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
+
+    const loadedCategories = await applets.getAllCategories();
+
+    return (loadedCategories ?? []) as ICategory[];
+  },
+  defaultErrorMessage: 'Failed to load categories',
+  onSuccess: (loadedCategories) => {
+    console.log('[StorePage] Categories loaded:', {
+      count: loadedCategories.length
+    });
+  }
+});
+
 const themedItems = newlyAddedItems;
 </script>
 
@@ -194,7 +226,11 @@ const themedItems = newlyAddedItems;
       </AppletCarousel>
     </StoreSection>
 
-    <StoreSection v-if="newlyAddedItems" :title="$t('storePage.new.title')" :payoff="$t('storePage.new.payoff')">
+    <StoreSection
+      v-if="newlyAddedItems"
+      :title="$t('storePage.new.title')"
+      :payoff="$t('storePage.new.payoff')"
+    >
       <AppletCarousel itemWidth="wide" :applets="newlyAddedItems">
         <template #item="applet">
           <AppletCard view="preview" :applet />
@@ -211,9 +247,18 @@ const themedItems = newlyAddedItems;
       <DButton size="xs" color="neutral" @click="reloadNewlyAdded">Retry</DButton>
     </div>
 
-    <!-- <StoreSection v-if="categories" title="Categories">
+    <StoreSection v-if="categories" :title="$t('storePage.categories.title')">
       <CategoryList :categories isInteractive />
-    </StoreSection> -->
+    </StoreSection>
+
+    <p v-else-if="isCategoriesLoading" class="m-4 text-center">Loading categories...</p>
+    <p v-else-if="isWaitingForCategoriesPeer" class="m-4 text-center">
+      Waiting for device connection...
+    </p>
+    <div v-else-if="categoriesError" class="m-4 text-center">
+      <p class="text-error">{{ categoriesError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadCategories">Retry</DButton>
+    </div>
 
     <!-- mostInstalledItems komt later -->
     <!-- <StoreSection
@@ -254,31 +299,39 @@ const themedItems = newlyAddedItems;
     <section>[Build your own applet! Submit it via Github]</section>
 
     <FeatureToggle features="debug">
-      <DebugSection :data="{
-        isConnecting,
-        isConnected,
-        lastError,
-        spotlight: {
-          spotlightItems: spotlightItems?.length,
-          isSpotlightLoading,
-          spotlightError,
-          isWaitingForSpotlightPeer,
-          spotlightCategoryKey
-        },
-        newlyAdded: {
-          newlyAddedItems: newlyAddedItems?.length,
-          isNewlyAddedLoading,
-          newlyAddedError,
-          isWaitingForNewlyAddedPeer
-        },
-        starterPack: {
-          starterPackItems: starterPackItems?.length,
-          isStarterPackLoading,
-          starterPackError,
-          isWaitingForStarterPackPeer,
-          starterPackCategoryKey
-        }
-      }" />
+      <DebugSection
+        :data="{
+          isConnecting,
+          isConnected,
+          lastError,
+          spotlight: {
+            spotlightItems: spotlightItems?.length,
+            isSpotlightLoading,
+            spotlightError,
+            isWaitingForSpotlightPeer,
+            spotlightCategoryKey
+          },
+          newlyAdded: {
+            newlyAddedItems: newlyAddedItems?.length,
+            isNewlyAddedLoading,
+            newlyAddedError,
+            isWaitingForNewlyAddedPeer
+          },
+          starterPack: {
+            starterPackItems: starterPackItems?.length,
+            isStarterPackLoading,
+            starterPackError,
+            isWaitingForStarterPackPeer,
+            starterPackCategoryKey
+          },
+          categories: {
+            categories: categories?.length,
+            isCategoriesLoading,
+            categoriesError,
+            isWaitingForCategoriesPeer
+          }
+        }"
+      />
     </FeatureToggle>
   </main>
 </template>

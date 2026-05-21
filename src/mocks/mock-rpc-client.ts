@@ -646,6 +646,10 @@ export class MockRpcClient {
       };
     }
 
+    if (method === 'getAllCategories') {
+      return { method, data: cloneMockData(categoryList) };
+    }
+
     throw new MockJsonRpcError(
       `Mock applets action not implemented: ${method}`,
       'method_not_found'

@@ -5,7 +5,13 @@
  * on the Pixelrunner device.
  */
 
-import type { IAppletSchema, ICategory, UUID, IFullApplet, IFullAppletRecord } from 'pixelrunner-shared';
+import type {
+  IAppletSchema,
+  ICategory,
+  UUID,
+  IFullApplet,
+  IFullAppletRecord
+} from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
 
 interface AppletActionResponse<T> {
@@ -78,9 +84,7 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
    * Get the schema for an applet
    * @param packageName - The package name
    */
-  async getSchema(
-    packageName: string
-  ): Promise<IAppletSchema | string | null> {
+  async getSchema(packageName: string): Promise<IAppletSchema | string | null> {
     return this.action<IAppletSchema | string | null>('getSchema', {
       packageName
     });
@@ -105,6 +109,10 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
 
   async getAppletsByCategoryKey(categoryKey: string): Promise<IFullApplet[]> {
     return this.action<IFullApplet[]>('getAppletsByCategoryKey', { categoryKey });
+  }
+
+  async getAllCategories(): Promise<ICategory[]> {
+    return this.action<ICategory[]>('getAllCategories');
   }
 
   private async action<T>(method: string, params?: Record<string, unknown>): Promise<T> {

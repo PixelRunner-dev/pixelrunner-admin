@@ -319,6 +319,9 @@
     "starterPack": {
       "title": "Starter Pack",
       "payoff": "Start with these applets"
+    },
+    "categories": {
+      "title": "All Categroies"
     }
   }
 }
