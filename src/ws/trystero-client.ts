@@ -773,10 +773,29 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         return channel;
       }
 
-      async createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {
-        console.log('[trystero-client] createOffer called:', options);
+      createOffer(options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit>;
+      createOffer(
+        successCallback: RTCSessionDescriptionCallback,
+        failureCallback: RTCPeerConnectionErrorCallback,
+        options?: RTCOfferOptions
+      ): Promise<void>;
+      async createOffer(
+        optionsOrSuccessCallback?: RTCOfferOptions | RTCSessionDescriptionCallback,
+        failureCallback?: RTCPeerConnectionErrorCallback,
+        options?: RTCOfferOptions
+      ): Promise<RTCSessionDescriptionInit | void> {
+        if (typeof optionsOrSuccessCallback === 'function') {
+          console.log('[trystero-client] createOffer called with callbacks:', options);
+          return super.createOffer(
+            optionsOrSuccessCallback as RTCSessionDescriptionCallback,
+            failureCallback!,
+            options
+          );
+        }
+
+        console.log('[trystero-client] createOffer called:', optionsOrSuccessCallback);
         try {
-          const offer = await super.createOffer(options);
+          const offer = await super.createOffer(optionsOrSuccessCallback);
           console.log('[trystero-client] createOffer resolved:', {
             type: offer.type,
             sdpLength: offer.sdp?.length ?? 0
@@ -788,10 +807,26 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         }
       }
 
-      async createAnswer(options?: RTCAnswerOptions): Promise<RTCSessionDescriptionInit> {
-        console.log('[trystero-client] createAnswer called:', options);
+      createAnswer(options?: RTCAnswerOptions): Promise<RTCSessionDescriptionInit>;
+      createAnswer(
+        successCallback: RTCSessionDescriptionCallback,
+        failureCallback: RTCPeerConnectionErrorCallback
+      ): Promise<void>;
+      async createAnswer(
+        optionsOrSuccessCallback?: RTCAnswerOptions | RTCSessionDescriptionCallback,
+        failureCallback?: RTCPeerConnectionErrorCallback
+      ): Promise<RTCSessionDescriptionInit | void> {
+        if (typeof optionsOrSuccessCallback === 'function') {
+          console.log('[trystero-client] createAnswer called with callbacks');
+          return super.createAnswer(
+            optionsOrSuccessCallback as RTCSessionDescriptionCallback,
+            failureCallback!
+          );
+        }
+
+        console.log('[trystero-client] createAnswer called:', optionsOrSuccessCallback);
         try {
-          const answer = await super.createAnswer(options);
+          const answer = await super.createAnswer(optionsOrSuccessCallback);
           console.log('[trystero-client] createAnswer resolved:', {
             type: answer.type,
             sdpLength: answer.sdp?.length ?? 0
@@ -837,10 +872,24 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         }
       }
 
-      async addIceCandidate(candidate?: RTCIceCandidateInit | RTCIceCandidate): Promise<void> {
+      addIceCandidate(candidate?: RTCIceCandidateInit | null): Promise<void>;
+      addIceCandidate(
+        candidate: RTCIceCandidateInit | null,
+        successCallback: VoidFunction,
+        failureCallback: RTCPeerConnectionErrorCallback
+      ): Promise<void>;
+      async addIceCandidate(
+        candidate?: RTCIceCandidateInit | null,
+        successCallback?: VoidFunction,
+        failureCallback?: RTCPeerConnectionErrorCallback
+      ): Promise<void> {
         console.log('[trystero-client] addIceCandidate called:', candidate?.candidate ?? null);
         try {
-          await super.addIceCandidate(candidate);
+          if (successCallback && failureCallback) {
+            await super.addIceCandidate(candidate ?? null, successCallback, failureCallback);
+          } else {
+            await super.addIceCandidate(candidate);
+          }
           console.log('[trystero-client] addIceCandidate resolved');
         } catch (error) {
           console.error('[trystero-client] addIceCandidate failed:', error);
