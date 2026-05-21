@@ -58,7 +58,6 @@ export function isFeatureSupportedByControllerVersion(
   feature: Pick<FeatureToggleItem, 'sinceVersion'>,
   controllerVersion: string | null
 ): boolean {
-  console.log('controllerVersion', controllerVersion);
   if (!controllerVersion) {
     return false;
   }
@@ -72,13 +71,16 @@ export function extractControllerVersionFromStatus(status: unknown): string | nu
   }
 
   const response = status as {
+    versions?: { controller?: unknown };
     result?: {
       versions?: { controller?: unknown };
       result?: { versions?: { controller?: unknown } };
     };
   };
   const controllerVersion =
-    response.result?.versions?.controller ?? response.result?.result?.versions?.controller;
+    response.versions?.controller ??
+    response.result?.versions?.controller ??
+    response.result?.result?.versions?.controller;
 
   return typeof controllerVersion === 'string' && controllerVersion.length > 0
     ? controllerVersion
