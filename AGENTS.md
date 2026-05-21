@@ -28,6 +28,7 @@ playlists, WiFi, settings, and display state.
 - `src/ws/room-id.ts` - Room ID/config discovery logic.
 - `src/ws/trystero-client.ts` - Browser-side Trystero transport.
 - `src/ws/api/` - RPC clients for device/controller APIs.
+- `src/mocks/` - Local mock RPC client used by standalone admin dev and future tests.
 - `src/utils/` - Shared frontend utilities.
 - `public/` - Static frontend assets.
 - `translations/` - i18n files for `de`, `en`, `es`, `fr`, `nl`.
@@ -52,10 +53,28 @@ npm run a11y
 npm run format
 ```
 
+### Standalone Mock Mode
+
+Use mock mode when working on only `admin-vue` without running the device
+controller or proxy:
+
+```bash
+DEV=true npm run dev
+```
+
+For Vite's dev server, `vite.config.ts` reads shell `DEV=true` and exposes
+`import.meta.env.VITE_MOCK_CONTROLLER`. In that mode `src/main.ts` provides
+`MockRpcClient` from `src/mocks/mock-rpc-client.ts` instead of creating a
+proxy WebSocket, Trystero, or local controller WebSocket client. Keep this mock
+behind the compile-time flag and keep its API responses aligned with
+`src/ws/api/*`; unit and e2e tests should reuse the same mock client.
+
 ## Code Rules
 
 - Keep the direct-cloud and local-proxy flows separate. Do not assume a cloud
   page can read local device secrets.
+- Keep mock mode isolated to `DEV=true`. Do not let production builds bypass
+  the proxy/controller connection path.
 - When changing WebRTC connection logic, update both `src/ws/room-id.ts` and
   `src/ws/trystero-client.ts` together when needed.
 - Never log room passwords, WiFi passwords, private keys, or full pairing

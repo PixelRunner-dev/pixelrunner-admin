@@ -11,6 +11,10 @@ import type { DatabaseMigrationResult } from '@/services/device-maintenance.ts';
 import type { SetupStatus } from '@/services/setup-status.ts';
 import type { IRequestOptions } from 'pixelrunner-shared';
 
+export interface DeviceStatusOptions extends Record<string, unknown> {
+  full?: boolean;
+}
+
 /**
  * DeviceAPI provides device management functionality.
  * Works with any client that implements IRpcClient (WebSocket or Trystero).
@@ -19,8 +23,8 @@ export class DeviceAPI extends ApiClientBase<IRpcClient> {
   /**
    * Get the current device status
    */
-  async status(): Promise<DeviceStatusResponse> {
-    return this.request<DeviceStatusResponse>('device.status');
+  async status(options?: DeviceStatusOptions): Promise<DeviceStatusResponse> {
+    return this.request<DeviceStatusResponse>('device.status', options);
   }
 
   /**

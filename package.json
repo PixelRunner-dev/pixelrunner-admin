@@ -14,7 +14,7 @@
     "remote_dir": "/home/pixelrunner/pixelrunner26/admin-vue"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "DEV=true vite",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "preview:a11y": "vite preview -l error --port 4166 --strictPort",

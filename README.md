@@ -1,6 +1,6 @@
-# .
+# Pixelrunner Admin Vue
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue 3 + TypeScript admin interface for managing a Pixelrunner device.
 
 ## Recommended IDE Setup
 
@@ -34,6 +34,17 @@ npm install
 ```sh
 npm run dev
 ```
+
+Run only the admin interface with mocked controller/proxy responses:
+
+```sh
+DEV=true npm run dev
+```
+
+Mock mode is only enabled for Vite's dev server. It uses
+`src/mocks/mock-rpc-client.ts` and skips the controller, device proxy,
+Trystero, and WebSocket connection setup. This is intended for standalone UI
+development and for reuse in unit/e2e tests.
 
 ### Type-Check, Compile and Minify for Production
 

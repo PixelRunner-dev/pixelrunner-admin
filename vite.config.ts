@@ -74,6 +74,8 @@ function adminVersionPlugin(adminBuildId: string): Plugin {
 }
 
 const adminBuildId = createAdminBuildId();
+const useMockController = process.env.DEV === 'true' && process.env.npm_lifecycle_event === 'dev';
+process.env.VITE_MOCK_CONTROLLER = useMockController ? 'true' : 'false';
 
 // https://vite.dev/config/
 export default defineConfig({

@@ -12,6 +12,7 @@ import { CookieStore } from '@/utils/CookieStore.ts';
 import { configureSetupStatusClient } from '@/services/setup-status.ts';
 import { WebSocketClient, WS_INJECTION_KEY } from '@/ws/index.ts';
 import { TrysteroWebRTCClient } from '@/ws/trystero-client.ts';
+import { MockRpcClient } from '@/mocks/mock-rpc-client.ts';
 import { NOSTR_RELAYS } from './constants.ts';
 import { fetchProxyRoomConfig, getFallbackRoomId } from '@/ws/room-id.ts';
 import {
@@ -57,9 +58,10 @@ i18next
     // Determine which WebSocket client to use
     let wsClient;
 
-    console.log('requiresProxyConnection', requiresProxyConnection());
-
-    if (requiresProxyConnection()) {
+    if (import.meta.env.VITE_MOCK_CONTROLLER === 'true') {
+      console.log('[main] Using mock controller client');
+      wsClient = new MockRpcClient();
+    } else if (requiresProxyConnection()) {
       // When served by the device proxy, prefer a same-origin WebSocket bridge.
       // Trystero stays as the fallback for static/remote admin access.
       const proxyRoomConfig = await fetchProxyRoomConfig();
