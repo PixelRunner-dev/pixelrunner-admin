@@ -3,7 +3,6 @@ import { computed } from 'vue';
 
 import AppletDetails from './AppletDetails.vue';
 import AppletImage from './AppletImage.vue';
-import CategoryList from '@/components/CategoryList.vue';
 
 import type { IAppletViews, IFullApplet } from 'pixelrunner-shared';
 
@@ -20,10 +19,9 @@ export interface Props {
 const {
   applet,
   view = 'horizontal' as IAppletViews,
-  hasCallToAction = false,
-  hasCategories = false
+  hasCallToAction = false
 }: Props = defineProps<Props>();
-const { details, categories } = applet;
+const { details } = applet;
 
 const appletImage = computed(() => {
   if (applet.isInstalled && applet.installationDetails?.image) {
@@ -54,8 +52,6 @@ const appletImage = computed(() => {
 
         <figcaption>
           <AppletDetails v-bind="details" :view="view" />
-
-          <!-- <CategoryList v-if="hasCategories" :categories hasItemsInline /> -->
 
           <router-link
             v-if="hasCallToAction && applet.isInstalled"

@@ -20,7 +20,7 @@ const {
 <template>
   <DFlex col :class="['component--applet-details', 'gap-2', { 'my-4': view === 'full-detail' }]">
     <hgroup>
-      <component :is="view === 'full-detail' ? 'h1' : 'h2'" :class="view === 'full-detail' ? 'text-5xl my-4' : 'text-2xl'">
+      <component :is="view === 'full-detail' ? 'h1' : 'h2'" :class="view === 'full-detail' ? 'text-5xl my-4' : 'text-lg'">
         {{ name }}
         <span
           v-if="isOfficialApplet"

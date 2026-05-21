@@ -74,7 +74,7 @@ watch(
 </script>
 
 <template>
-  <section v-if="isDev" class="debug-panel my-4 p-4 rounded-box border-5 border-red-500 bg-red-100">
+  <section v-if="isDev" class="debug-panel my-4 p-4 rounded-box border-5 border-red-500 bg-red-100 text-neutral-900">
     <h2 class="mb-2 text-lg font-bold">Debug</h2>
     <template v-if="props.data">
       <dl class="divide-y divide-base-200 text-xs">

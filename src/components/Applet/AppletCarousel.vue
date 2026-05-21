@@ -63,7 +63,7 @@ onBeforeUnmount(() => {
 }
 
 .carousel__item-width--default {
-  width: 15rem;
+  width: 12rem;
 }
 
 .carousel__item-width--wide {
@@ -136,7 +136,7 @@ onBeforeUnmount(() => {
 /* content and variations */
 
 .component--carousel .carousel__track__item {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   justify-content: center;
   scroll-snap-align: start;

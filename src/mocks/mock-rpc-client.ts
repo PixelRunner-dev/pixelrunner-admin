@@ -110,9 +110,9 @@ const categories = {
     key: 'starter_pack',
     icon: { iconId: 'icon--rocket' as const, alt: 'Starter pack' }
   },
-  utility: {
-    key: 'utility',
-    icon: { iconId: 'icon--settings' as const, alt: 'Utility' }
+  fireworks: {
+    key: 'fireworks',
+    icon: { iconId: 'icon--bomb' as const, alt: 'Fireworks' }
   }
 } satisfies Record<string, ICategory>;
 
