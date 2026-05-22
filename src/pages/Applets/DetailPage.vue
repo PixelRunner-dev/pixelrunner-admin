@@ -86,7 +86,8 @@ const debugState = computed(() => ({
   packageName: packageName.value ?? null,
   uuid: uuid.value ?? null,
   loadedPackageName: applet.value?.packageName ?? null,
-  loadedUuid: applet.value?.installationDetails?.uuid ?? null
+  loadedUuid: applet.value?.installationDetails?.uuid ?? null,
+  applet
 }));
 </script>
 
