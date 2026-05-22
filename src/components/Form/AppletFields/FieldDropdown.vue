@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import {
   Flex as DFlex,
@@ -8,14 +8,25 @@ import {
 
 interface Props {
   id: string;
-  options: { label: string; display: string }[];
-  default?: string;
+  options: { label?: string; display: string; value?: string | number | boolean | object }[];
+  default?: string | number | boolean | object;
 }
 
 const { id, options, default: defaultValue }: Props = defineProps<Props>();
 
-const dropdown = ref(defaultValue);
-const dropdownOptions = ref<{ label: string; display: string }[]>(options.map((o) => ({ ...o, label: o.display })));
+const modelValue = defineModel<string | number | boolean | object | null>();
+const dropdownOptions = ref(
+  options.map((option) => ({
+    ...option,
+    label: option.display
+  }))
+);
+const dropdown = computed({
+  get: () => modelValue.value ?? defaultValue ?? null,
+  set: (value) => {
+    modelValue.value = value;
+  }
+});
 </script>
 
 <template>

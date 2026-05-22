@@ -6,6 +6,7 @@
  */
 
 import type {
+  IAppletConfigurations,
   IAppletSchema,
   ICategory,
   UUID,
@@ -96,7 +97,34 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
    * @param config - The configuration object
    */
   async setConfig(uuid: UUID, config: Record<string, unknown>): Promise<void> {
-    return this.request<void>('applets.setconfig', { uuid, config });
+    await this.saveConfig(uuid, {
+      appId: '',
+      config: config as IAppletConfigurations['config']
+    });
+  }
+
+  async install(
+    packageName: string,
+    appliedConfigurations: IAppletConfigurations
+  ): Promise<IFullAppletRecord | null> {
+    return this.action<IFullAppletRecord | null>('installApplet', {
+      packageName,
+      appliedConfigurations
+    });
+  }
+
+  async saveConfig(
+    uuid: UUID,
+    appliedConfigurations: IAppletConfigurations
+  ): Promise<IFullAppletRecord | null> {
+    return this.action<IFullAppletRecord | null>('saveAppletConfig', {
+      uuid,
+      appliedConfigurations
+    });
+  }
+
+  async remove(uuid: UUID): Promise<void> {
+    await this.action<unknown>('removeApplet', { uuid });
   }
 
   async getAllApplets(options: AppletQueryOptions = {}): Promise<IFullApplet[]> {

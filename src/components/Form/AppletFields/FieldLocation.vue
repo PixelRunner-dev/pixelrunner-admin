@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 import LocationSearch, { type LocationResult } from '@/components/Form/SettingFields/LocationSearch.vue';
 
@@ -10,7 +10,14 @@ interface Props {
 
 const { id, default: defaultValue }: Props = defineProps<Props>();
 
-const location = ref();
+const modelValue = defineModel<LocationResult>();
+const emptyLocation: LocationResult = { lat: '', lng: '' };
+const location = computed({
+  get: () => modelValue.value ?? defaultValue ?? emptyLocation,
+  set: (value) => {
+    modelValue.value = value;
+  }
+});
 </script>
 
 <template>

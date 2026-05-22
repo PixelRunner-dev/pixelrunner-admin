@@ -19,6 +19,7 @@
     "official": "official",
     "install": "Install",
     "save": "Save",
+    "remove": "Remove",
     "edit": "Edit",
     "close": "Close",
     "cancel": "Cancel"

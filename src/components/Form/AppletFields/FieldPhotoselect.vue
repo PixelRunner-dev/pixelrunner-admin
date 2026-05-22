@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 import AppletImage from '@/components/Applet/AppletImage.vue';
 
@@ -10,11 +10,19 @@ import {
 
 interface Props {
   id: string;
+  default?: string;
 }
 
-const { id }: Props = defineProps<Props>();
+const { id, default: defaultValue }: Props = defineProps<Props>();
 
-const file = ref();
+const modelValue = defineModel<string | null>();
+const selectedFile = ref<File | null>(null);
+const file = computed({
+  get: () => modelValue.value ?? defaultValue ?? null,
+  set: (value) => {
+    modelValue.value = value;
+  }
+});
 
 function onChange(event: Event) {
   const target = event.target as HTMLInputElement;
@@ -54,19 +62,12 @@ function onChange(event: Event) {
   }
 }
 
-const emit = defineEmits<{
-  'update:modelValue': [value: File | null];
-}>();
-
-watch(file, (newFile) => {
-  emit('update:modelValue', newFile);
-});
 </script>
 
 <template>
 <div class="component--field-photo-select">
   <DFlex col class="gap-2">
-    <DFileInput v-model="file" :id accept="image/*" max-size="2097152" @change="onChange" />
+    <DFileInput v-model="selectedFile" :id accept="image/*" max-size="2097152" @change="onChange" />
     <figure class="w-80">
       <AppletImage v-if="file" :src="file" alt="Example image" :dateCreated="new Date()" />
     </figure>

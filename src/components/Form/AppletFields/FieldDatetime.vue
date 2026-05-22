@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 import {
   Flex as DFlex,
@@ -16,7 +16,13 @@ const toDatetimeLocal = (isoString: string): string => {
   return isoString.replace('Z', '').slice(0, 16);
 };
 
-const dateTimeLocal = ref(toDatetimeLocal(defaultValue || ''));
+const modelValue = defineModel<string>();
+const dateTimeLocal = computed({
+  get: () => toDatetimeLocal(modelValue.value ?? defaultValue ?? ''),
+  set: (value) => {
+    modelValue.value = value;
+  }
+});
 </script>
 
 <template>

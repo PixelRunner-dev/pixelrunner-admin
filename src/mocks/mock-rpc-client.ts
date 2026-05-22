@@ -1,6 +1,7 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue';
 
 import type {
+  IAppletConfigurations,
   IAppletSchema,
   ICategory,
   IConnectionState,
@@ -331,6 +332,7 @@ export class MockRpcClient {
     defaultSettings.map((setting) => [setting.key, { ...setting }])
   );
   private readonly applets = cloneMockData(mockApplets);
+  private installCounter = 0;
   private wifiStatus = cloneMockData(defaultWifiStatus);
   private activePlaylist: IPlaylist = {
     uuid: uuid('mock-active-playlist'),
@@ -629,6 +631,19 @@ export class MockRpcClient {
       };
     }
 
+    if (method === 'installApplet') {
+      return { method, data: cloneMockData(this.installApplet(params)) };
+    }
+
+    if (method === 'saveAppletConfig') {
+      return { method, data: cloneMockData(this.saveAppletConfig(params)) };
+    }
+
+    if (method === 'removeApplet') {
+      this.removeApplet(params);
+      return { method, data: null };
+    }
+
     if (method === 'getAllApplets') {
       const limit = Number(params.limit) || this.applets.length;
       return { method, data: cloneMockData(this.applets.slice(0, limit)) };
@@ -677,6 +692,106 @@ export class MockRpcClient {
     applet.installationDetails.appliedConfigurations = {
       appId: applet.packageName,
       config: record.config as Record<string, string | number | boolean | object>
+    };
+  }
+
+  private installApplet(params: Record<string, unknown>): IFullApplet {
+    const packageName = String(params.packageName ?? '');
+    const applet = this.applets.find((candidate) => candidate.packageName === packageName);
+
+    if (!applet) {
+      throw new MockJsonRpcError('Mock applet not found', 'not_found');
+    }
+
+    const installedApplet: IFullApplet = {
+      ...cloneMockData(applet),
+      isInstalled: true,
+      installationDetails: {
+        uuid: uuid(`mock-installed-${++this.installCounter}-${packageName}`),
+        image: applet.installationDetails?.image ?? {
+          src: `https://applets.pixelrunner.dev/${packageName}.webp`,
+          alt: `${applet.details.name} installed preview`,
+          dateCreated: mockDate
+        },
+        appliedConfigurations: this.getAppliedConfigurations(params, packageName)
+      }
+    };
+
+    this.applets.push(installedApplet);
+    this.activePlaylist = {
+      ...this.activePlaylist,
+      applets: [...this.activePlaylist.applets, installedApplet as IPlaylist['applets'][number]],
+      dateModified: new Date()
+    };
+
+    return installedApplet;
+  }
+
+  private saveAppletConfig(params: Record<string, unknown>): IFullApplet {
+    const applet = this.applets.find(
+      (candidate) => candidate.installationDetails?.uuid === params.uuid
+    );
+
+    if (!applet?.installationDetails) {
+      throw new MockJsonRpcError('Mock applet not installed', 'not_found');
+    }
+
+    applet.installationDetails.appliedConfigurations = this.getAppliedConfigurations(
+      params,
+      applet.packageName
+    );
+
+    this.activePlaylist = {
+      ...this.activePlaylist,
+      applets: this.activePlaylist.applets.map((playlistApplet) =>
+        playlistApplet.installationDetails.uuid === params.uuid
+          ? applet as IPlaylist['applets'][number]
+          : playlistApplet
+      ),
+      dateModified: new Date()
+    };
+
+    return applet;
+  }
+
+  private removeApplet(params: Record<string, unknown>): void {
+    const uuidValue = params.uuid;
+    const previousLength = this.activePlaylist.applets.length;
+
+    this.activePlaylist = {
+      ...this.activePlaylist,
+      applets: this.activePlaylist.applets.filter(
+        (applet) => applet.installationDetails.uuid !== uuidValue
+      ),
+      dateModified: new Date()
+    };
+
+    if (this.activePlaylist.applets.length === previousLength) {
+      throw new MockJsonRpcError('Mock applet not installed', 'not_found');
+    }
+  }
+
+  private getAppliedConfigurations(
+    params: Record<string, unknown>,
+    fallbackAppId: string
+  ): IAppletConfigurations {
+    const candidate = params.appliedConfigurations;
+
+    if (!candidate || typeof candidate !== 'object') {
+      return {
+        appId: fallbackAppId,
+        config: {}
+      };
+    }
+
+    const appliedConfigurations = candidate as Partial<IAppletConfigurations>;
+
+    return {
+      appId: appliedConfigurations.appId || fallbackAppId,
+      config:
+        appliedConfigurations.config && typeof appliedConfigurations.config === 'object'
+          ? appliedConfigurations.config
+          : {}
     };
   }
 

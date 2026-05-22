@@ -33,6 +33,7 @@ playlists, WiFi, settings, and display state.
 - `public/` - Static frontend assets.
 - `translations/` - i18n files for `de`, `en`, `es`, `fr`, `nl`.
 - `test/` - Unit and e2e tests.
+- `dist/` - Do not edit files here, but instead run `npm run build`.
 
 ## Commands
 

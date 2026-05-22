@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 import {
   Flex as DFlex,
@@ -15,7 +15,13 @@ interface Props {
 
 const { id, palette, default: defaultValue }: Props = defineProps<Props>();
 
-const colorValue = ref(defaultValue || palette[0] || '#000000');
+const modelValue = defineModel<string>();
+const colorValue = computed({
+  get: () => modelValue.value ?? defaultValue ?? palette[0] ?? '#000000',
+  set: (value) => {
+    modelValue.value = value;
+  }
+});
 </script>
 
 <template>

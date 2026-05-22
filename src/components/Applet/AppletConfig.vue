@@ -1,14 +1,23 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import FormField from '../Form/FormField.vue';
 import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
 import FeatureToggle from '../FeatureToggle.vue';
 
 import { useClientApi } from '@/ws/index.ts';
+import { useNotifications } from '@/composables/useNotifications.ts';
 
 import type { Component } from 'vue';
-import type { IAppletSchema, IAppletSchemaObject, IFullApplet } from 'pixelrunner-shared';
+import type {
+  IAppletConfigurations,
+  IAppletSchema,
+  IAppletSchemaObject,
+  IFullApplet,
+  UUID
+} from 'pixelrunner-shared';
+import type { Notification } from '@/utils/notifications.ts';
 
 import {
   Button as DButton,
@@ -22,9 +31,12 @@ export interface Props {
 
 const { applet }: Props = defineProps<Props>();
 
-const { isConnected, applets } = useClientApi();
+const { isConnected, applets, settings } = useClientApi();
+const notifications = useNotifications();
+const router = useRouter();
 
 type AppletSchemaValue = IAppletSchemaObject['default'];
+type AppletConfigurationValue = NonNullable<IAppletConfigurations['config'][string]>;
 type RawAppletSchemaItem = IAppletSchemaObject & {
   desc?: string;
 };
@@ -46,9 +58,17 @@ const fieldComponents: Partial<Record<IAppletSchemaObject['type'], Component>> =
 const appletSchema = ref<IAppletSchema | null>(null);
 const schemaError = ref<string | null>(null);
 const isSchemaLoading = ref(false);
+const isSubmitting = ref(false);
+const isRemoving = ref(false);
+const formRef = ref<HTMLFormElement | null>(null);
+const configurationValues = ref<Record<string, AppletConfigurationValue>>({});
+const controllerLocation = ref<AppletConfigurationValue | null>(null);
 
 const schemaItems = computed(() => appletSchema.value?.schema ?? []);
 const hasSchemaItems = computed(() => schemaItems.value.length > 0);
+const installedUuid = computed(() => applet.installationDetails?.uuid as UUID | undefined);
+const isEditMode = computed(() => applet.isInstalled && Boolean(installedUuid.value));
+const isBusy = computed(() => isSchemaLoading.value || isSubmitting.value || isRemoving.value);
 
 const isAppletSchemaItem = (item: unknown): item is RawAppletSchemaItem => {
   if (!item || typeof item !== 'object') return false;
@@ -88,8 +108,64 @@ const normalizeDefaultValue = (
 const normalizeSchemaItem = (item: RawAppletSchemaItem): IAppletSchemaObject => ({
   ...item,
   description: item.description ?? item.desc ?? '',
-  default: normalizeDefaultValue(item, getAppliedConfigurationValue(item) ?? item.default)
+  default: normalizeDefaultValue(
+    item,
+    getAppliedConfigurationValue(item)
+      ?? (item.type === 'location' ? controllerLocation.value : undefined)
+      ?? item.default
+  )
 });
+
+const parseSettingValue = (value: unknown): AppletConfigurationValue | null => {
+  if (typeof value === 'string') {
+    if (!value) return null;
+
+    try {
+      return JSON.parse(value) as AppletConfigurationValue;
+    } catch {
+      return value;
+    }
+  }
+
+  if (
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
+    (value !== null && typeof value === 'object')
+  ) {
+    return value;
+  }
+
+  return null;
+};
+
+const getSchemaItemInitialValue = (item: IAppletSchemaObject): AppletConfigurationValue => {
+  if (item.default !== undefined) {
+    return item.default;
+  }
+
+  switch (item.type) {
+    case 'onoff':
+      return false;
+    case 'color':
+      return item.palette?.[0] ?? '#000000';
+    case 'dropdown':
+      return item.options?.[0]?.value ?? '';
+    case 'location':
+      return {};
+    default:
+      return '';
+  }
+};
+
+const createInitialConfigurationValues = (
+  items: IAppletSchemaObject[]
+): Record<string, AppletConfigurationValue> => {
+  return items.reduce<Record<string, AppletConfigurationValue>>((values, item) => {
+    values[item.id] = getSchemaItemInitialValue(item);
+
+    return values;
+  }, {});
+};
 
 const parseSchemaResponse = (schemaResponse: unknown): IAppletSchema | null => {
   if (schemaResponse === null || schemaResponse === undefined || schemaResponse === 'null') {
@@ -121,6 +197,26 @@ const parseSchemaResponse = (schemaResponse: unknown): IAppletSchema | null => {
 
 const getFieldComponent = (item: IAppletSchemaObject) => fieldComponents[item.type];
 
+const setConfigurationValue = (id: string, value: AppletConfigurationValue) => {
+  configurationValues.value = {
+    ...configurationValues.value,
+    [id]: value
+  };
+};
+
+const createAppliedConfigurations = (): IAppletConfigurations => ({
+  appId: applet.packageName,
+  config: { ...configurationValues.value }
+});
+
+const notify = (notification: Notification) => {
+  notifications?.addNotification(notification);
+};
+
+const getErrorMessage = (error: unknown, fallback: string): string => {
+  return error instanceof Error ? error.message : fallback;
+};
+
 const loadAppletSchema = async () => {
   if (!isConnected.value || !applets) return;
 
@@ -128,13 +224,84 @@ const loadAppletSchema = async () => {
   schemaError.value = null;
 
   try {
-    appletSchema.value = parseSchemaResponse(await applets.getSchema(applet.packageName));
+    controllerLocation.value = settings
+      ? parseSettingValue(await settings.get<string | undefined>('location'))
+      : null;
+
+    const schema = parseSchemaResponse(await applets.getSchema(applet.packageName));
+    appletSchema.value = schema;
+    configurationValues.value = createInitialConfigurationValues(schema?.schema ?? []);
   } catch (error) {
     appletSchema.value = null;
+    configurationValues.value = {};
     console.error('Failed to load applet schema', error);
     schemaError.value = 'Configuration schema unavailable.';
+    notify({
+      type: 'error',
+      message: getErrorMessage(error, schemaError.value),
+      hasCloseButton: true
+    });
   } finally {
     isSchemaLoading.value = false;
+  }
+};
+
+const redirectToApplets = async () => {
+  await router.replace('/applets');
+};
+
+const handleSubmit = async () => {
+  if (!applets || isBusy.value || !formRef.value?.reportValidity()) return;
+
+  isSubmitting.value = true;
+
+  try {
+    const appliedConfigurations = createAppliedConfigurations();
+
+    if (isEditMode.value) {
+      await applets.saveConfig(installedUuid.value as UUID, appliedConfigurations);
+    } else {
+      await applets.install(applet.packageName, appliedConfigurations);
+    }
+
+    await redirectToApplets();
+  } catch (error) {
+    notify({
+      type: 'error',
+      message: getErrorMessage(
+        error,
+        isEditMode.value
+          ? 'Failed to save applet configuration.'
+          : 'Failed to install applet.'
+      ),
+      hasCloseButton: true
+    });
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
+const handleRemove = async () => {
+  if (!applets || !installedUuid.value || isBusy.value) return;
+
+  isRemoving.value = true;
+
+  try {
+    await applets.remove(installedUuid.value);
+    notify({
+      type: 'success',
+      message: 'Applet removed from playlist.',
+      hasCloseButton: true
+    });
+    await redirectToApplets();
+  } catch (error) {
+    notify({
+      type: 'error',
+      message: getErrorMessage(error, 'Failed to remove applet from playlist.'),
+      hasCloseButton: true
+    });
+  } finally {
+    isRemoving.value = false;
   }
 };
 
@@ -149,7 +316,7 @@ watch(
 
 <template>
 <div class="component--applet-config">
-  <form>
+  <form ref="formRef" @submit.prevent="handleSubmit">
     <template v-if="isSchemaLoading">...</template>
     <template v-else-if="schemaError">
       {{ schemaError }}
@@ -158,7 +325,12 @@ watch(
       <DDivider vertical />
       <template v-for="item in schemaItems" :key="item.id">
         <FormField :id="item.id" :label="item.name" :description="item.description">
-          <component :is="getFieldComponent(item)" v-bind="item" />
+          <component
+            :is="getFieldComponent(item)"
+            v-bind="item"
+            :model-value="configurationValues[item.id]"
+            @update:model-value="setConfigurationValue(item.id, $event)"
+          />
         </FormField>
       </template>
     </template>
@@ -170,8 +342,20 @@ watch(
     </FeatureToggle>
 
     <DFlex class="gap-4">
-      <DButton type="submit" primary wide>{{ (applet.isInstalled) ? $t('generic.save') : $t('generic.install') }}</DButton>
-      <DButton type="button" outline dash error v-if="applet.installationDetails?.uuid">{{ $t('generic.remove') }}</DButton>
+      <DButton type="submit" primary wide :disabled="!isConnected || isBusy">
+        {{ isSubmitting ? $t('generic.loading') : (isEditMode ? $t('generic.save') : $t('generic.install')) }}
+      </DButton>
+      <DButton
+        type="button"
+        outline
+        dash
+        error
+        v-if="installedUuid"
+        :disabled="!isConnected || isBusy"
+        @click="handleRemove"
+      >
+        {{ isRemoving ? $t('generic.loading') : $t('generic.remove') }}
+      </DButton>
     </DFlex>
   </form>
 </div>

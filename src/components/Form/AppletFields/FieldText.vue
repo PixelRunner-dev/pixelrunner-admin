@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 
 import {
   Flex as DFlex,
@@ -12,7 +12,13 @@ export interface Props {
 }
 
 const { id, default: defaultValue }: Props = defineProps<Props>();
-const input = ref(defaultValue);
+const modelValue = defineModel<string>();
+const input = computed({
+  get: () => modelValue.value ?? defaultValue ?? '',
+  set: (value) => {
+    modelValue.value = value;
+  }
+});
 </script>
 
 <template>
