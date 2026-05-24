@@ -238,8 +238,20 @@ export const FEATURE_TOGGLE_LIST = [
     sinceVersion: '0.0.1'
   },
   {
-    key: 'appletStats',
-    label: 'Enable statistics of installed applets, likes and such',
+    key: 'appletUserStats',
+    label: 'Enable user statistics of an applets (favorite)',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'appletGlobalStats',
+    label: 'Enable global statistics of an applets (total likes, total installations, etc)',
+    isPermanent: false,
+    sinceVersion: '0.0.1'
+  },
+  {
+    key: 'appletZaps',
+    label: 'Enable functionality to zap the creator of the applet via NWC and shows total amount of zapped sats on AppletDetails',
     isPermanent: false,
     sinceVersion: '0.0.1'
   }
