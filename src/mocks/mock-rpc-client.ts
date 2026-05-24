@@ -191,12 +191,27 @@ function makeApplet(
 }
 
 const mockApplets: IFullApplet[] = [
-  makeApplet('clockbyhenry', 'Clock By Henry', 'Shows current time on the Pixelrunner display.'),
-  makeApplet('buienradar', 'Buienradar', 'Shows local conditions and forecast.'),
-  makeApplet('bitcointicker', 'Bitcoin Ticker', 'Tracks Bitcoin price and market movement.'),
-  makeApplet('spotify', 'Spotify Now Playing', 'Displays the current Spotify track.'),
-  makeApplet('textbyt', 'Textbyt', 'Renders a custom message.'),
-  makeApplet('usdebtclock', 'US Debt Clock', 'Shows how much debt the United States has.')
+  makeApplet(
+    'clockbyhenry',
+    'Clock By Henry',
+    'Shows current time on the Pixelrunner display.',
+    true,
+    [categories.spotlight, categories.starterPack]
+  ),
+  makeApplet('buienradar', 'Buienradar', 'Shows local conditions and forecast.', true, [
+    categories.starterPack
+  ]),
+  makeApplet('bitcointicker', 'Bitcoin Ticker', 'Tracks Bitcoin price and market movement.', true, [
+    categories.spotlight
+  ]),
+  makeApplet('spotify', 'Spotify Now Playing', 'Displays the current Spotify track.', false, [
+    categories.starterPack
+  ]),
+  makeApplet('textbyt', 'Textbyt', 'Renders a custom message.', true, [categories.fireworks]),
+  makeApplet('usdebtclock', 'US Debt Clock', 'Shows how much debt the United States has.', false, [
+    categories.fireworks,
+    categories.spotlight
+  ])
 ];
 
 const mockAppletSchemas = new Map<string, IAppletSchema>([
@@ -745,7 +760,7 @@ export class MockRpcClient {
       ...this.activePlaylist,
       applets: this.activePlaylist.applets.map((playlistApplet) =>
         playlistApplet.installationDetails.uuid === params.uuid
-          ? applet as IPlaylist['applets'][number]
+          ? (applet as IPlaylist['applets'][number])
           : playlistApplet
       ),
       dateModified: new Date()

@@ -21,11 +21,19 @@ const {
 <template>
   <component
     :is="hasSorting ? 'ol' : 'ul'"
-    :class="['component--category-list', {
-      'menu menu-horizontal': hasItemsInline,
-      'md:columns-4 sm:columns-3 columns-2 gap-4': !hasItemsInline
-    }]">
-    <li v-for="category in categories" :key="category.key" :class="{'break-inside-avoid': !hasItemsInline}">
+    :class="[
+      'component--category-list',
+      {
+        'menu menu-horizontal': hasItemsInline,
+        'md:columns-4 sm:columns-3 columns-2 gap-4': !hasItemsInline
+      }
+    ]"
+  >
+    <li
+      v-for="category in categories"
+      :key="category.key"
+      :class="{ 'break-inside-avoid': !hasItemsInline }"
+    >
       <component
         :is="isInteractive ? 'router-link' : 'span'"
         :to="isInteractive ? `/library/categories/${category.key}` : undefined"

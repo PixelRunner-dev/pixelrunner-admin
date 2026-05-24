@@ -49,11 +49,12 @@ const router = createRouter({
       component: () => import('@/pages/Library/LibraryPage.vue'),
       meta: { title: 'Library' }
     },
+    { path: '/library/categories', redirect: '/library' },
     {
-      path: '/library/categories/:key',
+      path: '/library/categories/:categoryKey',
       name: 'library-category',
-      component: () => import('@/pages/Library/SearchPage.vue'),
-      meta: { title: 'Library Search' }
+      component: () => import('@/pages/CategoryPage.vue'),
+      meta: { title: 'Category' }
     },
     {
       path: '/library/search',

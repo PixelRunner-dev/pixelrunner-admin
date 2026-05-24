@@ -332,5 +332,8 @@
     "categories": {
       "title": "All Categroies"
     }
+  },
+  "categoryPage": {
+    "pageTitle": "{{category}} applets"
   }
 }
