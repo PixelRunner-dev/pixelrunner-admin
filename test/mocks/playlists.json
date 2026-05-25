@@ -1,0 +1,147 @@
+[
+  {
+    "uuid": "00000000-0000-4000-8000-deadbeefcafe",
+    "name": "myPlaylistName",
+    "dateCreated": "2026-01-01T00:00:00.000Z",
+    "dateModified": "2026-01-01T00:00:00.000Z",
+    "applets": [
+      {
+        "details": {
+          "name": "myAppletName",
+          "summary": "myAppletSummary",
+          "desc": "myAppletDescription",
+          "author": "myAppletAuthor",
+          "tags": ["tag 1", "tag 2"],
+          "isOfficialApplet": true
+        },
+        "defaultImage": {
+          "src": "https://picsum.photos/64/32",
+          "alt": "myAppletImageAlt",
+          "dateModified": "2026-01-02T01:01:01.000Z",
+          "dateCreated": "2026-01-01T00:00:00.000Z"
+        },
+        "installationDetails": {
+          "uuid": "a7d7e4a8-0e3d-4a38-b44c-b3b646b49eb8",
+          "isHidden": true,
+          "isPinned": false,
+          "image": {
+            "src": "https://picsum.photos/64/32",
+            "alt": "myAppletImageAlt",
+            "dateModified": "2026-01-02T01:01:01.000Z",
+            "dateCreated": "2026-01-01T00:00:00.000Z"
+          },
+          "appliedConfigurations": {
+            "myColorField": "#ffffff",
+            "myDateTimeField": "2026-01-03T13:37:00Z",
+            "myDropdownField": "myDropdownOption2Value",
+            "myGeneratedField": "#777777",
+            "myLocationField": {
+              "lat": "40.6781784",
+              "lng": "-73.9441579",
+              "desc": "Brooklyn, NY, USA",
+              "locality": "Brooklyn",
+              "place_id": "ChIJCSF8lBZEwokRhngABHRcdoI",
+              "timezone": "America/New_York"
+            },
+            "myLocationBasedField": {
+              "lat": "40.6781784",
+              "lng": "-73.9441579",
+              "desc": "Brooklyn, NY, USA",
+              "locality": "Brooklyn",
+              "place_id": "ChIJCSF8lBZEwokRhngABHRcdoI",
+              "timezone": "America/New_York"
+            },
+            "myOAuth2Field": "access_token",
+            "myPhotoSelectField": "R0lGODlhAQABAAAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==",
+            "myTextField": "myTextFieldValue",
+            "myToggleField": true,
+            "myTypeaheadField": "myTypeaheadOption1Value"
+          }
+        },
+        "isInstalled": true,
+        "fileName": "myAppletFileName",
+        "packageName": "myAppletPackageName",
+        "categories": [
+          {
+            "name": "Gaming",
+            "icon": "icon--gamepad"
+          },
+          {
+            "name": "Art",
+            "icon": "icon--paintbrush"
+          }
+        ]
+      },
+      {
+        "details": {
+          "name": "My Applet Name",
+          "summary": "This is a summary of the applet.",
+          "desc": "This is a description of the applet with the name My Applet Name. It has a long description like this text here.",
+          "author": "author",
+          "tags": ["tag 1", "tag 2"],
+          "isOfficialApplet": false
+        },
+        "defaultImage": {
+          "src": "https://picsum.photos/64/32",
+          "alt": "Some alt text",
+          "dateModified": "2026-02-03T01:01:01.000Z",
+          "dateCreated": "2026-02-03T00:00:00.000Z"
+        },
+        "installationDetails": {
+          "uuid": "74fe6bdd-c542-4276-98ca-ffa677865a21",
+          "isHidden": false,
+          "isPinned": true,
+          "image": {
+            "src": "https://picsum.photos/64/32",
+            "alt": "Some alt text",
+            "dateModified": "2026-02-03T01:01:01.000Z",
+            "dateCreated": "2026-02-03T00:00:00.000Z"
+          },
+          "appliedConfigurations": {}
+        },
+        "isInstalled": true,
+        "fileName": "differentApplet",
+        "packageName": "differentAppletPackage",
+        "categories": [
+          {
+            "name": "Gaming",
+            "icon": "icon--gamepad"
+          },
+          {
+            "name": "Art",
+            "icon": "icon--paintbrush"
+          }
+        ]
+      },
+      {
+        "details": {
+          "name": "Applet Not Installed",
+          "summary": "This is applet is not installed.",
+          "desc": "This is a description of the not installed applet. It has a long description like this text here.",
+          "author": "developer",
+          "tags": ["tag 3", "tag 2"],
+          "isOfficialApplet": false
+        },
+        "defaultImage": {
+          "src": "https://picsum.photos/64/32",
+          "alt": "Some alt text",
+          "dateModified": "2026-02-03T01:01:01.000Z",
+          "dateCreated": "2026-02-03T00:00:00.000Z"
+        },
+        "isInstalled": false,
+        "fileName": "differentAppletNotInstalledFileName",
+        "packageName": "differentAppletNotInstalledPackage",
+        "categories": [
+          {
+            "name": "Gaming",
+            "icon": "icon--gamepad"
+          },
+          {
+            "name": "Art",
+            "icon": "icon--paintbrush"
+          }
+        ]
+      }
+    ]
+  }
+]
