@@ -5,20 +5,18 @@ import type { ErrorResponse, SuccessResponse } from 'pixelrunner-shared';
 // ============================================================================
 
 export interface DeviceStatusResult {
-  result: {
-    status: 'idle' | 'busy' | 'error';
-    uptime: [number, number];
-    updateAvailable: boolean;
-    // temperature?: number;
-    cpus?: unknown[];
-    memory?: [number, number, number];
-    versions?: {
-      admin: string;
-      applets: string;
-      controller: string;
-      shared: string;
-      os: string;
-    };
+  status: 'idle' | 'busy' | 'error';
+  uptime: [number | null, number];
+  updateAvailable: boolean;
+  // temperature?: number;
+  cpus?: unknown[];
+  memory?: [number, number, number];
+  versions?: {
+    admin: string;
+    applets: string;
+    controller: string;
+    shared: string;
+    os: string;
   };
 }
 export type DeviceStatusResponse = SuccessResponse<DeviceStatusResult> | ErrorResponse;

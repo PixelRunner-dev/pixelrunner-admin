@@ -19,7 +19,7 @@ describe('feature toggle helpers', () => {
     expect(compareVersions('1.2.3-mock', '1.2.3')).toBe(0);
   });
 
-  it('extracts controller versions from current and legacy status shapes', () => {
+  it('extracts controller versions from current status shapes', () => {
     expect(
       extractControllerVersionFromStatus({
         versions: { controller: '1.2.2' }
@@ -36,7 +36,7 @@ describe('feature toggle helpers', () => {
       extractControllerVersionFromStatus({
         result: { result: { versions: { controller: '1.2.4' } } }
       })
-    ).toBe('1.2.4');
+    ).toBeNull();
   });
 
   it('checks feature support against controller version', () => {

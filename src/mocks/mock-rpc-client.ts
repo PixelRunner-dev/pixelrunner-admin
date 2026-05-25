@@ -512,19 +512,17 @@ export class MockRpcClient {
       id: 1,
       ok: true,
       result: {
-        result: {
-          status: 'idle',
-          uptime: [12, 345],
-          updateAvailable: false,
-          cpus: [],
-          memory: [256, 512, 1024],
-          versions: {
-            admin: __ADMIN_BUILD_ID__,
-            applets: 'mock',
-            controller: '0.0.1-mock',
-            shared: 'mock',
-            os: 'mock'
-          }
+        status: 'idle',
+        uptime: [12, 345],
+        updateAvailable: false,
+        cpus: [],
+        memory: [256, 512, 1024],
+        versions: {
+          admin: __ADMIN_BUILD_ID__,
+          applets: 'mock',
+          controller: '0.0.1-mock',
+          shared: 'mock',
+          os: 'mock'
         }
       }
     };
