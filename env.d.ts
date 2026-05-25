@@ -1,11 +1,21 @@
 /// <reference types="vite/client" />
 
-declare const __ADMIN_BUILD_ID__: string;
+import 'vue';
 
-interface Window {
-  ask?: (message: string) => boolean | Promise<boolean>;
+declare global {
+  const __ADMIN_BUILD_ID__: string;
+
+  interface Window {
+    ask?: (message: string) => boolean | Promise<boolean>;
+  }
+
+  interface ImportMetaEnv {
+    readonly VITE_MOCK_CONTROLLER?: string;
+  }
 }
 
-interface ImportMetaEnv {
-  readonly VITE_MOCK_CONTROLLER?: string;
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $t: (key: string, options?: Record<string, unknown>) => string;
+  }
 }

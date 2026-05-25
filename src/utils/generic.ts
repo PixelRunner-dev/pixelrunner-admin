@@ -1,13 +1,37 @@
 import type { UUID } from 'pixelrunner-shared';
 
-export function isValidUUID(uuid: UUID): boolean {
+export function isValidUUID(uuid: string): uuid is UUID {
   const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return regex.test(uuid);
 }
 
 export function generateRandomUUID(): UUID {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return ([1e7] as any).toString(16).replace(/1|0/g, () => ((Math.random() * 16) | 0).toString(16));
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID() as UUID;
+  }
+
+  const bytes = new Uint8Array(16);
+
+  if (typeof globalThis.crypto?.getRandomValues === 'function') {
+    globalThis.crypto.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+
+  const hex = [...bytes].map((byte) => byte.toString(16).padStart(2, '0'));
+
+  return [
+    hex.slice(0, 4).join(''),
+    hex.slice(4, 6).join(''),
+    hex.slice(6, 8).join(''),
+    hex.slice(8, 10).join(''),
+    hex.slice(10, 16).join('')
+  ].join('-') as UUID;
 }
 
 export function toKebabCase(str: string): string {
@@ -21,7 +45,7 @@ export function toCamelCase(str: string): string {
 }
 
 export function toPascalCase(str: string): string {
-  return toCamelCase(toCapitalizeWords(str));
+  return toCamelCase(toCapitalizeWords(str.replace(/[-_]+/g, ' '))).replace(/\s+/g, '');
 }
 
 export function toCapitalizeWords(input: string): string {

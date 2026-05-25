@@ -6,8 +6,10 @@ import { describe, expect, it } from 'vitest';
 const SUPPORTED_LOCALES = ['de', 'en', 'es', 'fr', 'nl'] as const;
 
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
-type TranslationNode = string | TranslationTree;
-type TranslationTree = Record<string, TranslationNode>;
+
+interface TranslationTree {
+  [key: string]: string | TranslationTree;
+}
 
 const translationsDir = join(process.cwd(), 'translations');
 
@@ -51,7 +53,11 @@ const extractInterpolationVariables = (translation: string): string[] => {
   const interpolationPattern = /\{\{\s*([^}]+?)\s*\}\}/g;
 
   for (const match of translation.matchAll(interpolationPattern)) {
-    variables.add(match[1].trim());
+    const variable = match[1];
+
+    if (variable) {
+      variables.add(variable.trim());
+    }
   }
 
   return [...variables].sort();
@@ -75,8 +81,10 @@ describe('translation files', () => {
     '%s.json exposes language labels for every supported locale',
     (locale) => {
       for (const language of SUPPORTED_LOCALES) {
-        expect(translations[locale][`language.${language}`]).toEqual(expect.any(String));
-        expect(translations[locale][`language.${language}`].trim()).not.toBe('');
+        const label = translations[locale][`language.${language}`];
+
+        expect(label).toEqual(expect.any(String));
+        expect(label?.trim()).not.toBe('');
       }
     }
   );
@@ -104,8 +112,11 @@ describe('translation files', () => {
     '%s.json preserves interpolation variables for translated overrides',
     (locale) => {
       for (const [key, translation] of Object.entries(translations[locale])) {
+        const englishTranslation = translations.en[key];
+
+        expect(englishTranslation).toEqual(expect.any(String));
         expect(extractInterpolationVariables(translation)).toEqual(
-          extractInterpolationVariables(translations.en[key])
+          extractInterpolationVariables(englishTranslation ?? '')
         );
       }
     }
