@@ -37,8 +37,15 @@ const router = useRouter();
 
 type AppletSchemaValue = IAppletSchemaObject['default'];
 type AppletConfigurationValue = NonNullable<IAppletConfigurations['config'][string]>;
-type RawAppletSchemaItem = IAppletSchemaObject & {
+type RawAppletSchemaItem = Omit<IAppletSchemaObject, 'desc'> & {
   desc?: string;
+  description?: string;
+};
+type AppletSchemaField = IAppletSchemaObject & {
+  description: string;
+};
+type ParsedAppletSchema = Omit<IAppletSchema, 'schema'> & {
+  schema: AppletSchemaField[];
 };
 
 const fieldComponents: Partial<Record<IAppletSchemaObject['type'], Component>> = {
@@ -55,7 +62,7 @@ const fieldComponents: Partial<Record<IAppletSchemaObject['type'], Component>> =
   typeahead: defineAsyncComponent(() => import('../Form/AppletFields/FieldTypeahead.vue'))
 };
 
-const appletSchema = ref<IAppletSchema | null>(null);
+const appletSchema = ref<ParsedAppletSchema | null>(null);
 const schemaError = ref<string | null>(null);
 const isSchemaLoading = ref(false);
 const isSubmitting = ref(false);
@@ -81,7 +88,7 @@ const isAppletSchemaItem = (item: unknown): item is RawAppletSchemaItem => {
   );
 };
 
-const getAppliedConfigurationValue = (item: IAppletSchemaObject): AppletSchemaValue | undefined => {
+const getAppliedConfigurationValue = (item: Pick<IAppletSchemaObject, 'id'>): AppletSchemaValue | undefined => {
   const appliedConfigurations = applet.installationDetails?.appliedConfigurations;
 
   if (!applet.isInstalled || !appliedConfigurations) {
@@ -105,9 +112,12 @@ const normalizeDefaultValue = (
   return Boolean(value);
 };
 
-const normalizeSchemaItem = (item: RawAppletSchemaItem): IAppletSchemaObject => ({
+const normalizeSchemaItem = (item: RawAppletSchemaItem): AppletSchemaField => ({
   ...item,
-  description: item.description ?? item.desc ?? '',
+  name: item.name ?? item.id,
+  icon: item.icon ?? '',
+  desc: item.desc ?? item.description ?? '',
+  description: item.desc ?? item.description ?? '',
   default: normalizeDefaultValue(
     item,
     getAppliedConfigurationValue(item)
@@ -167,7 +177,7 @@ const createInitialConfigurationValues = (
   }, {});
 };
 
-const parseSchemaResponse = (schemaResponse: unknown): IAppletSchema | null => {
+const parseSchemaResponse = (schemaResponse: unknown): ParsedAppletSchema | null => {
   if (schemaResponse === null || schemaResponse === undefined || schemaResponse === 'null') {
     return null;
   }
