@@ -114,6 +114,14 @@ const categories = {
   fireworks: {
     key: 'fireworks',
     icon: { iconId: 'icon--bomb' as const, alt: 'Fireworks' }
+  },
+  weather: {
+    key: 'weather',
+    icon: { iconId: 'icon--cloud' as const, alt: 'Weather' }
+  },
+  alert: {
+    key: 'alert',
+    icon: { iconId: 'icon--triangle-alert' as const, alt: 'Alert' }
   }
 } satisfies Record<string, ICategory>;
 
@@ -190,6 +198,34 @@ function makeApplet(
   };
 }
 
+function makeZeroByteAlertApplet(): IFullApplet {
+  return {
+    ...makeApplet(
+      'knmialert',
+      'KNMIalert',
+      'Only displays active live weather alerts by KNMI for The Netherlands.',
+      true,
+      [categories.weather, categories.alert]
+    ),
+    installationDetails: {
+      uuid: uuid('knmialert-zero-byte-alert-mock-uuid'),
+      image: {
+        src: '/broken-image.webp',
+        alt: 'KNMIalert installed preview',
+        dateCreated: mockDate
+      },
+      appliedConfigurations: {
+        appId: 'knmialert',
+        config: {
+          location: 'Netherlands'
+        }
+      },
+      isHidden: false,
+      isPinned: false
+    }
+  };
+}
+
 const mockApplets: IFullApplet[] = [
   makeApplet(
     'clockbyhenry',
@@ -208,6 +244,7 @@ const mockApplets: IFullApplet[] = [
     categories.starterPack
   ]),
   makeApplet('textbyt', 'Textbyt', 'Renders a custom message.', true, [categories.fireworks]),
+  makeZeroByteAlertApplet(),
   makeApplet('usdebtclock', 'US Debt Clock', 'Shows how much debt the United States has.', false, [
     categories.fireworks,
     categories.spotlight
