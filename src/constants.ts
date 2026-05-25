@@ -3,7 +3,6 @@
  * for Trystero/WebRTC connections, WebSocket configuration, and API actions.
  */
 
-import { randomHex } from 'pixelrunner-shared';
 import type { IWebSocketConfig } from 'pixelrunner-shared';
 
 // Location of the fallback webp image
@@ -45,7 +44,7 @@ export const ROOM_PREFIX = 'pixelrunner';
  * Default device identifier used when no per-device identifier is available.
  * Must match the device proxy fallback default.
  */
-export const DEFAULT_DEVICE_ID = import.meta.env.VITE_DEVICE_ID || `pxlr_${randomHex(4)}`;
+export const DEFAULT_DEVICE_ID = import.meta.env.VITE_DEVICE_ID || 'pxlr_f91a';
 
 /**
  * Development fallback. Production devices return a per-device room password
