@@ -24,8 +24,6 @@ const appletApiMock = vi.hoisted(() => ({
   }
 }));
 
-const originalWorker = globalThis.Worker;
-
 vi.mock('@/ws/index.ts', () => ({
   useClientApi: () => ({
     applets: appletApiMock.applets,
@@ -42,17 +40,20 @@ vi.mock('vue-router', () => ({
   useRouter: () => appletApiMock.router
 }));
 
+function installWorkerMock() {
+  globalThis.Worker = class MockWorker {
+    onerror: ((event: ErrorEvent) => void) | null = null;
+    onmessage: ((event: MessageEvent) => void) | null = null;
+
+    postMessage = vi.fn();
+    terminate = vi.fn();
+  } as unknown as typeof Worker;
+}
+
 describe('AppletConfig', () => {
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    globalThis.Worker = vi.fn(function MockWorker() {
-      return {
-        addEventListener: vi.fn(),
-        postMessage: vi.fn(),
-        removeEventListener: vi.fn(),
-        terminate: vi.fn()
-      };
-    }) as unknown as typeof Worker;
+    installWorkerMock();
     appletApiMock.isConnected.value = true;
     appletApiMock.applets.getSchema.mockReset();
     appletApiMock.applets.install.mockReset();
@@ -69,8 +70,8 @@ describe('AppletConfig', () => {
   });
 
   afterEach(() => {
-    globalThis.Worker = originalWorker;
     vi.restoreAllMocks();
+    installWorkerMock();
   });
 
   it('does not load schema while disconnected and disables submit', async () => {
