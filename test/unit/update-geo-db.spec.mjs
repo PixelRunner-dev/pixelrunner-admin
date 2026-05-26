@@ -91,20 +91,24 @@ describe('update-geo-db script', () => {
   it('fails database download on HTTP errors or unreadable response bodies', async () => {
     await expect(
       updateDb({
+        dbPath: '/tmp/geo_db.json',
         fetchImpl: vi.fn(async () => ({
           ok: false,
           status: 404,
           statusText: 'Not Found'
-        }))
+        })),
+        unlinkImpl: vi.fn(async () => undefined)
       })
     ).rejects.toThrow('Download failed: 404 Not Found');
 
     await expect(
       updateDb({
+        dbPath: '/tmp/geo_db.json',
         fetchImpl: vi.fn(async () => ({
           ok: true,
           body: null
-        }))
+        })),
+        unlinkImpl: vi.fn(async () => undefined)
       })
     ).rejects.toThrow('Download failed: response body is not readable');
   });

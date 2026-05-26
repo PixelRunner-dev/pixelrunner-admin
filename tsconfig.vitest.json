@@ -3,8 +3,11 @@
   "include": [
     "test/unit/**/*",
     "env.d.ts",
+    "src/adapters/CarouselAdapter.ts",
     "src/App.vue",
     "src/crypto-polyfill.ts",
+    "src/components/Applet/AppletCard.vue",
+    "src/components/Applet/AppletDetails.vue",
     "src/components/Applet/AppletImage.vue",
     "src/components/Applet/AppletItem.vue",
     "src/components/Applet/AppletList.vue",

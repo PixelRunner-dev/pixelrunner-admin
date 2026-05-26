@@ -283,7 +283,7 @@ export class Carousel {
       this.pagination = document.createElement('div');
       this.pagination.className = this.stylesClass.pagination;
     } else {
-      this.container.removeChild(this.pagination!);
+      this.pagination!.replaceChildren();
     }
 
     for (let i = 0; i < numberOfPages; i++) {
