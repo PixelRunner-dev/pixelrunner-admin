@@ -165,8 +165,7 @@ describe('useSyncedControllerSettings', () => {
 
     await vi.advanceTimersByTimeAsync(1);
 
-    expect(harness.settings?.set).toHaveBeenCalledOnce();
-    expect(harness.settings?.set).toHaveBeenCalledWith('theme', '{"palette":"retro"}');
+    expect(harness.settings?.set).toHaveBeenCalledExactlyOnceWith('theme', '{"palette":"retro"}');
     expect(consoleLog).toHaveBeenCalledWith('[SettingsPage] Saved device setting:', 'theme');
   });
 
@@ -262,13 +261,15 @@ describe('useSyncedControllerSettings', () => {
   });
 });
 
-function mountSyncedSettings(options: {
-  isConnected?: boolean;
-  models?: Record<string, Ref<unknown>>;
-  retryDelayMs?: number;
-  saveDebounceMs?: number;
-  settings?: SettingsApiMock | null;
-} = {}) {
+function mountSyncedSettings(
+  options: {
+    isConnected?: boolean;
+    models?: Record<string, Ref<unknown>>;
+    retryDelayMs?: number;
+    saveDebounceMs?: number;
+    settings?: SettingsApiMock | null;
+  } = {}
+) {
   resetSyncedSettingsMocks();
   const models = options.models ?? {
     theme: ref('pixelrunner')

@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import type { CalendarOptions } from '../composables/use-calendar'
-import { computed, watch } from 'vue'
-import { useCalendar } from '../composables/use-calendar'
+import type { CalendarOptions } from '../composables/use-calendar';
+import { computed, watch } from 'vue';
+import { useCalendar } from '../composables/use-calendar';
 
 const props = defineProps<{
   /** Bound value: Date object or ISO string or null */
-  modelValue?: Date | string | null
+  modelValue?: Date | string | null;
   /** Calendar options */
-  options?: CalendarOptions
+  options?: CalendarOptions;
   /** If true, default to today when no value provided */
-  autoDefault?: boolean
-}>()
+  autoDefault?: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', v: Date | null): void
-}>()
+  (e: 'update:modelValue', v: Date | null): void;
+}>();
 
 // Parse initial date from modelValue
 function parseDate(value: Date | string | null | undefined): Date | null {
-  if (!value) return null
-  if (value instanceof Date) return value
-  const d = new Date(value)
-  return Number.isNaN(d.getTime()) ? null : d
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 const initialDate = computed(() => {
-  const parsed = parseDate(props.modelValue)
-  if (parsed) return parsed
-  if (props.autoDefault) return new Date()
-  return null
-})
+  const parsed = parseDate(props.modelValue);
+  if (parsed) return parsed;
+  if (props.autoDefault) return new Date();
+  return null;
+});
 
 const {
   selectedDate,
@@ -42,29 +42,29 @@ const {
   prevMonth,
   nextMonth,
   selectDate,
-  goToDate,
-} = useCalendar(initialDate.value, props.options)
+  goToDate
+} = useCalendar(initialDate.value, props.options);
 
 // Sync selectedDate back to modelValue
-watch(selectedDate, date => {
-  emit('update:modelValue', date)
-})
+watch(selectedDate, (date) => {
+  emit('update:modelValue', date);
+});
 
 // Watch for external modelValue changes
 watch(
   () => props.modelValue,
-  newValue => {
-    const parsed = parseDate(newValue)
+  (newValue) => {
+    const parsed = parseDate(newValue);
     if (parsed && (!selectedDate.value || parsed.getTime() !== selectedDate.value.getTime())) {
-      selectDate(parsed)
-      goToDate(parsed)
+      selectDate(parsed);
+      goToDate(parsed);
     }
-  },
-)
+  }
+);
 
 function handleDayClick(day: (typeof calendarDays.value)[0]) {
-  if (day.isDisabled) return
-  selectDate(day.date)
+  if (day.isDisabled) return;
+  selectDate(day.date);
 }
 </script>
 
@@ -79,11 +79,11 @@ function handleDayClick(day: (typeof calendarDays.value)[0]) {
             class="pika-select pika-select-month"
             :value="viewMonth"
             @change="
-              e => {
-                const target = e.target as HTMLSelectElement
-                const newMonth = parseInt(target.value, 10)
-                const d = new Date(viewYear, newMonth, 1)
-                goToDate(d)
+              (e) => {
+                const target = e.target as HTMLSelectElement;
+                const newMonth = parseInt(target.value, 10);
+                const d = new Date(viewYear, newMonth, 1);
+                goToDate(d);
               }
             "
           >
@@ -100,7 +100,7 @@ function handleDayClick(day: (typeof calendarDays.value)[0]) {
                 'September',
                 'October',
                 'November',
-                'December',
+                'December'
               ]"
               :key="i"
               :value="i"
@@ -115,15 +115,19 @@ function handleDayClick(day: (typeof calendarDays.value)[0]) {
             class="pika-select pika-select-year"
             :value="viewYear"
             @change="
-              e => {
-                const target = e.target as HTMLSelectElement
-                const newYear = parseInt(target.value, 10)
-                const d = new Date(newYear, viewMonth, 1)
-                goToDate(d)
+              (e) => {
+                const target = e.target as HTMLSelectElement;
+                const newYear = parseInt(target.value, 10);
+                const d = new Date(newYear, viewMonth, 1);
+                goToDate(d);
               }
             "
           >
-            <option v-for="y in Array.from({ length: 21 }, (_, i) => viewYear - 10 + i)" :key="y" :value="y">
+            <option
+              v-for="y in Array.from({ length: 21 }, (_, i) => viewYear - 10 + i)"
+              :key="y"
+              :value="y"
+            >
               {{ y }}
             </option>
           </select>
@@ -150,7 +154,8 @@ function handleDayClick(day: (typeof calendarDays.value)[0]) {
                 'is-today': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isToday,
                 'is-selected': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isSelected,
                 'is-disabled': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isDisabled,
-                'is-outside-current-month': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isOutsideMonth,
+                'is-outside-current-month':
+                  calendarDays[(week - 1) * 7 + dayIndex - 1]?.isOutsideMonth
               }"
               :aria-selected="calendarDays[(week - 1) * 7 + dayIndex - 1]?.isSelected"
               :data-day="calendarDays[(week - 1) * 7 + dayIndex - 1]?.day"

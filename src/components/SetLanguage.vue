@@ -67,13 +67,7 @@ defineExpose({ getCurrentLanguage });
 </script>
 
 <template>
-  <select
-    :id="id"
-    class="select"
-    :name="name"
-    :value="currentLanguage"
-    @change="onLanguageChange"
-  >
+  <select :id="id" class="select" :name="name" :value="currentLanguage" @change="onLanguageChange">
     <option v-if="requireSelection" value="" disabled>[Choose language]</option>
     <option
       v-for="languageCode in languages"

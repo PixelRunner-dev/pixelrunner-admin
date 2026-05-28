@@ -463,14 +463,26 @@ watchEffect(() => {
         <DFormControl class="gap-1">
           <DLabel label>
             <DText>{{ $t('settingsPage.dateAndTime.date.label') }}</DText>
-            <DInput class="input font-mono" type="date" name="current-date" v-model="date" disabled />
+            <DInput
+              class="input font-mono"
+              type="date"
+              name="current-date"
+              v-model="date"
+              disabled
+            />
           </DLabel>
         </DFormControl>
 
         <DFormControl class="gap-1">
           <DLabel label>
             <DText>{{ $t('settingsPage.dateAndTime.time.label') }}</DText>
-            <DInput class="input font-mono" type="time" name="current-time" v-model="time" disabled />
+            <DInput
+              class="input font-mono"
+              type="time"
+              name="current-time"
+              v-model="time"
+              disabled
+            />
           </DLabel>
         </DFormControl>
       </DFieldset>
@@ -520,18 +532,23 @@ watchEffect(() => {
         <div
           id="wifi-networks"
           class="grid gap-2 w-80 max-h-[21lh] overflow-y-auto"
-          style="scrollbar-width: thin;">
+          style="scrollbar-width: thin"
+        >
           <DButton
             v-for="network in uniqueWifiNetworks"
             :key="network.bssid"
             type="button"
             class="btn-xs items-center cursor-pointer flex justify-between w-full text-left"
             :class="{ 'btn-accent': network.ssid === ssid }"
-            :title="network.ssid === ssid ? 'Connected network' : `Connect to network '${network.ssid}'`"
+            :title="
+              network.ssid === ssid ? 'Connected network' : `Connect to network '${network.ssid}'`
+            "
             :disabled="network.ssid === ssid"
             @click="selectWifiNetwork(network)"
           >
-            <span class="font-bold overflow-hidden text-ellipsis whitespace-nowrap">{{ network.ssid }}</span>
+            <span class="font-bold overflow-hidden text-ellipsis whitespace-nowrap">{{
+              network.ssid
+            }}</span>
             <span class="font-normal text-base-content flex-[0_0_auto] text-xs pl-1">
               {{ network.security || 'open' }} · {{ network.signal ?? '?' }}%
             </span>
@@ -761,7 +778,8 @@ watchEffect(() => {
                   <option v-for="o in proxyOptions" :key="o" :value="o" :selected="o === proxy">
                     {{
                       $t(
-                        'settingsPage.wifiNetwork.proxyConfiguration.proxy.options.' + toCamelCase(o)
+                        'settingsPage.wifiNetwork.proxyConfiguration.proxy.options.' +
+                          toCamelCase(o)
                       )
                     }}
                   </option>
@@ -919,7 +937,12 @@ watchEffect(() => {
           <DFormControl class="gap-1">
             <DLabel input>
               <DText label size="sm">{{ $t('settingsPage.nightMode.nightModeEnd.label') }}</DText>
-              <DInput type="time" name="night-mode-end" v-model="nightModeEnd" :disabled="!nightMode" />
+              <DInput
+                type="time"
+                name="night-mode-end"
+                v-model="nightModeEnd"
+                :disabled="!nightMode"
+              />
             </DLabel>
           </DFormControl>
 
@@ -950,7 +973,12 @@ watchEffect(() => {
                   <DText label size="sm">{{
                     $t('settingsPage.nightMode.alarmClock.alarmTime.label')
                   }}</DText>
-                  <DInput type="time" name="alarm-time" v-model="alarmTime" :disabled="!alarmClock" />
+                  <DInput
+                    type="time"
+                    name="alarm-time"
+                    v-model="alarmTime"
+                    :disabled="!alarmClock"
+                  />
                 </DLabel>
               </DFormControl>
             </DFieldset>
@@ -1037,7 +1065,12 @@ watchEffect(() => {
               </dt>
               <dd class="w-12">
                 <DToggle
-                  :key="'feature-toggle-input-' + feature.key + '-' + featureToggleRenderKeys[feature.key]"
+                  :key="
+                    'feature-toggle-input-' +
+                    feature.key +
+                    '-' +
+                    featureToggleRenderKeys[feature.key]
+                  "
                   :model-value="featureToggleModels[feature.key].value"
                   :disabled="
                     !hasLoadedDeviceSettings ||
@@ -1107,32 +1140,58 @@ watchEffect(() => {
     </DFieldset>
 
     <FeatureToggle features="debug">
-      <DebugSection :data="{
-        isConnected,
-        lastError,
-        featureConnection: {
-          isLoadingFeatureToggleStatus,
-          featureToggleStatusError,
-          isWaitingForFeatureToggleStatusPeer
-        },
-        isFirstTimeSetup,
-        controllerVersion
-      }" />
-      <DebugSection :data="{
-        deviceName,
-        date, time,
-        location,
-        ssid, security, password,
-        hiddenNetwork, dhcp, ip, subnet, gateway,
-        dns, primaryDns, secondaryDns,
-        proxy, proxyServer, proxyPort, proxyAutoConfig,
-        brightness, dimAtSunset,
-        nightMode, nightModeStart, nightModeEnd,
-        alarmClock, alarmTime,
-        theme,
-        experimentalFeatures, featureToggleModels,
-        wifiStatus, wifiNetworks, wifiIsScanning, wifiIsSaving, wifiStatusMessage, wifiStatusError
-      }" />
+      <DebugSection
+        :data="{
+          isConnected,
+          lastError,
+          featureConnection: {
+            isLoadingFeatureToggleStatus,
+            featureToggleStatusError,
+            isWaitingForFeatureToggleStatusPeer
+          },
+          isFirstTimeSetup,
+          controllerVersion
+        }"
+      />
+      <DebugSection
+        :data="{
+          deviceName,
+          date,
+          time,
+          location,
+          ssid,
+          security,
+          password,
+          hiddenNetwork,
+          dhcp,
+          ip,
+          subnet,
+          gateway,
+          dns,
+          primaryDns,
+          secondaryDns,
+          proxy,
+          proxyServer,
+          proxyPort,
+          proxyAutoConfig,
+          brightness,
+          dimAtSunset,
+          nightMode,
+          nightModeStart,
+          nightModeEnd,
+          alarmClock,
+          alarmTime,
+          theme,
+          experimentalFeatures,
+          featureToggleModels,
+          wifiStatus,
+          wifiNetworks,
+          wifiIsScanning,
+          wifiIsSaving,
+          wifiStatusMessage,
+          wifiStatusError
+        }"
+      />
       <DebugSection :data="featureToggleModels" />
     </FeatureToggle>
   </main>

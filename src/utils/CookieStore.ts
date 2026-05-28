@@ -1,12 +1,13 @@
 export class CookieStore {
   static set(name: string, value: string, days: number = 365, path: string = '/'): void {
-    const expires = days === 0 ? '' : `; expires=${new Date(Date.now() + days * 864e5).toUTCString()}`;
+    const expires =
+      days === 0 ? '' : `; expires=${new Date(Date.now() + days * 864e5).toUTCString()}`;
     document.cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}${expires}; path=${path}`;
   }
 
   static get(name: string): string | null {
     const encoded = encodeURIComponent(name) + '=';
-    const match = document.cookie.split('; ').find(row => row.startsWith(encoded));
+    const match = document.cookie.split('; ').find((row) => row.startsWith(encoded));
     return match ? decodeURIComponent(match.substring(encoded.length)) : null;
   }
 

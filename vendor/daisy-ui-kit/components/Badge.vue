@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, h, mergeProps } from 'vue'
-import { resolveIs } from '../utils/resolve-is'
+import { computed, defineComponent, h, mergeProps } from 'vue';
+import { resolveIs } from '../utils/resolve-is';
 
 export default defineComponent({
   inheritAttrs: false,
@@ -26,7 +26,7 @@ export default defineComponent({
     info: Boolean,
     success: Boolean,
     warning: Boolean,
-    error: Boolean,
+    error: Boolean
   },
   setup(props, { slots, attrs }) {
     const classes = computed(() => [
@@ -50,11 +50,12 @@ export default defineComponent({
         'badge-info': props.info || props.color === 'info',
         'badge-success': props.success || props.color === 'success',
         'badge-warning': props.warning || props.color === 'warning',
-        'badge-error': props.error || props.color === 'error',
-      },
-    ])
+        'badge-error': props.error || props.color === 'error'
+      }
+    ]);
 
-    return () => h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.())
-  },
-})
+    return () =>
+      h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.());
+  }
+});
 </script>

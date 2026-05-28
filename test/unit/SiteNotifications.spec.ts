@@ -114,10 +114,7 @@ describe('SiteNotifications', () => {
   });
 });
 
-function createNotification(
-  message: string,
-  options: Partial<Notification> = {}
-): Notification {
+function createNotification(message: string, options: Partial<Notification> = {}): Notification {
   return {
     message,
     type: 'info',

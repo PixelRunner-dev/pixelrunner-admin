@@ -94,7 +94,8 @@ describe('base-client.ts', () => {
   describe('state management', () => {
     it('provides reactive state object', () => {
       const stateValue = client.state.value;
-      expect(stateValue).toHaveProperty('type');
+      expect(typeof stateValue).toBe('string');
+      expect(['disconnected', 'connecting', 'connected', 'reconnecting']).toContain(stateValue);
     });
 
     it('provides connected computed property', () => {

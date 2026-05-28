@@ -107,14 +107,24 @@ watch(
 }
 
 .is-showing-frame::before {
-  content: "";
-  clip-path: polygon(var(--_d) 0,100% 0,100% calc(100% - var(--_d)),calc(100% - var(--_d)) 100%,0 100%,0 var(--_d));
-  background:
-    conic-gradient(from -90deg at calc(100% - var(--_d)) var(--_d),
-     #703d15 135deg, #3b2805 0 270deg, transparent 0);
+  content: '';
+  clip-path: polygon(
+    var(--_d) 0,
+    100% 0,
+    100% calc(100% - var(--_d)),
+    calc(100% - var(--_d)) 100%,
+    0 100%,
+    0 var(--_d)
+  );
+  background: conic-gradient(
+    from -90deg at calc(100% - var(--_d)) var(--_d),
+    #703d15 135deg,
+    #3b2805 0 270deg,
+    transparent 0
+  );
   width: calc(100% + var(--_d));
-    height: calc(100% + var(--_d));
-    display: block;
+  height: calc(100% + var(--_d));
+  display: block;
   position: absolute;
   top: calc(var(--_d) * -1);
   right: calc(var(--_d) * -1);
@@ -123,8 +133,8 @@ watch(
 
 .image-frame {
   border-color: rgb(109, 84, 58) rgb(24, 19, 13) rgb(24, 19, 13) rgb(109, 84, 58);
-	border-style: solid;
-	border-width: 5px;
+  border-style: solid;
+  border-width: 5px;
 }
 
 .image-frame > div {
@@ -132,8 +142,8 @@ watch(
 }
 
 .image-frame > div > div {
-	border-color: rgb(24, 19, 13)	rgb(109, 84, 58) rgb(109, 84, 58) rgb(24, 19, 13);
-	border-style: solid;
+  border-color: rgb(24, 19, 13) rgb(109, 84, 58) rgb(109, 84, 58) rgb(24, 19, 13);
+  border-style: solid;
   border-width: 5px;
 }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent, h, inject, mergeProps } from 'vue'
+import { computed, defineComponent, h, inject, mergeProps } from 'vue';
 
 export default defineComponent({
   inheritAttrs: false,
@@ -7,21 +7,21 @@ export default defineComponent({
     is: { type: [String, Object], default: 'label' },
     name: String,
     active: Boolean,
-    disabled: Boolean,
+    disabled: Boolean
   },
   setup(props, { slots, attrs }) {
-    const tabManager: any = inject('tabManager')
+    const tabManager: any = inject('tabManager');
     if (!tabManager.currentTab.value) {
-      tabManager.currentTab.value = props.name
+      tabManager.currentTab.value = props.name;
     }
 
     const classes = computed(() => [
       'tab',
       {
         'tab-active': props.active || tabManager.currentTab.value === props.name,
-        'tab-disabled': props.disabled,
-      },
-    ])
+        'tab-disabled': props.disabled
+      }
+    ]);
 
     return () =>
       h(
@@ -30,9 +30,9 @@ export default defineComponent({
           class: classes.value,
           onKeypress: (e: KeyboardEvent) => {
             if (e.key === 'Enter') {
-              tabManager.currentTab.value = props.name
+              tabManager.currentTab.value = props.name;
             }
-          },
+          }
         }),
         [
           h('input', {
@@ -41,12 +41,12 @@ export default defineComponent({
             value: props.name,
             checked: tabManager.currentTab.value === props.name,
             onChange: () => {
-              tabManager.currentTab.value = props.name
-            },
+              tabManager.currentTab.value = props.name;
+            }
           }),
-          ...(slots.default ? slots.default() : [h('span', props.name)]),
-        ],
-      )
-  },
-})
+          ...(slots.default ? slots.default() : [h('span', props.name)])
+        ]
+      );
+  }
+});
 </script>

@@ -1,45 +1,45 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: boolean
-    closeOnClickOutside?: boolean
-    placement?: 'top' | 'bottom' | 'start' | 'end'
-    top?: boolean
-    bottom?: boolean
-    start?: boolean
-    end?: boolean
+    modelValue?: boolean;
+    closeOnClickOutside?: boolean;
+    placement?: 'top' | 'bottom' | 'start' | 'end';
+    top?: boolean;
+    bottom?: boolean;
+    start?: boolean;
+    end?: boolean;
   }>(),
   {
-    closeOnClickOutside: true,
-  },
-)
-const emit = defineEmits(['update:modelValue'])
+    closeOnClickOutside: true
+  }
+);
+const emit = defineEmits(['update:modelValue']);
 
-const is = 'div'
+const is = 'div';
 
 // defineModel 'open'
-const _isOpen = ref(props.modelValue)
+const _isOpen = ref(props.modelValue);
 watch(
   () => props.modelValue,
-  val => {
-    _isOpen.value = val
-  },
-)
+  (val) => {
+    _isOpen.value = val;
+  }
+);
 const isOpen = computed({
   get: () => _isOpen.value,
-  set: val => {
-    _isOpen.value = val
+  set: (val) => {
+    _isOpen.value = val;
     if (props.modelValue !== val) {
-      emit('update:modelValue', val)
+      emit('update:modelValue', val);
     }
-  },
-})
+  }
+});
 
 function handleClick() {
   if (props.closeOnClickOutside) {
-    isOpen.value = false
+    isOpen.value = false;
   }
 }
 </script>
@@ -54,7 +54,7 @@ function handleClick() {
       'modal-top': props.top,
       'modal-bottom': props.bottom,
       'modal-start': props.start,
-      'modal-end': props.end,
+      'modal-end': props.end
     }"
     @click.self="handleClick"
   >

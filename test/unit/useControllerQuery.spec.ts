@@ -264,21 +264,23 @@ describe('useControllerQuery', () => {
   });
 });
 
-function mountControllerQuery(options: {
-  canLoad?: () => boolean;
-  clearDataOnError?: boolean;
-  defaultErrorMessage?: string;
-  enabled?: boolean;
-  includeLastError?: boolean;
-  includeState?: boolean;
-  label?: string;
-  load?: ReturnType<typeof vi.fn<() => Promise<string>>>;
-  onSuccess?: (data: string) => void;
-  retryDelayMs?: number;
-  shouldReloadOnEnabled?: (data: string | undefined) => boolean;
-  state?: string;
-  transientErrorMessage?: string;
-} = {}) {
+function mountControllerQuery(
+  options: {
+    canLoad?: () => boolean;
+    clearDataOnError?: boolean;
+    defaultErrorMessage?: string;
+    enabled?: boolean;
+    includeLastError?: boolean;
+    includeState?: boolean;
+    label?: string;
+    load?: ReturnType<typeof vi.fn<() => Promise<string>>>;
+    onSuccess?: (data: string) => void;
+    retryDelayMs?: number;
+    shouldReloadOnEnabled?: (data: string | undefined) => boolean;
+    state?: string;
+    transientErrorMessage?: string;
+  } = {}
+) {
   vi.spyOn(console, 'error').mockImplementation(() => undefined);
   vi.spyOn(console, 'log').mockImplementation(() => undefined);
 

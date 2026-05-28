@@ -29,7 +29,11 @@ export class PlaylistsAPI extends ApiClientBase<IRpcClient> {
     appletUuids: UUID[],
     options?: IRequestOptions
   ): Promise<PlaylistOrderUpdateResult> {
-    return this.request<PlaylistOrderUpdateResult>('playlists.updateOrder', { appletUuids }, options);
+    return this.request<PlaylistOrderUpdateResult>(
+      'playlists.updateOrder',
+      { appletUuids },
+      options
+    );
   }
 
   // /**
@@ -40,5 +44,4 @@ export class PlaylistsAPI extends ApiClientBase<IRpcClient> {
   // onStatusChange(handler: (status: DeviceStatusResponse) => void): () => void {
   //   return this.client.on('message:device.status_changed', handler);
   // }
-
 }

@@ -1,70 +1,70 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: number | string
-    count?: number | string
-    half?: boolean
+    modelValue?: number | string;
+    count?: number | string;
+    half?: boolean;
 
-    disabled?: boolean
+    disabled?: boolean;
 
-    color?: string
-    neutral?: boolean
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    info?: boolean
-    success?: boolean
-    warning?: boolean
-    error?: boolean
+    color?: string;
+    neutral?: boolean;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    info?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    error?: boolean;
 
-    bg?: string
+    bg?: string;
 
-    shape?: string
-    squircle?: boolean
-    heart?: boolean
-    hexagon?: boolean
-    hexagon2?: boolean
-    decagon?: boolean
-    pentagon?: boolean
-    diamond?: boolean
-    square?: boolean
-    circle?: boolean
+    shape?: string;
+    squircle?: boolean;
+    heart?: boolean;
+    hexagon?: boolean;
+    hexagon2?: boolean;
+    decagon?: boolean;
+    pentagon?: boolean;
+    diamond?: boolean;
+    square?: boolean;
+    circle?: boolean;
 
-    star?: boolean
-    star2?: boolean
-    triangle?: boolean
-    triangle2?: boolean
-    triangle3?: boolean
-    triangle4?: boolean
+    star?: boolean;
+    star2?: boolean;
+    triangle?: boolean;
+    triangle2?: boolean;
+    triangle3?: boolean;
+    triangle4?: boolean;
 
-    size?: 'lg' | 'md' | 'sm' | 'xs' | 'xl'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    size?: 'lg' | 'md' | 'sm' | 'xs' | 'xl';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
-    count: 5,
-  },
-)
-const emit = defineEmits(['update:modelValue'])
+    count: 5
+  }
+);
+const emit = defineEmits(['update:modelValue']);
 
-const max = computed(() => Number.parseInt(props.count as string))
+const max = computed(() => Number.parseInt(props.count as string));
 
 function handleValue(digit: number, half = false) {
   if (props.disabled) {
-    return
+    return;
   }
 
   if (props.half) {
-    emit('update:modelValue', half ? digit - 0.5 : digit)
-    return
+    emit('update:modelValue', half ? digit - 0.5 : digit);
+    return;
   }
 
-  emit('update:modelValue', digit)
+  emit('update:modelValue', digit);
 }
 
 // Check if any shape prop is set
@@ -86,8 +86,8 @@ const hasShape = computed(() => {
     props.triangle2 ||
     props.triangle3 ||
     props.triangle4
-  )
-})
+  );
+});
 </script>
 
 <template>
@@ -101,7 +101,7 @@ const hasShape = computed(() => {
       'rating-sm': sm || size === 'sm',
       'rating-xs': xs || size === 'xs',
       'opacity-60': disabled,
-      'cursor-not-allowed': disabled,
+      'cursor-not-allowed': disabled
     }"
   >
     <input
@@ -147,7 +147,7 @@ const hasShape = computed(() => {
           { 'mask-triangle': triangle || shape === 'triangle' },
           { 'mask-triangle-2': triangle2 || shape === 'triangle-2' },
           { 'mask-triangle-3': triangle3 || shape === 'triangle-3' },
-          { 'mask-triangle-4': triangle4 || shape === 'triangle-4' },
+          { 'mask-triangle-4': triangle4 || shape === 'triangle-4' }
         ]"
         :checked="half ? modelValue === digit - 0.5 : modelValue === digit"
         @change="() => handleValue(digit, true)"
@@ -187,7 +187,7 @@ const hasShape = computed(() => {
           { 'mask-triangle': triangle || shape === 'triangle' },
           { 'mask-triangle-2': triangle2 || shape === 'triangle-2' },
           { 'mask-triangle-3': triangle3 || shape === 'triangle-3' },
-          { 'mask-triangle-4': triangle4 || shape === 'triangle-4' },
+          { 'mask-triangle-4': triangle4 || shape === 'triangle-4' }
         ]"
         :checked="modelValue === digit"
         @change="() => handleValue(digit)"

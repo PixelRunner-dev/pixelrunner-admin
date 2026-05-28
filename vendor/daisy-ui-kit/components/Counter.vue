@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  value: number | string
-  is?: any
-  digits?: 2 | 3 | '2' | '3'
-}>()
+  value: number | string;
+  is?: any;
+  digits?: 2 | 3 | '2' | '3';
+}>();
 
 const style = computed(() => {
-  let css = `--value:${props.value};`
+  let css = `--value:${props.value};`;
   if (props.digits) {
-    css += `--digits:${props.digits};`
+    css += `--digits:${props.digits};`;
   }
-  return css
-})
+  return css;
+});
 </script>
 
 <template>

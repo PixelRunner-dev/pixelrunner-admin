@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const props = defineProps<{
-  is?: any
-  disabled?: boolean
-}>()
+  is?: any;
+  disabled?: boolean;
+}>();
 </script>
 
 <template>

@@ -69,7 +69,9 @@ describe('src/ws/api/playlists.ts', () => {
 
     it('handles invalid playlist data', async () => {
       const errorClient = new MockRpcClient({ failureRate: 1.0 });
-      await expect(errorClient.request('playlist.update', { id: '123', data: null })).rejects.toThrow();
+      await expect(
+        errorClient.request('playlist.update', { id: '123', data: null })
+      ).rejects.toThrow();
     });
 
     it('recovers from transient errors', async () => {

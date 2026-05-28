@@ -10,9 +10,7 @@ type SearchWorkerIncoming =
   | { type: 'search'; q?: unknown; limit?: unknown }
   | { type?: unknown };
 
-type SearchWorkerMessage =
-  | { type: 'ready' }
-  | { type: 'results'; q: string; results: Place[] };
+type SearchWorkerMessage = { type: 'ready' } | { type: 'results'; q: string; results: Place[] };
 
 type WorkerScope = {
   onmessage: ((event: MessageEvent<SearchWorkerIncoming>) => void) | null;
@@ -192,8 +190,9 @@ function createPlace(name: string, country: string): Place {
 function lastResults(messages: SearchWorkerMessage[]): Place[] {
   const result = [...messages]
     .reverse()
-    .find((message): message is Extract<SearchWorkerMessage, { type: 'results' }> =>
-      message.type === 'results'
+    .find(
+      (message): message is Extract<SearchWorkerMessage, { type: 'results' }> =>
+        message.type === 'results'
     );
 
   return result?.results ?? [];

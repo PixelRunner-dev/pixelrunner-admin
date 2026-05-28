@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { inject } from 'vue'
+import { inject } from 'vue';
 
-const checkboxId = inject('collapseCheckboxId', null)
-const hasToggle = inject('collapseToggle', false)
+const checkboxId = inject('collapseCheckboxId', null);
+const hasToggle = inject('collapseToggle', false);
 </script>
 
 <template>

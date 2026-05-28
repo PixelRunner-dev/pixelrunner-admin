@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, h, mergeProps } from 'vue'
-import { resolveIs } from '../utils/resolve-is'
+import { computed, defineComponent, h, mergeProps } from 'vue';
+import { resolveIs } from '../utils/resolve-is';
 
 export default defineComponent({
   inheritAttrs: false,
@@ -102,7 +102,7 @@ export default defineComponent({
     semibold: Boolean,
     bold: Boolean,
     extrabold: Boolean,
-    black: Boolean,
+    black: Boolean
   },
   setup(props, { slots, attrs }) {
     const classes = computed(() => ({
@@ -166,15 +166,18 @@ export default defineComponent({
       'font-semibold': props.semibold || props.weight === 'semibold',
       'font-bold': props.bold || props.weight === 'bold',
       'font-extrabold': props.extrabold || props.weight === 'extrabold',
-      'font-black': props.black || props.weight === 'black',
-    }))
+      'font-black': props.black || props.weight === 'black'
+    }));
 
     return () =>
       h(
         resolveIs(props.is),
-        mergeProps(attrs, { ...(props.label ? { 'data-role': 'label' } : {}), class: classes.value }),
-        slots.default?.(),
-      )
-  },
-})
+        mergeProps(attrs, {
+          ...(props.label ? { 'data-role': 'label' } : {}),
+          class: classes.value
+        }),
+        slots.default?.()
+      );
+  }
+});
 </script>

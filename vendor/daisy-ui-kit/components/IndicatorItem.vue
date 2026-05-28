@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, h, mergeProps } from 'vue'
-import { resolveIs } from '../utils/resolve-is'
+import { computed, defineComponent, h, mergeProps } from 'vue';
+import { resolveIs } from '../utils/resolve-is';
 
 export default defineComponent({
   inheritAttrs: false,
@@ -15,7 +15,7 @@ export default defineComponent({
     vAlign: String as () => 'top' | 'middle' | 'bottom',
     top: Boolean,
     middle: Boolean,
-    bottom: Boolean,
+    bottom: Boolean
   },
   setup(props, { slots, attrs }) {
     const classes = computed(() => [
@@ -27,11 +27,12 @@ export default defineComponent({
 
         'indicator-top': props.top || props.vAlign === 'top',
         'indicator-middle': props.middle || props.vAlign === 'middle',
-        'indicator-bottom': props.bottom || props.vAlign === 'bottom',
-      },
-    ])
+        'indicator-bottom': props.bottom || props.vAlign === 'bottom'
+      }
+    ]);
 
-    return () => h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.())
-  },
-})
+    return () =>
+      h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.());
+  }
+});
 </script>

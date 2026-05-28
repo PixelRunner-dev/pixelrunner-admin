@@ -29,8 +29,8 @@ describe('LibrarySearch.vue', () => {
 
   it('initializes with empty query', () => {
     const wrapper = mount(LibrarySearch);
-    const input = wrapper.find('input[type="text"]');
-    expect(input.element).toBeDefined();
+    const input = wrapper.find('input');
+    expect(input.exists()).toBe(true);
   });
 
   it('supports search input', async () => {

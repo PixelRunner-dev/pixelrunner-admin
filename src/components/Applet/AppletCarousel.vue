@@ -26,7 +26,13 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="component--carousel" ref="carousel">
-    <AppletList :applets :classes="{ list: 'carousel__track', item: `carousel__track__item carousel__item-width--${itemWidth}` }">
+    <AppletList
+      :applets
+      :classes="{
+        list: 'carousel__track',
+        item: `carousel__track__item carousel__item-width--${itemWidth}`
+      }"
+    >
       <template #item="applet">
         <slot name="item" v-bind="applet" />
       </template>

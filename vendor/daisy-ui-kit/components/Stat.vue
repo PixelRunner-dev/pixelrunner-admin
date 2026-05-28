@@ -1,9 +1,9 @@
 <script setup lang="ts">
 defineProps<{
-  orientation?: 'vertical' | 'horizontal'
-  vertical?: boolean
-  horizontal?: boolean
-}>()
+  orientation?: 'vertical' | 'horizontal';
+  vertical?: boolean;
+  horizontal?: boolean;
+}>();
 </script>
 
 <template>
@@ -11,7 +11,7 @@ defineProps<{
     class="stat"
     :class="{
       'stat-vertical': vertical || orientation === 'vertical',
-      'stat-horizontal': horizontal || orientation === 'horizontal',
+      'stat-horizontal': horizontal || orientation === 'horizontal'
     }"
   >
     <slot />

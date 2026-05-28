@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Text from './Text.vue'
+import Text from './Text.vue';
 
-const { is = 'div' } = defineProps<{ is?: string }>()
+const { is = 'div' } = defineProps<{ is?: string }>();
 </script>
 
 <template>

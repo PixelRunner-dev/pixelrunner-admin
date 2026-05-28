@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { DockState } from './Dock.vue'
-import { inject, onUnmounted, useId } from 'vue'
+import type { DockState } from './Dock.vue';
+import { inject, onUnmounted, useId } from 'vue';
 
 const { active } = defineProps<{
-  active?: boolean
-}>()
+  active?: boolean;
+}>();
 
-const itemId = useId()
-const { registerItem, setActiveItemId, activeItemId } = inject<DockState>('dockState')!
-const unregister = registerItem(itemId)
+const itemId = useId();
+const { registerItem, setActiveItemId, activeItemId } = inject<DockState>('dockState')!;
+const unregister = registerItem(itemId);
 
 onUnmounted(() => {
-  unregister()
-})
+  unregister();
+});
 </script>
 
 <template>

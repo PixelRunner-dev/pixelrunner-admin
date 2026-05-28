@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
+import { computed, inject } from 'vue';
 
 const { is = 'div', name } = defineProps<{
-  is?: any
-  name: string
-}>()
+  is?: any;
+  name: string;
+}>();
 
-const tabManager: any = inject('tabManager')
+const tabManager: any = inject('tabManager');
 
 const isCurrentTab = computed(() => {
-  return tabManager.currentTab.value === name
-})
+  return tabManager.currentTab.value === name;
+});
 
 if (!tabManager?.currentTab.value) {
-  tabManager.currentTab.value = name
+  tabManager.currentTab.value = name;
 }
 
-const existing = tabManager?.tabs?.find((t: string) => t === name)
+const existing = tabManager?.tabs?.find((t: string) => t === name);
 if (!existing) {
-  tabManager.tabs.push(name)
+  tabManager.tabs.push(name);
 }
 </script>
 

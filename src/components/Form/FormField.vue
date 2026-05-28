@@ -15,7 +15,13 @@ export interface Props {
   showDescription?: boolean;
 }
 
-const { id, label, description, context = 'global', showDescription = false }: Props = defineProps<Props>();
+const {
+  id,
+  label,
+  description,
+  context = 'global',
+  showDescription = false
+}: Props = defineProps<Props>();
 </script>
 
 <template>
@@ -24,11 +30,7 @@ const { id, label, description, context = 'global', showDescription = false }: P
       <DText size="sm">{{ label || $t(`${context}.${toCamelCase(id)}.label`) }}</DText>
     </DLabel>
     <slot />
-    <DText
-      v-if="description?.length || showDescription"
-      is="p"
-      size="xs"
-      :id="`${id}-description`">
+    <DText v-if="description?.length || showDescription" is="p" size="xs" :id="`${id}-description`">
       {{ description || $t(`${context}.${toCamelCase(id)}.description`) }}
     </DText>
   </DFormControl>

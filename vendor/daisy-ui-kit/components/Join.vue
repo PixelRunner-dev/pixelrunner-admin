@@ -1,9 +1,9 @@
 <script setup lang="ts">
 defineProps<{
-  direction?: 'horizontal' | 'vertical'
-  horizontal?: boolean
-  vertical?: boolean
-}>()
+  direction?: 'horizontal' | 'vertical';
+  horizontal?: boolean;
+  vertical?: boolean;
+}>();
 </script>
 
 <template>
@@ -11,7 +11,7 @@ defineProps<{
     class="join"
     :class="{
       'join-vertical': direction === 'vertical' || vertical,
-      'join-horizontal': direction === 'horizontal' || horizontal,
+      'join-horizontal': direction === 'horizontal' || horizontal
     }"
   >
     <slot />

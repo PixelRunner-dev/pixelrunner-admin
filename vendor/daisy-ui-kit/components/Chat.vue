@@ -3,13 +3,13 @@ const {
   pre,
   align = 'start',
   start,
-  end,
+  end
 } = defineProps<{
-  pre?: boolean
-  align?: string
-  start?: boolean
-  end?: boolean
-}>()
+  pre?: boolean;
+  align?: string;
+  start?: boolean;
+  end?: boolean;
+}>();
 </script>
 
 <template>
@@ -18,7 +18,7 @@ const {
     :class="{
       'chat-start': start || (!end && align === 'start'),
       'chat-end': end || align === 'end',
-      'whitespace-pre': pre,
+      'whitespace-pre': pre
     }"
   >
     <slot />

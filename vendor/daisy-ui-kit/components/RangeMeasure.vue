@@ -1,53 +1,57 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import RangeMeasureTick from './RangeMeasureTick.vue'
+import { computed } from 'vue';
+import RangeMeasureTick from './RangeMeasureTick.vue';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: number | string
-    min?: number | string
-    max?: number | string
-    step?: number | string
+    modelValue?: number | string;
+    min?: number | string;
+    max?: number | string;
+    step?: number | string;
 
-    numbered?: boolean
-    asButtons?: boolean
-    disabled?: boolean
+    numbered?: boolean;
+    asButtons?: boolean;
+    disabled?: boolean;
 
-    color?: string
-    neutral?: boolean
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    success?: boolean
-    warning?: boolean
-    info?: boolean
-    error?: boolean
+    color?: string;
+    neutral?: boolean;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    info?: boolean;
+    error?: boolean;
 
-    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
     min: 0,
     max: 100,
-    step: 1,
-  },
-)
-defineEmits(['update:modelValue'])
+    step: 1
+  }
+);
+defineEmits(['update:modelValue']);
 
 const values = computed(() => {
-  const vals = []
-  for (let index = Number.parseInt(props.min as string); index < Number.parseInt(props.max as string) + 1; index++) {
+  const vals = [];
+  for (
+    let index = Number.parseInt(props.min as string);
+    index < Number.parseInt(props.max as string) + 1;
+    index++
+  ) {
     vals.push({
       value: index,
-      isVisible: index % Number.parseInt(props.step as string) === 0,
-    })
+      isVisible: index % Number.parseInt(props.step as string) === 0
+    });
   }
-  return vals
-})
+  return vals;
+});
 // const count = computed(() => Number.parseInt(props.max as string) - Number.parseInt(props.min as string))
 </script>
 
@@ -68,7 +72,7 @@ const values = computed(() => {
       'text-md': md || size === 'md',
       'text-sm': sm || size === 'sm',
       'text-xs': xs || size === 'xs',
-      'opacity-50': disabled,
+      'opacity-50': disabled
     }"
   >
     <RangeMeasureTick

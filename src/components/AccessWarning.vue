@@ -2,9 +2,23 @@
 import { computed } from 'vue';
 
 // Use Vue's global t function from i18next-vue plugin
-const title = computed(() => (window as unknown as { $t: (key: string) => string }).$t?.('generic.accessWarning.title') ?? 'Access Via Device IP');
-const message = computed(() => (window as unknown as { $t: (key: string) => string }).$t?.('generic.accessWarning.message') ?? 'You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device\'s local IP address.');
-const instruction = computed(() => (window as unknown as { $t: (key: string) => string }).$t?.('generic.accessWarning.instruction') ?? 'Find your device\'s IP address in your router\'s connected devices list, then access this admin interface via: http://[device-ip]');
+const title = computed(
+  () =>
+    (window as unknown as { $t: (key: string) => string }).$t?.('generic.accessWarning.title') ??
+    'Access Via Device IP'
+);
+const message = computed(
+  () =>
+    (window as unknown as { $t: (key: string) => string }).$t?.('generic.accessWarning.message') ??
+    "You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device's local IP address."
+);
+const instruction = computed(
+  () =>
+    (window as unknown as { $t: (key: string) => string }).$t?.(
+      'generic.accessWarning.instruction'
+    ) ??
+    "Find your device's IP address in your router's connected devices list, then access this admin interface via: http://[device-ip]"
+);
 </script>
 
 <template>

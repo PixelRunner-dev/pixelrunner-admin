@@ -8,12 +8,15 @@ vi.mock('i18next', () => ({
   }
 }));
 
-vi.stubGlobal('Worker', class MockWorker {
-  postMessage = vi.fn();
-  terminate = vi.fn();
-  addEventListener = vi.fn();
-  removeEventListener = vi.fn();
-});
+vi.stubGlobal(
+  'Worker',
+  class MockWorker {
+    postMessage = vi.fn();
+    terminate = vi.fn();
+    addEventListener = vi.fn();
+    removeEventListener = vi.fn();
+  }
+);
 
 interface LocationResult {
   lat: string;

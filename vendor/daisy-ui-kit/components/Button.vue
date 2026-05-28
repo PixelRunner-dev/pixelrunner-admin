@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, h, mergeProps } from 'vue'
-import { resolveIs } from '../utils/resolve-is'
+import { computed, defineComponent, h, mergeProps } from 'vue';
+import { resolveIs } from '../utils/resolve-is';
 
 export default defineComponent({
   inheritAttrs: false,
@@ -42,10 +42,10 @@ export default defineComponent({
     sm: Boolean,
     xs: Boolean,
 
-    type: { type: String as () => 'button' | 'submit' | 'reset', default: 'button' },
+    type: { type: String as () => 'button' | 'submit' | 'reset', default: 'button' }
   },
   setup(props, { slots, attrs }) {
-    const isButton = computed(() => (props.is || 'button') === 'button')
+    const isButton = computed(() => (props.is || 'button') === 'button');
 
     const classes = computed(() => [
       'btn',
@@ -61,13 +61,18 @@ export default defineComponent({
         'btn-warning': !props.disabled && (props.warning || props.color === 'warning'),
         'btn-error': !props.disabled && (props.error || props.color === 'error'),
 
-        'text-primary': !props.disabled && (props.primary || props.color === 'primary') && props.link,
-        'text-secondary': !props.disabled && (props.secondary || props.color === 'secondary') && props.link,
-        'text-neutral': !props.disabled && (props.neutral || props.color === 'neutral') && props.link,
+        'text-primary':
+          !props.disabled && (props.primary || props.color === 'primary') && props.link,
+        'text-secondary':
+          !props.disabled && (props.secondary || props.color === 'secondary') && props.link,
+        'text-neutral':
+          !props.disabled && (props.neutral || props.color === 'neutral') && props.link,
         'text-accent': !props.disabled && (props.accent || props.color === 'accent') && props.link,
         'text-info': !props.disabled && (props.info || props.color === 'info') && props.link,
-        'text-success': !props.disabled && (props.success || props.color === 'success') && props.link,
-        'text-warning': !props.disabled && (props.warning || props.color === 'warning') && props.link,
+        'text-success':
+          !props.disabled && (props.success || props.color === 'success') && props.link,
+        'text-warning':
+          !props.disabled && (props.warning || props.color === 'warning') && props.link,
         'text-error': !props.disabled && (props.error || props.color === 'error') && props.link,
 
         glass: !props.disabled && props.glass,
@@ -91,21 +96,21 @@ export default defineComponent({
         'btn-disabled': props.disabled,
 
         'no-animation': props.noAnimation,
-        'btn-active': !props.disabled && props.active,
-      },
-    ])
+        'btn-active': !props.disabled && props.active
+      }
+    ]);
 
     function onKeydown(e: KeyboardEvent) {
-      if (props.disabled) return
+      if (props.disabled) return;
       if (e.code === 'Space' || e.code === 'Enter' || e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault()
-        ;(e.currentTarget as HTMLElement)?.click?.()
+        e.preventDefault();
+        (e.currentTarget as HTMLElement)?.click?.();
       }
     }
 
     return () => {
-      const tag = props.is ? resolveIs(props.is) : 'button'
-      const isBtnEl = isButton.value
+      const tag = props.is ? resolveIs(props.is) : 'button';
+      const isBtnEl = isButton.value;
 
       return h(
         tag as any,
@@ -116,11 +121,11 @@ export default defineComponent({
           tabindex: !isBtnEl ? (props.disabled ? -1 : 0) : undefined,
           role: !isBtnEl ? 'button' : undefined,
           class: classes.value,
-          onKeydown: !isBtnEl ? onKeydown : undefined,
+          onKeydown: !isBtnEl ? onKeydown : undefined
         }),
-        slots.default?.(),
-      )
-    }
-  },
-})
+        slots.default?.()
+      );
+    };
+  }
+});
 </script>

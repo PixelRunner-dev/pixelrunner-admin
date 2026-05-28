@@ -1,68 +1,68 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 defineOptions({
-  inheritAttrs: false,
-})
+  inheritAttrs: false
+});
 
 const props = withDefaults(
   defineProps<{
-    is?: string
-    name: string
-    items: FilterItemInput[]
-    modelValue?: any
-    resetLabel?: string
-    position?: 'start' | 'end'
-    start?: boolean
-    end?: boolean
+    is?: string;
+    name: string;
+    items: FilterItemInput[];
+    modelValue?: any;
+    resetLabel?: string;
+    position?: 'start' | 'end';
+    start?: boolean;
+    end?: boolean;
 
-    color?: string
-    neutral?: boolean
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    info?: boolean
-    success?: boolean
-    warning?: boolean
-    error?: boolean
+    color?: string;
+    neutral?: boolean;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    info?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    error?: boolean;
 
-    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
     resetLabel: 'All',
-    is: 'div',
-  },
-)
+    is: 'div'
+  }
+);
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 interface FilterItem {
-  label: string
-  value: any
+  label: string;
+  value: any;
 }
 
-type FilterItemInput = string | FilterItem
+type FilterItemInput = string | FilterItem;
 
 const currentValue = computed({
   get: () => props.modelValue,
   set(val) {
-    emit('update:modelValue', val)
-  },
-})
+    emit('update:modelValue', val);
+  }
+});
 
 const normalizedItems = computed(() => {
-  return props.items.map(item => {
+  return props.items.map((item) => {
     if (typeof item === 'string') {
-      return { label: item, value: item }
+      return { label: item, value: item };
     }
-    return item
-  })
-})
+    return item;
+  });
+});
 </script>
 
 <template>
@@ -78,7 +78,7 @@ const normalizedItems = computed(() => {
         'btn-lg': size === 'lg' || lg,
         'btn-md': size === 'md' || md,
         'btn-sm': size === 'sm' || sm,
-        'btn-xs': size === 'xs' || xs,
+        'btn-xs': size === 'xs' || xs
       }"
       :name="name"
       :aria-label="resetLabel"
@@ -103,7 +103,7 @@ const normalizedItems = computed(() => {
           'btn-lg': size === 'lg' || lg,
           'btn-md': size === 'md' || md,
           'btn-sm': size === 'sm' || sm,
-          'btn-xs': size === 'xs' || xs,
+          'btn-xs': size === 'xs' || xs
         }"
         type="radio"
         :name="name"

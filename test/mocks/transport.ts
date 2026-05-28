@@ -107,7 +107,7 @@ export class MockRpcClient extends EventEmitter {
     }
 
     if (this.responseDelay > 0) {
-      await new Promise(resolve => setTimeout(resolve, this.responseDelay));
+      await new Promise((resolve) => setTimeout(resolve, this.responseDelay));
     }
 
     return this.responses.get(id) ?? { jsonrpc: '2.0', result: null, id };
@@ -165,7 +165,9 @@ export class MockTrysteroRoom extends EventEmitter {
     this.on('peer-leave', handler);
   }
 
-  makeAction(actionName: string): [
+  makeAction(
+    actionName: string
+  ): [
     send: (data: string, peerId?: string) => void,
     receive: (handler: (data: string, peerId: string) => void) => void
   ] {
@@ -269,7 +271,10 @@ export class TransportScenarios {
   /**
    * Connection with intermittent failures.
    */
-  static unreliableConnection(failureRate: number = 0.3, delayMs: number = 100): MockTransportOptions {
+  static unreliableConnection(
+    failureRate: number = 0.3,
+    delayMs: number = 100
+  ): MockTransportOptions {
     return { delay: delayMs, failureRate };
   }
 

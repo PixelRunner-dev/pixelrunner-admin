@@ -1,17 +1,17 @@
 <script setup lang="ts">
 const props = defineProps<{
-  outline?: boolean
-  dash?: boolean
-  soft?: boolean
-  type?: 'info' | 'success' | 'warning' | 'error'
-  info?: boolean
-  success?: boolean
-  warning?: boolean
-  error?: boolean
-  orientation?: 'vertical' | 'horizontal'
-  vertical?: boolean
-  horizontal?: boolean
-}>()
+  outline?: boolean;
+  dash?: boolean;
+  soft?: boolean;
+  type?: 'info' | 'success' | 'warning' | 'error';
+  info?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  error?: boolean;
+  orientation?: 'vertical' | 'horizontal';
+  vertical?: boolean;
+  horizontal?: boolean;
+}>();
 </script>
 
 <template>
@@ -28,7 +28,7 @@ const props = defineProps<{
       'alert-error': props.error || props.type === 'error',
 
       'alert-vertical': props.vertical || props.orientation === 'vertical',
-      'alert-horizontal': props.horizontal || props.orientation === 'horizontal',
+      'alert-horizontal': props.horizontal || props.orientation === 'horizontal'
     }"
   >
     <slot />

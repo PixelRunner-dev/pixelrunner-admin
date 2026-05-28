@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import { provide, ref } from 'vue'
-import Text from './Text.vue'
+import { provide, ref } from 'vue';
+import Text from './Text.vue';
 
 withDefaults(
   defineProps<{
-    is?: string
-    floating?: boolean
+    is?: string;
+    floating?: boolean;
 
-    input?: boolean
-    select?: boolean
-    toggle?: boolean
+    input?: boolean;
+    select?: boolean;
+    toggle?: boolean;
 
-    join?: boolean
-    color?: string
-    neutral?: boolean
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    info?: boolean
-    success?: boolean
-    warning?: boolean
-    error?: boolean
-    ghost?: boolean
-    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    join?: boolean;
+    color?: string;
+    neutral?: boolean;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    info?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    error?: boolean;
+    ghost?: boolean;
+    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
-    is: 'label',
-  },
-)
+    is: 'label'
+  }
+);
 
 // Provide label context for child inputs
-const checked = ref(false)
-provide('labelCtx', { checked })
+const checked = ref(false);
+provide('labelCtx', { checked });
 </script>
 
 <template>
@@ -89,10 +89,10 @@ provide('labelCtx', { checked })
         'toggle-lg': toggle && (size === 'lg' || lg),
         'toggle-md': toggle && (size === 'md' || md),
         'toggle-sm': toggle && (size === 'sm' || sm),
-        'toggle-xs': toggle && (size === 'xs' || xs),
+        'toggle-xs': toggle && (size === 'xs' || xs)
       },
       { label: !floating && !(input || toggle) },
-      { 'floating-label': floating },
+      { 'floating-label': floating }
     ]"
   >
     <slot />

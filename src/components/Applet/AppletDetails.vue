@@ -20,11 +20,12 @@ const {
 <template>
   <DFlex col :class="['component--applet-details', 'gap-2', { 'my-4': view === 'full-detail' }]">
     <hgroup>
-      <component :is="view === 'full-detail' ? 'h1' : 'h2'" :class="view === 'full-detail' ? 'text-5xl my-4' : 'text-lg'">
+      <component
+        :is="view === 'full-detail' ? 'h1' : 'h2'"
+        :class="view === 'full-detail' ? 'text-5xl my-4' : 'text-lg'"
+      >
         {{ name }}
-        <span
-          v-if="isOfficialApplet"
-          class="badge badge-primary badge-sm ml-2">
+        <span v-if="isOfficialApplet" class="badge badge-primary badge-sm ml-2">
           {{ $t('generic.official') }}
         </span>
       </component>

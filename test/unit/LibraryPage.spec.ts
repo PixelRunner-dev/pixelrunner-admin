@@ -172,7 +172,9 @@ describe('LibraryPage', () => {
     expect(wrapper.text()).toContain('categories failed');
     expect(wrapper.text()).toContain('starter failed');
 
-    for (const retryButton of wrapper.findAll('button').filter((button) => button.text() === 'Retry')) {
+    for (const retryButton of wrapper
+      .findAll('button')
+      .filter((button) => button.text() === 'Retry')) {
       await retryButton.trigger('click');
     }
 
@@ -187,9 +189,7 @@ describe('LibraryPage', () => {
 
     for (const option of libraryPageMock.queryOptions) {
       expect(option.canLoad()).toBe(false);
-      expect(option.skipContext()).toEqual(
-        expect.objectContaining({ hasAppletsApi: false })
-      );
+      expect(option.skipContext()).toEqual(expect.objectContaining({ hasAppletsApi: false }));
       await expect(option.load()).rejects.toThrow('Applets API not available');
     }
   });
@@ -205,10 +205,12 @@ describe('LibraryPage', () => {
   });
 });
 
-async function mountLibraryPage(options: {
-  hasAppletsApi?: boolean;
-  states?: Record<string, QueryState>;
-} = {}) {
+async function mountLibraryPage(
+  options: {
+    hasAppletsApi?: boolean;
+    states?: Record<string, QueryState>;
+  } = {}
+) {
   resetLibraryPageMocks(options);
   const { default: LibraryPage } = await import('@/pages/Library/LibraryPage.vue');
 
@@ -282,9 +284,7 @@ function createApplet(packageName: string, name: string): IFullApplet {
 }
 
 function buttonByText(wrapper: VueWrapper, text: string) {
-  const button = wrapper
-    .findAll('button')
-    .find((candidate) => candidate.text().includes(text));
+  const button = wrapper.findAll('button').find((candidate) => candidate.text().includes(text));
 
   if (!button) {
     throw new Error(`Button not found: ${text}`);
@@ -301,11 +301,13 @@ function libraryPageStubs() {
     },
     AppletCarousel: {
       props: ['applets', 'itemWidth'],
-      template: '<div>carousel:{{ applets.map((applet) => applet.packageName).join(",") }}:<slot v-bind="applets[0]" /></div>'
+      template:
+        '<div>carousel:{{ applets.map((applet) => applet.packageName).join(",") }}:<slot v-bind="applets[0]" /></div>'
     },
     CategoryList: {
       props: ['categories', 'isInteractive'],
-      template: '<div>categories:{{ categories.map((category) => category.key).join(",") }}:{{ isInteractive }}</div>'
+      template:
+        '<div>categories:{{ categories.map((category) => category.key).join(",") }}:{{ isInteractive }}</div>'
     },
     DebugSection: {
       props: ['data'],

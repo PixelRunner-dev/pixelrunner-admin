@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineProps<{
-  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-  xl?: boolean
-  lg?: boolean
-  md?: boolean
-  sm?: boolean
-  xs?: boolean
-}>()
+  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+  xl?: boolean;
+  lg?: boolean;
+  md?: boolean;
+  sm?: boolean;
+  xs?: boolean;
+}>();
 </script>
 
 <template>
@@ -17,7 +17,7 @@ defineProps<{
       'kbd-lg': lg || size === 'lg',
       'kbd-md': md || size === 'md',
       'kbd-sm': sm || size === 'sm',
-      'kbd-xs': xs || size === 'xs',
+      'kbd-xs': xs || size === 'xs'
     }"
   >
     <slot />

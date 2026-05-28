@@ -1,61 +1,61 @@
 <script setup lang="ts">
 defineOptions({
-  inheritAttrs: false,
-})
+  inheritAttrs: false
+});
 
 const props = withDefaults(
   defineProps<{
-    btn?: boolean
-    join?: boolean
-    close?: boolean
+    btn?: boolean;
+    join?: boolean;
+    close?: boolean;
 
-    color?: string
-    neutral?: boolean
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    info?: boolean
-    success?: boolean
-    warning?: boolean
-    error?: boolean
+    color?: string;
+    neutral?: boolean;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    info?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    error?: boolean;
 
-    ghost?: boolean
-    link?: boolean
-    glass?: boolean
-    outline?: boolean
-    dash?: boolean
-    soft?: boolean
+    ghost?: boolean;
+    link?: boolean;
+    glass?: boolean;
+    outline?: boolean;
+    dash?: boolean;
+    soft?: boolean;
 
-    shape?: 'circle' | 'square' | 'wide' | 'block'
-    circle?: boolean
-    square?: boolean
-    wide?: boolean
-    block?: boolean
+    shape?: 'circle' | 'square' | 'wide' | 'block';
+    circle?: boolean;
+    square?: boolean;
+    wide?: boolean;
+    block?: boolean;
 
-    noAnimation?: boolean
-    active?: boolean
+    noAnimation?: boolean;
+    active?: boolean;
 
-    size?: 'lg' | 'md' | 'sm' | 'xs' | 'xl'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    size?: 'lg' | 'md' | 'sm' | 'xs' | 'xl';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
-    btn: true,
-  },
-)
+    btn: true
+  }
+);
 
 function handleMouseDown(event: MouseEvent) {
-  if (!props.close) return
-  const fab = (event.currentTarget as HTMLElement)?.closest('.fab')
+  if (!props.close) return;
+  const fab = (event.currentTarget as HTMLElement)?.closest('.fab');
   // Only close if FAB is already open (has focus within)
   if (fab instanceof HTMLElement && fab.matches(':focus-within')) {
-    event.preventDefault()
-    fab.blur()
+    event.preventDefault();
+    fab.blur();
     if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur()
+      document.activeElement.blur();
     }
   }
 }
@@ -108,7 +108,7 @@ function handleMouseDown(event: MouseEvent) {
       'btn-link': link,
 
       'no-animation': noAnimation,
-      'btn-active': active,
+      'btn-active': active
     }"
     @mousedown="handleMouseDown"
   >

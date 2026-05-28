@@ -2,11 +2,7 @@
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-import {
-  Alert as DAlert,
-  Button as DButton,
-  Text as DText
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Alert as DAlert, Button as DButton, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 import SetLanguage from '@/components/SetLanguage.vue';
 import FeatureToggle from '@/components/FeatureToggle.vue';
@@ -69,11 +65,11 @@ useSyncedControllerSettings({
       </svg>
     </figure>
 
-    <DText is="h1" size="5xl" class="my-4">[Hello! - ¡Hola! - Bonjour! - Hallo! - こんにちわ！ - <span dir="rtl">مرحبًا!</span>]</DText>
+    <DText is="h1" size="5xl" class="my-4"
+      >[Hello! - ¡Hola! - Bonjour! - Hallo! - こんにちわ！ - <span dir="rtl">مرحبًا!</span>]</DText
+    >
 
-    <SetLanguage
-      v-model="language"
-      require-selection />
+    <SetLanguage v-model="language" require-selection />
 
     <Transition name="setup-fade">
       <section v-if="language">
@@ -102,15 +98,17 @@ useSyncedControllerSettings({
     </Transition>
 
     <FeatureToggle features="debug">
-      <DebugSection :data="{
-        isConnected,
-        lastError,
-        state,
-        language,
-        isMigratingDatabase,
-        setupError,
-        canContinue
-      }" />
+      <DebugSection
+        :data="{
+          isConnected,
+          lastError,
+          state,
+          language,
+          isMigratingDatabase,
+          setupError,
+          canContinue
+        }"
+      />
     </FeatureToggle>
   </main>
 </template>

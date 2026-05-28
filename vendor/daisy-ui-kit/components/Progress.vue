@@ -10,21 +10,21 @@ const {
   success,
   info,
   warning,
-  error,
+  error
 } = defineProps<{
-  value?: string | number
-  max?: string | number
+  value?: string | number;
+  max?: string | number;
 
-  color?: string
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  success?: boolean
-  info?: boolean
-  warning?: boolean
-  error?: boolean
-}>()
+  color?: string;
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  success?: boolean;
+  info?: boolean;
+  warning?: boolean;
+  error?: boolean;
+}>();
 </script>
 
 <template>
@@ -40,7 +40,7 @@ const {
       'progress-success': success || color === 'success',
       'progress-info': info || color === 'info',
       'progress-warning': warning || color === 'warning',
-      'progress-error': error || color === 'error',
+      'progress-error': error || color === 'error'
     }"
   />
 </template>

@@ -1,44 +1,44 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
+import { computed, inject } from 'vue';
 
 const props = defineProps<{
-  modelValue?: any
-  value: any
-  disabled?: boolean
-  themeController?: boolean
+  modelValue?: any;
+  value: any;
+  disabled?: boolean;
+  themeController?: boolean;
 
-  color?: string
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  success?: boolean
-  warning?: boolean
-  info?: boolean
-  error?: boolean
+  color?: string;
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  info?: boolean;
+  error?: boolean;
 
-  size?: string
-  xs?: boolean
-  sm?: boolean
-  md?: boolean
-  lg?: boolean
-  xl?: boolean
-}>()
-const emit = defineEmits(['update:modelValue'])
+  size?: string;
+  xs?: boolean;
+  sm?: boolean;
+  md?: boolean;
+  lg?: boolean;
+  xl?: boolean;
+}>();
+const emit = defineEmits(['update:modelValue']);
 
-const radioGroup: any = inject('radio-group', null)
+const radioGroup: any = inject('radio-group', null);
 
 const currentValue = computed({
   get() {
-    return radioGroup ? radioGroup.currentValue : props.modelValue
+    return radioGroup ? radioGroup.currentValue : props.modelValue;
   },
   set(val: any) {
     if (radioGroup) {
-      radioGroup.currentValue = val
+      radioGroup.currentValue = val;
     }
-    emit('update:modelValue', val)
-  },
-})
+    emit('update:modelValue', val);
+  }
+});
 </script>
 
 <template>
@@ -61,7 +61,7 @@ const currentValue = computed({
       'radio-md': props.md || props.size === 'md',
       'radio-lg': props.lg || props.size === 'lg',
       'radio-xl': props.xl || props.size === 'xl',
-      'theme-controller': props.themeController,
+      'theme-controller': props.themeController
     }"
     :disabled="props.disabled"
     :value="props.value"

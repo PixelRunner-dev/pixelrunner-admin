@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { MenuExpandState } from './MenuExpand.vue'
+import type { MenuExpandState } from './MenuExpand.vue';
 
-import { inject } from 'vue'
+import { inject } from 'vue';
 
-const menuExpandState = inject<MenuExpandState>('menuExpandState')
-const { id, isOpen, toggle } = menuExpandState || {}
+const menuExpandState = inject<MenuExpandState>('menuExpandState');
+const { id, isOpen, toggle } = menuExpandState || {};
 </script>
 
 <template>

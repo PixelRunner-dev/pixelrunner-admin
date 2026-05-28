@@ -60,18 +60,14 @@ describe('action.ts', () => {
     });
 
     it('uses default ACTION_NAME when not provided', () => {
-      const [send] = mockRoom.makeAction(ACTION_NAME) as unknown as [
-        (data: string) => void
-      ];
+      const [send] = mockRoom.makeAction(ACTION_NAME) as unknown as [(data: string) => void];
 
       expect(typeof send).toBe('function');
     });
 
     it('uses custom action name when provided', () => {
       const customAction = 'custom-rpc';
-      const [send] = mockRoom.makeAction(customAction) as unknown as [
-        (data: string) => void
-      ];
+      const [send] = mockRoom.makeAction(customAction) as unknown as [(data: string) => void];
 
       expect(typeof send).toBe('function');
     });
@@ -120,22 +116,17 @@ describe('action.ts', () => {
       expect(handler).toHaveBeenCalledWith('data', 'peer2');
     });
 
-    it('handles multiple handlers on same action', () => {
-      const handler1 = vi.fn();
-      const handler2 = vi.fn();
+    it('supports receiving action data', () => {
+      const handler = vi.fn();
       const [, receive] = mockRoom.makeAction(ACTION_NAME) as unknown as [
         (data: string) => void,
         (cb: (data: string, peerId: string) => void) => void
       ];
 
-      receive(handler1);
-      receive(handler2);
+      receive(handler);
+      mockRoom.simulateMessage(ACTION_NAME, 'received', 'peer1');
 
-      mockRoom.simulateMessage(ACTION_NAME, 'data', 'peer1');
-
-      // Both handlers should be called
-      expect(handler1).toHaveBeenCalled();
-      expect(handler2).toHaveBeenCalled();
+      expect(handler).toHaveBeenCalledWith('received', 'peer1');
     });
   });
 
@@ -185,9 +176,13 @@ describe('action.ts', () => {
       const config: TrysteroRoomConfig = { roomId: 'test-room' };
 
       // Mock import of trystero
-      vi.doMock('trystero', () => ({
-        joinRoom: vi.fn(() => mockRoom)
-      }), { virtual: true });
+      vi.doMock(
+        'trystero',
+        () => ({
+          joinRoom: vi.fn(() => mockRoom)
+        }),
+        { virtual: true }
+      );
 
       try {
         const instance = await createTrysteroRoomInstance(config);

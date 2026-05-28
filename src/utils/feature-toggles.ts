@@ -76,9 +76,7 @@ export function extractControllerVersionFromStatus(status: unknown): string | nu
       versions?: { controller?: unknown };
     };
   };
-  const controllerVersion =
-    response.versions?.controller ??
-    response.result?.versions?.controller;
+  const controllerVersion = response.versions?.controller ?? response.result?.versions?.controller;
 
   return typeof controllerVersion === 'string' && controllerVersion.length > 0
     ? controllerVersion

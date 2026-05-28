@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import LocationSearch, { type LocationResult } from '@/components/Form/SettingFields/LocationSearch.vue';
+import LocationSearch, {
+  type LocationResult
+} from '@/components/Form/SettingFields/LocationSearch.vue';
 
 interface Props {
   id: string;
@@ -21,7 +23,7 @@ const location = computed({
 </script>
 
 <template>
-<div class="component--field-location">
-  <LocationSearch :id v-model="location" :default="defaultValue" />
-</div>
+  <div class="component--field-location">
+    <LocationSearch :id v-model="location" :default="defaultValue" />
+  </div>
 </template>

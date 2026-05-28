@@ -1,71 +1,71 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, ref, watch } from 'vue';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string
-    placeholder?: string
-    type?: 'text' | 'phone' | 'email' | 'search'
-    rows?: number
-    autoExpand?: boolean
+    modelValue?: string;
+    placeholder?: string;
+    type?: 'text' | 'phone' | 'email' | 'search';
+    rows?: number;
+    autoExpand?: boolean;
 
-    color?: string
-    neutral?: boolean
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    info?: boolean
-    success?: boolean
-    warning?: boolean
-    error?: boolean
+    color?: string;
+    neutral?: boolean;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    info?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    error?: boolean;
 
-    ghost?: boolean
-    disabled?: boolean
-    validator?: boolean
+    ghost?: boolean;
+    disabled?: boolean;
+    validator?: boolean;
 
-    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
     type: 'text',
-    rows: 2,
-  },
-)
-defineEmits(['update:modelValue'])
+    rows: 2
+  }
+);
+defineEmits(['update:modelValue']);
 
-const textareaRef = ref<HTMLTextAreaElement | null>(null)
+const textareaRef = ref<HTMLTextAreaElement | null>(null);
 
-let minHeight = 0
+let minHeight = 0;
 
 function adjustHeight() {
-  if (!props.autoExpand || !textareaRef.value) return
-  const el = textareaRef.value
+  if (!props.autoExpand || !textareaRef.value) return;
+  const el = textareaRef.value;
 
   // Capture the initial rendered height as minimum (respects rows attribute)
   if (minHeight === 0) {
-    minHeight = el.offsetHeight
+    minHeight = el.offsetHeight;
   }
 
-  el.style.height = 'auto'
-  el.style.height = `${Math.max(el.scrollHeight, minHeight)}px`
+  el.style.height = 'auto';
+  el.style.height = `${Math.max(el.scrollHeight, minHeight)}px`;
 }
 
 watch(
   () => props.modelValue,
   () => {
-    nextTick(adjustHeight)
-  },
-)
+    nextTick(adjustHeight);
+  }
+);
 
 onMounted(() => {
   if (props.autoExpand) {
-    nextTick(adjustHeight)
+    nextTick(adjustHeight);
   }
-})
+});
 </script>
 
 <template>
@@ -94,12 +94,12 @@ onMounted(() => {
       'textarea-lg': props.lg || props.size === 'lg',
       'textarea-md': props.md || props.size === 'md',
       'textarea-sm': props.sm || props.size === 'sm',
-      'textarea-xs': props.xs || props.size === 'xs',
+      'textarea-xs': props.xs || props.size === 'xs'
     }"
     @input="
-      event => {
-        $emit('update:modelValue', (event.target as HTMLTextAreaElement).value)
-        adjustHeight()
+      (event) => {
+        $emit('update:modelValue', (event.target as HTMLTextAreaElement).value);
+        adjustHeight();
       }
     "
   />

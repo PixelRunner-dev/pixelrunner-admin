@@ -1,7 +1,3 @@
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-
-<template>
-[Not yet implemented]
-</template>
+<template>[Not yet implemented]</template>

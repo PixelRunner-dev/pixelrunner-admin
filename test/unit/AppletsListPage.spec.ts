@@ -97,10 +97,7 @@ describe('Applets ListPage', () => {
     expect(listPageMock.playlists.activePlaylist).toHaveBeenCalledOnce();
     expect(consoleLog).toHaveBeenCalledWith('[ListPage] Active playlist applet count:', 0);
     expect(consoleLog).toHaveBeenCalledWith('[ListPage] Active playlist applet count:', 2);
-    expect(consoleWarn).toHaveBeenCalledWith(
-      '[ListPage] Active playlist received but contains no applets'
-    );
-    expect(consoleWarn).toHaveBeenCalledOnce();
+    expect(consoleWarn).toHaveBeenCalledExactlyOnceWith('[ListPage] Active playlist received but contains no applets');
   });
 
   it('renders the playlist, library shortcut, debug state and touch feedback', async () => {
@@ -172,10 +169,9 @@ describe('Applets ListPage', () => {
     await wrapper.get('[data-testid="reorder-reverse"]').trigger('click');
     await flushPromises();
 
-    expect(listPageMock.playlists.updateOrder).toHaveBeenCalledOnce();
-    expect(listPageMock.playlists.updateOrder).toHaveBeenCalledWith(['uuid-weather', 'uuid-clock'], {
-      timeout: 5000
-    });
+    expect(listPageMock.playlists.updateOrder).toHaveBeenCalledExactlyOnceWith(['uuid-weather', 'uuid-clock'], {
+        timeout: 5000
+      });
     expect(wrapper.text()).toContain('order:weather,clock');
     expect(wrapper.text()).toContain('saving:true');
     expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
@@ -206,7 +202,8 @@ describe('Applets ListPage', () => {
       true,
       {
         hasCloseButton: true,
-        message: 'Cannot save playlist order: one or more applets are missing an installation UUID.',
+        message:
+          'Cannot save playlist order: one or more applets are missing an installation UUID.',
         type: 'error'
       },
       { delay: 500 }
@@ -260,10 +257,12 @@ describe('Applets ListPage', () => {
   });
 });
 
-async function mountListPage(options: {
-  hasPlaylistsApi?: boolean;
-  queryState?: QueryState;
-} = {}): Promise<VueWrapper> {
+async function mountListPage(
+  options: {
+    hasPlaylistsApi?: boolean;
+    queryState?: QueryState;
+  } = {}
+): Promise<VueWrapper> {
   resetListPageMocks(options);
   const { default: ListPage } = await import('@/pages/Applets/ListPage.vue');
 
@@ -281,10 +280,12 @@ async function mountListPage(options: {
   return wrapper;
 }
 
-function resetListPageMocks(options: {
-  hasPlaylistsApi?: boolean;
-  queryState?: QueryState;
-} = {}): void {
+function resetListPageMocks(
+  options: {
+    hasPlaylistsApi?: boolean;
+    queryState?: QueryState;
+  } = {}
+): void {
   vi.clearAllMocks();
   listPageMock.hasPlaylistsApi = options.hasPlaylistsApi ?? true;
   listPageMock.isConnected.value = true;

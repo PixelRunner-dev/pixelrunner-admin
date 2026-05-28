@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import Text from './Text.vue'
+import Text from './Text.vue';
 
 withDefaults(
   defineProps<{
-    is?: string
+    is?: string;
   }>(),
   {
-    is: 'div',
-  },
-)
+    is: 'div'
+  }
+);
 </script>
 
 <template>

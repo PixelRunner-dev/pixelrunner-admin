@@ -1,61 +1,61 @@
 <script setup lang="ts">
-import type { CalendarOptions } from '../composables/use-calendar'
-import { computed, ref, useId, watch } from 'vue'
-import { useCalendar } from '../composables/use-calendar'
+import type { CalendarOptions } from '../composables/use-calendar';
+import { computed, ref, useId, watch } from 'vue';
+import { useCalendar } from '../composables/use-calendar';
 
 const props = defineProps<{
   /** Bound value: Date object or ISO string or null */
-  modelValue?: Date | string | number | null
+  modelValue?: Date | string | number | null;
   /** Calendar options */
-  options?: CalendarOptions
+  options?: CalendarOptions;
   /** If true, default to today when no value provided */
-  autoDefault?: boolean
-  placeholder?: string
-  disabled?: boolean
-  validator?: boolean
-  join?: boolean
-  color?: string
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  info?: boolean
-  success?: boolean
-  warning?: boolean
-  error?: boolean
-  ghost?: boolean
-  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-  xl?: boolean
-  lg?: boolean
-  md?: boolean
-  sm?: boolean
-  xs?: boolean
-}>()
+  autoDefault?: boolean;
+  placeholder?: string;
+  disabled?: boolean;
+  validator?: boolean;
+  join?: boolean;
+  color?: string;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  info?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  error?: boolean;
+  ghost?: boolean;
+  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+  xl?: boolean;
+  lg?: boolean;
+  md?: boolean;
+  sm?: boolean;
+  xs?: boolean;
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', v: Date | null): void
-  (e: 'update:inputValue', v: string | null): void
-}>()
+  (e: 'update:modelValue', v: Date | null): void;
+  (e: 'update:inputValue', v: string | null): void;
+}>();
 
-const uniqueId = useId()
-const popoverId = `calendar-popover-${uniqueId}`
-const anchorName = `--calendar-anchor-${uniqueId}`
-const inputRef = ref<HTMLInputElement | null>(null)
-const popoverRef = ref<HTMLElement | null>(null)
+const uniqueId = useId();
+const popoverId = `calendar-popover-${uniqueId}`;
+const anchorName = `--calendar-anchor-${uniqueId}`;
+const inputRef = ref<HTMLInputElement | null>(null);
+const popoverRef = ref<HTMLElement | null>(null);
 
 // Parse date from various input types
 function parseDate(value: Date | string | number | null | undefined): Date | null {
-  if (!value) return null
-  if (value instanceof Date) return value
-  const d = new Date(value)
-  return Number.isNaN(d.getTime()) ? null : d
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
 }
 
 const initialDate = computed(() => {
-  const parsed = parseDate(props.modelValue)
-  if (parsed) return parsed
-  if (props.autoDefault) return new Date()
-  return null
-})
+  const parsed = parseDate(props.modelValue);
+  if (parsed) return parsed;
+  if (props.autoDefault) return new Date();
+  return null;
+});
 
 const {
   selectedDate,
@@ -69,44 +69,44 @@ const {
   nextMonth,
   selectDate,
   goToDate,
-  formatDate,
-} = useCalendar(initialDate.value, props.options)
+  formatDate
+} = useCalendar(initialDate.value, props.options);
 
 // Input display value
-const inputValue = computed(() => formatDate('D MMM YYYY'))
+const inputValue = computed(() => formatDate('D MMM YYYY'));
 
 // Sync selectedDate back to modelValue
-watch(selectedDate, date => {
-  emit('update:modelValue', date)
-  emit('update:inputValue', formatDate('D MMM YYYY'))
-})
+watch(selectedDate, (date) => {
+  emit('update:modelValue', date);
+  emit('update:inputValue', formatDate('D MMM YYYY'));
+});
 
 // Watch for external modelValue changes
 watch(
   () => props.modelValue,
-  newValue => {
-    const parsed = parseDate(newValue)
+  (newValue) => {
+    const parsed = parseDate(newValue);
     if (parsed && (!selectedDate.value || parsed.getTime() !== selectedDate.value.getTime())) {
-      selectDate(parsed)
-      goToDate(parsed)
+      selectDate(parsed);
+      goToDate(parsed);
     } else if (!newValue && selectedDate.value) {
-      selectedDate.value = null
+      selectedDate.value = null;
     }
-  },
-)
+  }
+);
 
 function handleDayClick(day: (typeof calendarDays.value)[0]) {
-  if (day.isDisabled) return
-  selectDate(day.date)
-  popoverRef.value?.hidePopover()
+  if (day.isDisabled) return;
+  selectDate(day.date);
+  popoverRef.value?.hidePopover();
 }
 
 function handleClick() {
   // Sync view to selected date when opening
   if (selectedDate.value) {
-    goToDate(selectedDate.value)
+    goToDate(selectedDate.value);
   }
-  popoverRef.value?.togglePopover()
+  popoverRef.value?.togglePopover();
 }
 </script>
 
@@ -135,7 +135,7 @@ function handleClick() {
         { 'input-md': props.md || props.size === 'md' },
         { 'input-sm': props.sm || props.size === 'sm' },
         { 'input-xs': props.xs || props.size === 'xs' },
-        { 'join-item': props.join },
+        { 'join-item': props.join }
       ]"
       :style="{ 'anchor-name': anchorName } as any"
       v-bind="$attrs"
@@ -159,11 +159,11 @@ function handleClick() {
               class="pika-select pika-select-month"
               :value="viewMonth"
               @change="
-                e => {
-                  const target = e.target as HTMLSelectElement
-                  const newMonth = parseInt(target.value, 10)
-                  const d = new Date(viewYear, newMonth, 1)
-                  goToDate(d)
+                (e) => {
+                  const target = e.target as HTMLSelectElement;
+                  const newMonth = parseInt(target.value, 10);
+                  const d = new Date(viewYear, newMonth, 1);
+                  goToDate(d);
                 }
               "
             >
@@ -180,7 +180,7 @@ function handleClick() {
                   'September',
                   'October',
                   'November',
-                  'December',
+                  'December'
                 ]"
                 :key="i"
                 :value="i"
@@ -195,15 +195,19 @@ function handleClick() {
               class="pika-select pika-select-year"
               :value="viewYear"
               @change="
-                e => {
-                  const target = e.target as HTMLSelectElement
-                  const newYear = parseInt(target.value, 10)
-                  const d = new Date(newYear, viewMonth, 1)
-                  goToDate(d)
+                (e) => {
+                  const target = e.target as HTMLSelectElement;
+                  const newYear = parseInt(target.value, 10);
+                  const d = new Date(newYear, viewMonth, 1);
+                  goToDate(d);
                 }
               "
             >
-              <option v-for="y in Array.from({ length: 21 }, (_, i) => viewYear - 10 + i)" :key="y" :value="y">
+              <option
+                v-for="y in Array.from({ length: 21 }, (_, i) => viewYear - 10 + i)"
+                :key="y"
+                :value="y"
+              >
                 {{ y }}
               </option>
             </select>
@@ -230,7 +234,8 @@ function handleClick() {
                   'is-today': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isToday,
                   'is-selected': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isSelected,
                   'is-disabled': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isDisabled,
-                  'is-outside-current-month': calendarDays[(week - 1) * 7 + dayIndex - 1]?.isOutsideMonth,
+                  'is-outside-current-month':
+                    calendarDays[(week - 1) * 7 + dayIndex - 1]?.isOutsideMonth
                 }"
                 :aria-selected="calendarDays[(week - 1) * 7 + dayIndex - 1]?.isSelected"
               >

@@ -107,9 +107,7 @@ describe('src/ws/api/client.ts', () => {
     });
 
     it('handles batched requests', async () => {
-      const requests = Array.from({ length: 10 }, (_, i) =>
-        mockRpc.request(`client.method${i}`)
-      );
+      const requests = Array.from({ length: 10 }, (_, i) => mockRpc.request(`client.method${i}`));
 
       const results = await Promise.all(requests);
       expect(results).toHaveLength(10);
@@ -124,7 +122,7 @@ describe('src/ws/api/client.ts', () => {
       await mockRpc.request('client.status');
       const req2 = mockRpc.getLastRequest();
 
-      expect(req2?.id).toBeGreaterThan((req1?.id ?? 0));
+      expect(req2?.id).toBeGreaterThan(req1?.id ?? 0);
     });
 
     it('maintains request context', async () => {

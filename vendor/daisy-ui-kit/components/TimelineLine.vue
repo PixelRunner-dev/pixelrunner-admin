@@ -1,15 +1,15 @@
 <script setup lang="ts">
 defineProps<{
-  color?: 'neutral' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error'
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  info?: boolean
-  success?: boolean
-  warning?: boolean
-  error?: boolean
-}>()
+  color?: 'neutral' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error';
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  info?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  error?: boolean;
+}>();
 </script>
 
 <template>
@@ -23,7 +23,7 @@ defineProps<{
       'bg-info': info || color === 'info',
       'bg-success': success || color === 'success',
       'bg-warning': warning || color === 'warning',
-      'bg-error': error || color === 'error',
+      'bg-error': error || color === 'error'
     }"
   />
 </template>

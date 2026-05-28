@@ -1,10 +1,10 @@
 <script setup>
-import { inject } from 'vue'
+import { inject } from 'vue';
 
-const id = inject('dropdownId')
-const isOpen = inject('isDropdownOpen')
-const buttonEl = inject('buttonEl')
-const isHover = inject('dropdownHover')
+const id = inject('dropdownId');
+const isOpen = inject('isDropdownOpen');
+const buttonEl = inject('buttonEl');
+const isHover = inject('dropdownHover');
 </script>
 
 <template>

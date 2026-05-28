@@ -1,9 +1,9 @@
 <script setup>
-import { inject } from 'vue'
+import { inject } from 'vue';
 
-const id = inject('dropdownId')
-const isOpen = inject('isDropdownOpen')
-const buttonEl = inject('buttonEl')
+const id = inject('dropdownId');
+const isOpen = inject('isDropdownOpen');
+const buttonEl = inject('buttonEl');
 </script>
 
 <template>

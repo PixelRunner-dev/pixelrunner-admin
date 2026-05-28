@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import {
-  Flex as DFlex,
-  Input as DInput
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Flex as DFlex, Input as DInput } from '(vendor)/daisy-ui-kit/index.ts';
 
 interface Props {
   id: string;
@@ -26,9 +23,9 @@ const dateTimeLocal = computed({
 </script>
 
 <template>
-<div class="component--field-datetime">
-  <DFlex>
-    <DInput v-model="dateTimeLocal" :id type="datetime-local" />
-  </DFlex>
-</div>
+  <div class="component--field-datetime">
+    <DFlex>
+      <DInput v-model="dateTimeLocal" :id type="datetime-local" />
+    </DFlex>
+  </div>
 </template>

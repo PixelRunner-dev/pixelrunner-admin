@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { useTimeoutFn } from '@vueuse/core'
-import { computed, ref, watch } from 'vue'
+import { useTimeoutFn } from '@vueuse/core';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
-  tick: number
-  modelValue?: number | string
-  numbered?: boolean
-  asButton?: boolean
-  isHidden?: boolean
-  disabled?: boolean
-}>()
-defineEmits(['update:modelValue'])
+  tick: number;
+  modelValue?: number | string;
+  numbered?: boolean;
+  asButton?: boolean;
+  isHidden?: boolean;
+  disabled?: boolean;
+}>();
+defineEmits(['update:modelValue']);
 
-const hasChanged = ref(false)
+const hasChanged = ref(false);
 const { isPending, start, stop } = useTimeoutFn(() => {
-  hasChanged.value = false
-}, 1000)
+  hasChanged.value = false;
+}, 1000);
 watch(
   () => props.modelValue,
-  val => {
+  (val) => {
     if (val) {
-      start()
-      hasChanged.value = true
+      start();
+      hasChanged.value = true;
     } else if (!isPending.value) {
-      stop()
+      stop();
     }
-  },
-)
+  }
+);
 
-// eslint-disable-next-line eqeqeq
-const isCurrent = computed(() => props.modelValue == props.tick)
+ 
+const isCurrent = computed(() => props.modelValue == props.tick);
 </script>
 
 <template>
@@ -42,7 +42,7 @@ const isCurrent = computed(() => props.modelValue == props.tick)
       'font-bold': isCurrent,
       'opacity-50': props.disabled,
       'cursor-pointer': !props.disabled,
-      'cursor-not-allowed': props.disabled,
+      'cursor-not-allowed': props.disabled
     }"
     :disabled="disabled"
     @click="$emit('update:modelValue', tick)"
@@ -58,7 +58,7 @@ const isCurrent = computed(() => props.modelValue == props.tick)
       'px-[2px]': !asButton,
       'opacity-50': disabled,
       'cursor-pointer': !disabled,
-      'cursor-not-allowed': disabled,
+      'cursor-not-allowed': disabled
     }"
     @click="$emit('update:modelValue', tick)"
   >

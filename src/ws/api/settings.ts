@@ -115,10 +115,9 @@ export class SettingsAPI extends ApiClientBase<IRpcClient> {
   }
 
   async getWifiStatus(): Promise<WifiStatus> {
-    const response = await this.request<SettingsActionResponse<WifiStatus>>(
-      'settings.action',
-      { method: 'getWifiStatus' }
-    );
+    const response = await this.request<SettingsActionResponse<WifiStatus>>('settings.action', {
+      method: 'getWifiStatus'
+    });
 
     return response.data;
   }
@@ -133,10 +132,10 @@ export class SettingsAPI extends ApiClientBase<IRpcClient> {
   }
 
   async configureWifi(input: WifiConfigureInput): Promise<WifiStatus> {
-    const response = await this.request<SettingsActionResponse<WifiStatus>>(
-      'settings.action',
-      { method: 'configureWifi', params: input }
-    );
+    const response = await this.request<SettingsActionResponse<WifiStatus>>('settings.action', {
+      method: 'configureWifi',
+      params: input
+    });
 
     return response.data;
   }

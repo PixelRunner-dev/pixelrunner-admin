@@ -1,86 +1,90 @@
 <script setup>
-import { useFocusTrap } from '@vueuse/integrations/useFocusTrap'
-import { computed, inject, nextTick, watch, watchEffect } from 'vue'
-import { getPositionArea, getPositionFallbacks } from '../utils/position-area'
+import { useFocusTrap } from '@vueuse/integrations/useFocusTrap';
+import { computed, inject, nextTick, watch, watchEffect } from 'vue';
+import { getPositionArea, getPositionFallbacks } from '../utils/position-area';
 
-const autoFocus = inject('dropdownAutoFocus')
-const id = inject('dropdownId')
-const isOpen = inject('isDropdownOpen')
-const contentEl = inject('contentEl')
-const placement = inject('dropdownPlacement')
-const closeOnClickOutside = inject('dropdownCloseOnClickOutside')
+const autoFocus = inject('dropdownAutoFocus');
+const id = inject('dropdownId');
+const isOpen = inject('isDropdownOpen');
+const contentEl = inject('contentEl');
+const placement = inject('dropdownPlacement');
+const closeOnClickOutside = inject('dropdownCloseOnClickOutside');
 
 // Dropdown Utils
-const toggle = inject('toggleDropdown')
-const open = inject('openDropdown')
-const close = inject('closeDropdown')
+const toggle = inject('toggleDropdown');
+const open = inject('openDropdown');
+const close = inject('closeDropdown');
 
 // Compute CSS position-area value based on placement
-const positionArea = computed(() => getPositionArea(placement.value))
-const positionFallbacks = computed(() => getPositionFallbacks(placement.value))
+const positionArea = computed(() => getPositionArea(placement.value));
+const positionFallbacks = computed(() => getPositionFallbacks(placement.value));
 
 // Determine popover mode: "auto" for light dismiss, "manual" to disable it
-const popoverMode = computed(() => (closeOnClickOutside.value ? 'auto' : 'manual'))
+const popoverMode = computed(() => (closeOnClickOutside.value ? 'auto' : 'manual'));
 
-let activate
-let deactivate
+let activate;
+let deactivate;
 
 if (autoFocus.value) {
-  const { activate: _activate, deactivate: _deactivate, hasFocus } = useFocusTrap(contentEl, { immediate: true })
-  activate = _activate
-  deactivate = _deactivate
+  const {
+    activate: _activate,
+    deactivate: _deactivate,
+    hasFocus
+  } = useFocusTrap(contentEl, { immediate: true });
+  activate = _activate;
+  deactivate = _deactivate;
 
   // hide the dropdown when the focus-trap drops focus (by pressing escape, for example)
   watchEffect(() => {
     if (!hasFocus.value) {
-      close()
+      close();
     }
-  })
+  });
 }
 
 // Sync popover state with isOpen model (for programmatic control)
 watch(
   isOpen,
-  async newValue => {
+  async (newValue) => {
     if (contentEl.value) {
       try {
         // Check current popover state
-        const isPopoverOpen = contentEl.value.matches(':popover-open')
+        const isPopoverOpen = contentEl.value.matches(':popover-open');
 
         // Only programmatically control if state differs
         if (newValue && !isPopoverOpen) {
-          contentEl.value.showPopover()
+          contentEl.value.showPopover();
           if (autoFocus.value) {
-            await nextTick()
-            activate?.()
+            await nextTick();
+            activate?.();
           }
         } else if (!newValue && isPopoverOpen) {
-          contentEl.value.hidePopover()
+          contentEl.value.hidePopover();
           if (autoFocus.value) {
-            deactivate?.()
-            await nextTick()
+            deactivate?.();
+            await nextTick();
           }
         }
       } catch (e) {
         // Silently handle if popover API is not supported
-        console.warn('Popover API not supported:', e)
+        console.warn('Popover API not supported:', e);
       }
     }
   },
-  { flush: 'post' },
-)
+  { flush: 'post' }
+);
 
 // Listen to popover toggle events to sync back to isOpen model
 function handleToggle(event) {
-  const newState = event.newState === 'open'
+  const newState = event.newState === 'open';
 
   if (isOpen.value !== newState) {
-    isOpen.value = newState
+    isOpen.value = newState;
 
     if (newState && autoFocus.value) {
-      nextTick().then(() => activate?.())
+      nextTick().then(() => activate?.());
     } else if (!newState && autoFocus.value) {
-      deactivate?.()
+      deactivate?.();
     }
   }
 }
@@ -98,7 +102,7 @@ function handleToggle(event) {
     :style="{
       'position-anchor': `--${id}`,
       'position-area': positionArea,
-      'position-try-fallbacks': positionFallbacks,
+      'position-try-fallbacks': positionFallbacks
     }"
     @toggle="handleToggle"
   >

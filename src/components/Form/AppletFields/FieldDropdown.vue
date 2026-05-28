@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import {
-  Flex as DFlex,
-  Select as DSelect
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Flex as DFlex, Select as DSelect } from '(vendor)/daisy-ui-kit/index.ts';
 
 interface Props {
   id: string;
@@ -30,9 +27,9 @@ const dropdown = computed({
 </script>
 
 <template>
-<div class="component--field-dropdown">
-  <DFlex>
-    <DSelect v-model="dropdown" :id :options="dropdownOptions" />
-  </DFlex>
-</div>
+  <div class="component--field-dropdown">
+    <DFlex>
+      <DSelect v-model="dropdown" :id :options="dropdownOptions" />
+    </DFlex>
+  </div>
 </template>

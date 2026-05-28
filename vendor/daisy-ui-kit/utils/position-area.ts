@@ -25,10 +25,10 @@ export function getPositionArea(placement: string): string {
     // Left positions
     left: 'center left', // centered to left
     'left-start': 'left span-bottom', // left, top edge aligned
-    'left-end': 'left span-top', // left, bottom edge aligned
-  }
+    'left-end': 'left span-top' // left, bottom edge aligned
+  };
 
-  return positionMap[placement] || 'bottom span-right'
+  return positionMap[placement] || 'bottom span-right';
 }
 
 /**
@@ -36,5 +36,5 @@ export function getPositionArea(placement: string): string {
  */
 export function getPositionFallbacks(_placement: string): string {
   // Simple flip fallbacks - flip to opposite side on same axis
-  return 'flip-block, flip-inline'
+  return 'flip-block, flip-inline';
 }

@@ -1,17 +1,17 @@
 <script setup lang="ts">
 const props = defineProps<{
-  glyph?: string
+  glyph?: string;
 
-  color?: string
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  info?: boolean
-  success?: boolean
-  warning?: boolean
-  error?: boolean
-}>()
+  color?: string;
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  info?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  error?: boolean;
+}>();
 </script>
 
 <template>
@@ -25,7 +25,7 @@ const props = defineProps<{
       'step-info': props.info || props.color === 'info',
       'step-success': props.success || props.color === 'success',
       'step-warning': props.warning || props.color === 'warning',
-      'step-error': props.error || props.color === 'error',
+      'step-error': props.error || props.color === 'error'
     }"
     :data-content="glyph"
   >

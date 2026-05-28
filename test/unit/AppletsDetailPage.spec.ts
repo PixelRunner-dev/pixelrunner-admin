@@ -133,7 +133,9 @@ describe('Applets DetailPage', () => {
     });
 
     expect(wrapper.text()).toContain('item:weather');
-    expect(wrapper.text()).toContain('image:/weather-installed.webp:Weather installed preview:true');
+    expect(wrapper.text()).toContain(
+      'image:/weather-installed.webp:Weather installed preview:true'
+    );
     expect(wrapper.text()).toContain('details:Weather:full-detail');
     expect(wrapper.text()).toContain('categories:weather,clock:true');
     expect(wrapper.text()).toContain('config:weather:weather-uuid');
@@ -236,12 +238,14 @@ describe('Applets DetailPage', () => {
   });
 });
 
-async function mountDetailPage(options: {
-  hasAppletsApi?: boolean;
-  isConnected?: boolean;
-  queryState?: QueryState;
-  routeParams?: RouteParams;
-} = {}): Promise<VueWrapper> {
+async function mountDetailPage(
+  options: {
+    hasAppletsApi?: boolean;
+    isConnected?: boolean;
+    queryState?: QueryState;
+    routeParams?: RouteParams;
+  } = {}
+): Promise<VueWrapper> {
   resetDetailPageMocks(options);
   const { default: DetailPage } = await import('@/pages/Applets/DetailPage.vue');
 

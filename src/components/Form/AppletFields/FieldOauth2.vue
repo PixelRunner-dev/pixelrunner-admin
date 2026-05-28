@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onUnmounted } from 'vue';
 
-import {
-  Button as DButton,
-  Flex as DFlex,
-  Text as DText
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Button as DButton, Flex as DFlex, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 interface Props {
   id: string;
@@ -154,7 +150,8 @@ async function startTrysteroOAuthFlow(): Promise<void> {
     console.log('Using Trystero-based OAuth flow');
 
     // For now, show an error that this feature is not yet implemented
-    errorMessage.value = 'OAuth via Trystero is not yet implemented. Please allow popups for this site.';
+    errorMessage.value =
+      'OAuth via Trystero is not yet implemented. Please allow popups for this site.';
     isLoading.value = false;
   } catch (err) {
     errorMessage.value = err instanceof Error ? err.message : 'Failed to start OAuth flow';
@@ -233,19 +230,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-<div class="component--field-oauth2">
-  <DFlex class="gap-2">
-    <DButton
-      :dash="isConnected"
-      :outline="!isConnected"
-      :loading="isLoading"
-      @click="isConnected ? disconnect() : startOAuthFlow()"
-    >
-      {{ isConnected ? 'Disconnect' : 'Connect' }}
-    </DButton>
-    <DText v-if="errorMessage" class="has-text-danger" size="sm">
-      {{ errorMessage }}
-    </DText>
-  </DFlex>
-</div>
+  <div class="component--field-oauth2">
+    <DFlex class="gap-2">
+      <DButton
+        :dash="isConnected"
+        :outline="!isConnected"
+        :loading="isLoading"
+        @click="isConnected ? disconnect() : startOAuthFlow()"
+      >
+        {{ isConnected ? 'Disconnect' : 'Connect' }}
+      </DButton>
+      <DText v-if="errorMessage" class="has-text-danger" size="sm">
+        {{ errorMessage }}
+      </DText>
+    </DFlex>
+  </div>
 </template>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useElementHover } from '@vueuse/core'
-import { onMounted, provide, ref, useId, watch  } from 'vue'
+import { useElementHover } from '@vueuse/core';
+import { onMounted, provide, ref, useId, watch } from 'vue';
 
 const props = withDefaults(
   defineProps<{
-    autoFocus?: boolean
+    autoFocus?: boolean;
 
     placement?:
       | 'top'
@@ -18,12 +18,12 @@ const props = withDefaults(
       | 'bottom-end'
       | 'left'
       | 'left-start'
-      | 'left-end'
+      | 'left-end';
 
-    hover?: boolean
-    delayEnter?: number
-    delayLeave?: number
-    closeOnClickOutside?: boolean
+    hover?: boolean;
+    delayEnter?: number;
+    delayLeave?: number;
+    closeOnClickOutside?: boolean;
   }>(),
   {
     autoFocus: false,
@@ -31,54 +31,54 @@ const props = withDefaults(
     hover: false,
     delayEnter: 0,
     delayLeave: 300,
-    closeOnClickOutside: true,
-  },
-)
+    closeOnClickOutside: true
+  }
+);
 
 // Dropdown Visibility
-const isOpen = defineModel('open', { default: false })
-provide('isDropdownOpen', isOpen)
+const isOpen = defineModel('open', { default: false });
+provide('isDropdownOpen', isOpen);
 
-const autoFocus = ref(props.autoFocus)
-provide('dropdownAutoFocus', autoFocus)
+const autoFocus = ref(props.autoFocus);
+provide('dropdownAutoFocus', autoFocus);
 
 // Use Nuxt's useId() for unique IDs
-const uniqueId = useId()
-const wrapperId = `dropdown-wrapper-${uniqueId}`
-const id = `dropdown-${uniqueId}`
-provide('dropdownId', id)
+const uniqueId = useId();
+const wrapperId = `dropdown-wrapper-${uniqueId}`;
+const id = `dropdown-${uniqueId}`;
+provide('dropdownId', id);
 
 // Provide placement for CSS anchor positioning
-provide('dropdownPlacement', ref(props.placement))
+provide('dropdownPlacement', ref(props.placement));
 
 // Provide closeOnClickOutside for popover mode selection
-provide('dropdownCloseOnClickOutside', ref(props.closeOnClickOutside))
+provide('dropdownCloseOnClickOutside', ref(props.closeOnClickOutside));
 
 // Provide hover mode for button behavior
-provide('dropdownHover', ref(props.hover))
+provide('dropdownHover', ref(props.hover));
 
 // References
-const buttonEl = ref(null)
-const contentEl = ref(null)
+const buttonEl = ref(null);
+const contentEl = ref(null);
 
-provide('buttonEl', buttonEl)
-provide('contentEl', contentEl)
+provide('buttonEl', buttonEl);
+provide('contentEl', contentEl);
 
 // Visibility Utils
 function toggle() {
-  isOpen.value = !isOpen.value
+  isOpen.value = !isOpen.value;
 }
 function open() {
-  isOpen.value = true
+  isOpen.value = true;
 }
 function close() {
-  isOpen.value = false
+  isOpen.value = false;
 }
-provide('toggleDropdown', toggle)
-provide('openDropdown', open)
-provide('closeDropdown', close)
+provide('toggleDropdown', toggle);
+provide('openDropdown', open);
+provide('closeDropdown', close);
 
-const dropdownWrapper = ref(null)
+const dropdownWrapper = ref(null);
 
 onMounted(() => {
   // Note: closeOnClickOutside is handled automatically by popover="auto"
@@ -88,14 +88,14 @@ onMounted(() => {
   if (props.hover) {
     const hover = useElementHover(dropdownWrapper, {
       delayLeave: props.delayLeave,
-      delayEnter: props.delayEnter,
-    })
+      delayEnter: props.delayEnter
+    });
 
-    watch(hover, newValue => {
-      isOpen.value = newValue
-    })
+    watch(hover, (newValue) => {
+      isOpen.value = newValue;
+    });
   }
-})
+});
 </script>
 
 <template>

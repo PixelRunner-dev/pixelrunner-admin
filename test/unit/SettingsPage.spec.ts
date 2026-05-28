@@ -252,7 +252,10 @@ describe('SettingsPage', () => {
   it('handles firmware, reboot, shutdown, and factory reset actions', async () => {
     vi.useFakeTimers();
     const alert = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValueOnce(true).mockReturnValueOnce(false);
+    const confirm = vi
+      .spyOn(window, 'confirm')
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false);
     const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     const wrapper = await mountSettingsPage();
 
@@ -324,9 +327,7 @@ function resetSettingsPageMocks(options: { firstTime?: boolean; connected?: bool
 }
 
 function buttonByText(wrapper: VueWrapper, text: string) {
-  const button = wrapper
-    .findAll('button')
-    .find((candidate) => candidate.text().includes(text));
+  const button = wrapper.findAll('button').find((candidate) => candidate.text().includes(text));
 
   if (!button) {
     throw new Error(`Button not found: ${text}`);
@@ -438,7 +439,8 @@ function settingsPageStubs() {
     DToggle: {
       props: ['disabled', 'modelValue'],
       emits: ['update:modelValue'],
-      template: '<button type="button" :disabled="disabled" @click="$emit(\'update:modelValue\', !modelValue)">toggle</button>'
+      template:
+        '<button type="button" :disabled="disabled" @click="$emit(\'update:modelValue\', !modelValue)">toggle</button>'
     },
     DebugSection: {
       props: ['data'],

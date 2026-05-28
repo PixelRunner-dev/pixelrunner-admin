@@ -1,9 +1,9 @@
 <script setup lang="ts">
 const props = defineProps<{
-  orientation?: 'horizontal' | 'vertical'
-  horizontal?: boolean
-  vertical?: boolean
-}>()
+  orientation?: 'horizontal' | 'vertical';
+  horizontal?: boolean;
+  vertical?: boolean;
+}>();
 </script>
 
 <template>
@@ -14,7 +14,7 @@ const props = defineProps<{
         props.orientation === 'horizontal' ||
         props.horizontal ||
         (!props.orientation && !props.vertical && !props.horizontal),
-      'flex-col': props.orientation === 'vertical' || props.vertical,
+      'flex-col': props.orientation === 'vertical' || props.vertical
     }"
   >
     <slot />

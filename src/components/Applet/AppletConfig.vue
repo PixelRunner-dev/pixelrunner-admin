@@ -88,15 +88,18 @@ const isAppletSchemaItem = (item: unknown): item is RawAppletSchemaItem => {
   );
 };
 
-const getAppliedConfigurationValue = (item: Pick<IAppletSchemaObject, 'id'>): AppletSchemaValue | undefined => {
+const getAppliedConfigurationValue = (
+  item: Pick<IAppletSchemaObject, 'id'>
+): AppletSchemaValue | undefined => {
   const appliedConfigurations = applet.installationDetails?.appliedConfigurations;
 
   if (!applet.isInstalled || !appliedConfigurations) {
     return undefined;
   }
 
-  const config = appliedConfigurations.config
-    ?? (appliedConfigurations as unknown as Record<string, AppletSchemaValue>);
+  const config =
+    appliedConfigurations.config ??
+    (appliedConfigurations as unknown as Record<string, AppletSchemaValue>);
 
   return config[item.id] as AppletSchemaValue | undefined;
 };
@@ -120,9 +123,9 @@ const normalizeSchemaItem = (item: RawAppletSchemaItem): AppletSchemaField => ({
   description: item.desc ?? item.description ?? '',
   default: normalizeDefaultValue(
     item,
-    getAppliedConfigurationValue(item)
-      ?? (item.type === 'location' ? controllerLocation.value : undefined)
-      ?? item.default
+    getAppliedConfigurationValue(item) ??
+      (item.type === 'location' ? controllerLocation.value : undefined) ??
+      item.default
   )
 });
 
@@ -194,7 +197,11 @@ const parseSchemaResponse = (schemaResponse: unknown): ParsedAppletSchema | null
     return null;
   }
 
-  const candidate = schemaResponse as { version?: unknown; notifications?: unknown; schema?: unknown };
+  const candidate = schemaResponse as {
+    version?: unknown;
+    notifications?: unknown;
+    schema?: unknown;
+  };
 
   return {
     version: typeof candidate.version === 'string' ? candidate.version : '1',
@@ -280,9 +287,7 @@ const handleSubmit = async () => {
       type: 'error',
       message: getErrorMessage(
         error,
-        isEditMode.value
-          ? 'Failed to save applet configuration.'
-          : 'Failed to install applet.'
+        isEditMode.value ? 'Failed to save applet configuration.' : 'Failed to install applet.'
       ),
       hasCloseButton: true
     });
@@ -325,48 +330,54 @@ watch(
 </script>
 
 <template>
-<div class="component--applet-config">
-  <form ref="formRef" @submit.prevent="handleSubmit">
-    <template v-if="isSchemaLoading">...</template>
-    <template v-else-if="schemaError">
-      {{ schemaError }}
-    </template>
-    <template v-else-if="hasSchemaItems">
-      <DDivider vertical />
-      <template v-for="item in schemaItems" :key="item.id">
-        <FormField :id="item.id" :label="item.name" :description="item.description">
-          <component
-            :is="getFieldComponent(item)"
-            v-bind="item"
-            :model-value="configurationValues[item.id]"
-            @update:model-value="setConfigurationValue(item.id, $event)"
-          />
-        </FormField>
+  <div class="component--applet-config">
+    <form ref="formRef" @submit.prevent="handleSubmit">
+      <template v-if="isSchemaLoading">...</template>
+      <template v-else-if="schemaError">
+        {{ schemaError }}
       </template>
-    </template>
+      <template v-else-if="hasSchemaItems">
+        <DDivider vertical />
+        <template v-for="item in schemaItems" :key="item.id">
+          <FormField :id="item.id" :label="item.name" :description="item.description">
+            <component
+              :is="getFieldComponent(item)"
+              v-bind="item"
+              :model-value="configurationValues[item.id]"
+              @update:model-value="setConfigurationValue(item.id, $event)"
+            />
+          </FormField>
+        </template>
+      </template>
 
-    <DDivider vertical />
+      <DDivider vertical />
 
-    <FeatureToggle features="appletScheduler">
-      <FieldSchedule />
-    </FeatureToggle>
+      <FeatureToggle features="appletScheduler">
+        <FieldSchedule />
+      </FeatureToggle>
 
-    <DFlex class="gap-4">
-      <DButton type="submit" primary wide :disabled="!isConnected || isBusy">
-        {{ isSubmitting ? $t('generic.loading') : (isEditMode ? $t('generic.save') : $t('generic.install')) }}
-      </DButton>
-      <DButton
-        type="button"
-        outline
-        dash
-        error
-        v-if="installedUuid"
-        :disabled="!isConnected || isBusy"
-        @click="handleRemove"
-      >
-        {{ isRemoving ? $t('generic.loading') : $t('generic.remove') }}
-      </DButton>
-    </DFlex>
-  </form>
-</div>
+      <DFlex class="gap-4">
+        <DButton type="submit" primary wide :disabled="!isConnected || isBusy">
+          {{
+            isSubmitting
+              ? $t('generic.loading')
+              : isEditMode
+                ? $t('generic.save')
+                : $t('generic.install')
+          }}
+        </DButton>
+        <DButton
+          type="button"
+          outline
+          dash
+          error
+          v-if="installedUuid"
+          :disabled="!isConnected || isBusy"
+          @click="handleRemove"
+        >
+          {{ isRemoving ? $t('generic.loading') : $t('generic.remove') }}
+        </DButton>
+      </DFlex>
+    </form>
+  </div>
 </template>

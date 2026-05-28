@@ -2,12 +2,12 @@
 const {
   orientation,
   vertical = false,
-  horizontal = false,
+  horizontal = false
 } = defineProps<{
-  orientation?: 'vertical' | 'horizontal'
-  vertical?: boolean
-  horizontal?: boolean
-}>()
+  orientation?: 'vertical' | 'horizontal';
+  vertical?: boolean;
+  horizontal?: boolean;
+}>();
 </script>
 
 <template>
@@ -15,7 +15,7 @@ const {
     class="steps"
     :class="{
       'steps-vertical': orientation === 'vertical' || vertical,
-      'steps-horizontal': orientation === 'horizontal' || horizontal,
+      'steps-horizontal': orientation === 'horizontal' || horizontal
     }"
   >
     <slot />

@@ -1,23 +1,23 @@
 <script setup>
-import { computed, inject, ref, watch } from 'vue'
-import { getPositionArea, getPositionFallbacks } from '../utils/position-area'
+import { computed, inject, ref, watch } from 'vue';
+import { getPositionArea, getPositionFallbacks } from '../utils/position-area';
 
-const id = inject('tooltipId', null)
-const isOpen = inject('isTooltipOpen', ref(false))
-const contentEl = inject('contentEl', ref(null))
-const placement = inject('tooltipPlacement', ref('bottom'))
-const color = inject('tooltipColor', ref(null))
+const id = inject('tooltipId', null);
+const isOpen = inject('isTooltipOpen', ref(false));
+const contentEl = inject('contentEl', ref(null));
+const placement = inject('tooltipPlacement', ref('bottom'));
+const color = inject('tooltipColor', ref(null));
 
 // Check if we're in popover mode (inside a Tooltip wrapper with context)
-const isPopoverMode = computed(() => id !== null)
+const isPopoverMode = computed(() => id !== null);
 
 // Compute CSS position-area value based on placement
-const positionArea = computed(() => getPositionArea(placement.value))
-const positionFallbacks = computed(() => getPositionFallbacks(placement.value))
+const positionArea = computed(() => getPositionArea(placement.value));
+const positionFallbacks = computed(() => getPositionFallbacks(placement.value));
 
 // Color classes for the tooltip
 const colorClass = computed(() => {
-  if (!color.value) return ''
+  if (!color.value) return '';
   const colorMap = {
     neutral: 'tooltip-neutral',
     primary: 'tooltip-primary',
@@ -26,37 +26,37 @@ const colorClass = computed(() => {
     info: 'tooltip-info',
     success: 'tooltip-success',
     warning: 'tooltip-warning',
-    error: 'tooltip-error',
-  }
-  return colorMap[color.value] || ''
-})
+    error: 'tooltip-error'
+  };
+  return colorMap[color.value] || '';
+});
 
 // Sync popover state with isOpen model
 watch(
   isOpen,
-  newValue => {
-    if (!isPopoverMode.value || !contentEl.value) return
+  (newValue) => {
+    if (!isPopoverMode.value || !contentEl.value) return;
 
     try {
-      const isPopoverOpen = contentEl.value.matches(':popover-open')
+      const isPopoverOpen = contentEl.value.matches(':popover-open');
 
       if (newValue && !isPopoverOpen) {
-        contentEl.value.showPopover()
+        contentEl.value.showPopover();
       } else if (!newValue && isPopoverOpen) {
-        contentEl.value.hidePopover()
+        contentEl.value.hidePopover();
       }
     } catch (e) {
-      console.warn('Popover API not supported:', e)
+      console.warn('Popover API not supported:', e);
     }
   },
-  { flush: 'post' },
-)
+  { flush: 'post' }
+);
 
 // Listen to popover toggle events to sync back to isOpen model
 function handleToggle(event) {
-  const newState = event.newState === 'open'
+  const newState = event.newState === 'open';
   if (isOpen.value !== newState) {
-    isOpen.value = newState
+    isOpen.value = newState;
   }
 }
 </script>
@@ -76,7 +76,7 @@ function handleToggle(event) {
     :style="{
       'position-anchor': `--${id}`,
       'position-area': positionArea,
-      'position-try-fallbacks': positionFallbacks,
+      'position-try-fallbacks': positionFallbacks
     }"
     @toggle="handleToggle"
   >

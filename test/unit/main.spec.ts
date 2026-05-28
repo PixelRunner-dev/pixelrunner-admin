@@ -276,10 +276,7 @@ describe('main bootstrap', () => {
       url: `ws://${window.location.hostname}:8765`
     });
     expect(latestClient().connect).toHaveBeenCalledOnce();
-    expect(consoleError).toHaveBeenCalledWith(
-      'Failed to connect to WebSocket:',
-      expect.any(Error)
-    );
+    expect(consoleError).toHaveBeenCalledWith('Failed to connect to WebSocket:', expect.any(Error));
   });
 
   it('falls back to the default theme and skips optional cookie side effects', async () => {
@@ -295,17 +292,19 @@ describe('main bootstrap', () => {
   });
 });
 
-async function importMain(options: {
-  accessMode?: string;
-  connectError?: Error;
-  cookieValues?: Record<string, string | null>;
-  fallbackRoomId?: string;
-  hasCookies?: Record<string, boolean>;
-  mockController?: boolean;
-  proxyRoomConfig?: Record<string, string> | null;
-  requiresProxy?: boolean;
-  search?: string;
-} = {}): Promise<void> {
+async function importMain(
+  options: {
+    accessMode?: string;
+    connectError?: Error;
+    cookieValues?: Record<string, string | null>;
+    fallbackRoomId?: string;
+    hasCookies?: Record<string, boolean>;
+    mockController?: boolean;
+    proxyRoomConfig?: Record<string, string> | null;
+    requiresProxy?: boolean;
+    search?: string;
+  } = {}
+): Promise<void> {
   resetMainMocks(options);
   vi.stubEnv('VITE_MOCK_CONTROLLER', options.mockController ? 'true' : 'false');
 

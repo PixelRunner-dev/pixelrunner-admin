@@ -1,16 +1,16 @@
 <script setup lang="ts">
 defineProps<{
-  zebra?: boolean
-  pinRows?: boolean
-  pinCols?: boolean
+  zebra?: boolean;
+  pinRows?: boolean;
+  pinCols?: boolean;
 
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  xs?: boolean
-  sm?: boolean
-  md?: boolean
-  lg?: boolean
-  xl?: boolean
-}>()
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  xs?: boolean;
+  sm?: boolean;
+  md?: boolean;
+  lg?: boolean;
+  xl?: boolean;
+}>();
 </script>
 
 <template>
@@ -24,7 +24,7 @@ defineProps<{
       sm || size === 'sm' ? 'table-sm' : '',
       md || size === 'md' || (!xs && !sm && !lg && !xl && !size) ? 'table-md' : '',
       lg || size === 'lg' ? 'table-lg' : '',
-      xl || size === 'xl' ? 'table-xl' : '',
+      xl || size === 'xl' ? 'table-xl' : ''
     ]"
   >
     <slot />

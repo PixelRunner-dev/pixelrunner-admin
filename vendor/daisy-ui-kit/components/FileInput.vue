@@ -1,27 +1,27 @@
 <script setup lang="ts">
 defineProps<{
-  join?: boolean
+  join?: boolean;
 
-  color?: string
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  info?: boolean
-  success?: boolean
-  warning?: boolean
-  error?: boolean
+  color?: string;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  info?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  error?: boolean;
 
-  ghost?: boolean
-  disabled?: boolean
+  ghost?: boolean;
+  disabled?: boolean;
 
-  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-  xl?: boolean
-  lg?: boolean
-  md?: boolean
-  sm?: boolean
-  xs?: boolean
-}>()
-defineEmits(['files'])
+  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+  xl?: boolean;
+  lg?: boolean;
+  md?: boolean;
+  sm?: boolean;
+  xs?: boolean;
+}>();
+defineEmits(['files']);
 </script>
 
 <template>
@@ -46,7 +46,7 @@ defineEmits(['files'])
       'file-input-sm': sm || size === 'sm',
       'file-input-xs': xs || size === 'xs',
 
-      'file-input-ghost': ghost,
+      'file-input-ghost': ghost
     }"
     @input="$emit('files', ($event.target as any).value)"
   />

@@ -165,7 +165,7 @@ describe('errors.ts', () => {
 
     it('handles JSON-RPC error codes', () => {
       const codes = ['-32700', '-32600', '-32601', '-32602', '-32603', '-32000'];
-      codes.forEach(code => {
+      codes.forEach((code) => {
         const error = new JsonRpcError('Error', code);
         expect(error.code).toBe(code);
       });
@@ -205,7 +205,7 @@ describe('errors.ts', () => {
         new JsonRpcError('rpc', '-32000')
       ];
 
-      errors.forEach(error => {
+      errors.forEach((error) => {
         expect(error).toBeInstanceOf(Error);
       });
     });

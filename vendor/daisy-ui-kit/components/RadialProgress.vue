@@ -1,19 +1,19 @@
 <script setup lang="ts">
 defineProps<{
-  value: number | string
-  size?: string
-  thickness?: string
+  value: number | string;
+  size?: string;
+  thickness?: string;
 
-  color?: string
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  info?: boolean
-  success?: boolean
-  warning?: boolean
-  error?: boolean
-}>()
+  color?: string;
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  info?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  error?: boolean;
+}>();
 </script>
 
 <template>
@@ -27,7 +27,7 @@ defineProps<{
       'text-info': info || color === 'info',
       'text-success': success || color === 'success',
       'text-warning': warning || color === 'warning',
-      'text-error': error || color === 'error',
+      'text-error': error || color === 'error'
     }"
     :style="`--value:${value}; --size:${size || '4rem'}; --thickness:${thickness || 'calc(var(--size) / 10)'};`"
   >

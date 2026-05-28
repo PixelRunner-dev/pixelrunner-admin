@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  modelValue?: any
-  disabled?: boolean
-  validator?: boolean
-  themeController?: boolean
+  modelValue?: any;
+  disabled?: boolean;
+  validator?: boolean;
+  themeController?: boolean;
 
-  color?: string
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  success?: boolean
-  info?: boolean
-  warning?: boolean
-  error?: boolean
+  color?: string;
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  success?: boolean;
+  info?: boolean;
+  warning?: boolean;
+  error?: boolean;
 
-  size?: string
-  xs?: boolean
-  sm?: boolean
-  md?: boolean
-  lg?: boolean
-  xl?: boolean
-}>()
-const emit = defineEmits(['update:modelValue'])
+  size?: string;
+  xs?: boolean;
+  sm?: boolean;
+  md?: boolean;
+  lg?: boolean;
+  xl?: boolean;
+}>();
+const emit = defineEmits(['update:modelValue']);
 
 const currentValue = computed({
   get: () => props.modelValue,
-  set: (val: string) => emit('update:modelValue', val),
-})
+  set: (val: string) => emit('update:modelValue', val)
+});
 </script>
 
 <template>
@@ -54,7 +54,7 @@ const currentValue = computed({
       'toggle-md': md || size === 'md',
       'toggle-lg': lg || size === 'lg',
       'toggle-xl': xl || size === 'xl',
-      'theme-controller': themeController,
+      'theme-controller': themeController
     }"
   />
 </template>

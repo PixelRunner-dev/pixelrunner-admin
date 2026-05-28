@@ -1,65 +1,65 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: number | [number, number]
-    min?: number
-    max?: number
-    step?: number
-    disabled?: boolean
+    modelValue?: number | [number, number];
+    min?: number;
+    max?: number;
+    step?: number;
+    disabled?: boolean;
 
-    color?: string
-    neutral?: boolean
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    success?: boolean
-    warning?: boolean
-    info?: boolean
-    error?: boolean
+    color?: string;
+    neutral?: boolean;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    info?: boolean;
+    error?: boolean;
 
-    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
     min: 0,
     max: 100,
-    step: 1,
-  },
-)
-const emit = defineEmits(['update:modelValue'])
+    step: 1
+  }
+);
+const emit = defineEmits(['update:modelValue']);
 
 const isRange = computed(() => {
-  return Array.isArray(props.modelValue)
-})
+  return Array.isArray(props.modelValue);
+});
 
 const singleValue = computed({
   get: () => (isRange.value ? 0 : (props.modelValue as number)),
-  set: val => emit('update:modelValue', Number(val)),
-})
+  set: (val) => emit('update:modelValue', Number(val))
+});
 
 const lowValue = computed({
   get: () => (isRange.value ? (props.modelValue as [number, number])[0] : 0),
-  set: val => {
-    const v = Number(val)
-    const high = (props.modelValue as [number, number])[1]
-    emit('update:modelValue', [Math.min(v, high), high])
-  },
-})
+  set: (val) => {
+    const v = Number(val);
+    const high = (props.modelValue as [number, number])[1];
+    emit('update:modelValue', [Math.min(v, high), high]);
+  }
+});
 
 const highValue = computed({
   get: () => (isRange.value ? (props.modelValue as [number, number])[1] : 100),
-  set: val => {
-    const v = Number(val)
-    const low = (props.modelValue as [number, number])[0]
-    emit('update:modelValue', [low, Math.max(v, low)])
-  },
-})
+  set: (val) => {
+    const v = Number(val);
+    const low = (props.modelValue as [number, number])[0];
+    emit('update:modelValue', [low, Math.max(v, low)]);
+  }
+});
 
 const rangeClasses = computed(() => ({
   'range-neutral': props.neutral || props.color === 'neutral',
@@ -74,19 +74,19 @@ const rangeClasses = computed(() => ({
   'range-lg': props.lg || props.size === 'lg',
   'range-md': props.md || props.size === 'md',
   'range-sm': props.sm || props.size === 'sm',
-  'range-xs': props.xs || props.size === 'xs',
-}))
+  'range-xs': props.xs || props.size === 'xs'
+}));
 
 // Calculate percentage positions for the filled track
 const lowPercent = computed(() => {
-  const range = props.max - props.min
-  return ((lowValue.value - props.min) / range) * 100
-})
+  const range = props.max - props.min;
+  return ((lowValue.value - props.min) / range) * 100;
+});
 
 const highPercent = computed(() => {
-  const range = props.max - props.min
-  return ((highValue.value - props.min) / range) * 100
-})
+  const range = props.max - props.min;
+  return ((highValue.value - props.min) / range) * 100;
+});
 </script>
 
 <template>
@@ -110,7 +110,7 @@ const highPercent = computed(() => {
       class="range-slider-fill"
       :style="{
         left: `calc(${lowPercent}% + (var(--range-thumb-size, 1.5rem) / 2) - (${lowPercent} * var(--range-thumb-size, 1.5rem) / 100))`,
-        width: `calc(${highPercent - lowPercent}% - (${highPercent - lowPercent} * var(--range-thumb-size, 1.5rem) / 100))`,
+        width: `calc(${highPercent - lowPercent}% - (${highPercent - lowPercent} * var(--range-thumb-size, 1.5rem) / 100))`
       }"
     />
     <input

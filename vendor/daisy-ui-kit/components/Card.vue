@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, h, mergeProps } from 'vue'
-import { resolveIs } from '../utils/resolve-is'
+import { computed, defineComponent, h, mergeProps } from 'vue';
+import { resolveIs } from '../utils/resolve-is';
 
 export default defineComponent({
   inheritAttrs: false,
@@ -15,7 +15,7 @@ export default defineComponent({
     lg: Boolean,
     md: Boolean,
     sm: Boolean,
-    xs: Boolean,
+    xs: Boolean
   },
   setup(props, { slots, attrs }) {
     const classes = computed(() => [
@@ -29,11 +29,12 @@ export default defineComponent({
         'card-lg': props.lg || props.size === 'lg',
         'card-md': props.md || props.size === 'md',
         'card-sm': props.sm || props.size === 'sm',
-        'card-xs': props.xs || props.size === 'xs',
-      },
-    ])
+        'card-xs': props.xs || props.size === 'xs'
+      }
+    ]);
 
-    return () => h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.())
-  },
-})
+    return () =>
+      h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.());
+  }
+});
 </script>

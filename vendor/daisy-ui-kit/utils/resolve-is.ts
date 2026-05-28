@@ -1,4 +1,4 @@
-import { resolveComponent } from 'vue'
+import { resolveComponent } from 'vue';
 
 /**
  * Resolves the `is` prop value for render functions.
@@ -9,11 +9,11 @@ import { resolveComponent } from 'vue'
  * Otherwise returns the string as-is (treated as HTML tag).
  */
 export function resolveIs(is: string | object): any {
-  if (typeof is !== 'string') return is
+  if (typeof is !== 'string') return is;
   // PascalCase — try to resolve as a registered component
   if (/^[A-Z]/.test(is)) {
-    const resolved = resolveComponent(is)
-    if (typeof resolved !== 'string') return resolved
+    const resolved = resolveComponent(is);
+    if (typeof resolved !== 'string') return resolved;
   }
-  return is
+  return is;
 }

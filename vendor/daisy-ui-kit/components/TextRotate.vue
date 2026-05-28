@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  is?: any
-  center?: boolean
-  duration?: number
-}>()
+  is?: any;
+  center?: boolean;
+  duration?: number;
+}>();
 
 const style = computed(() => {
   if (props.duration) {
-    return { animationDuration: `${props.duration}ms` }
+    return { animationDuration: `${props.duration}ms` };
   }
-  return undefined
-})
+  return undefined;
+});
 </script>
 
 <template>

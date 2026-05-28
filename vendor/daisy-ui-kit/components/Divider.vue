@@ -1,22 +1,22 @@
 <script setup lang="ts">
 defineProps<{
-  orientation?: 'horizontal' | 'vertical'
-  horizontal?: boolean
-  vertical?: boolean
-  align?: 'center' | 'start' | 'end'
-  center?: boolean
-  start?: boolean
-  end?: boolean
-  color?: 'neutral' | 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'info' | 'error'
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  success?: boolean
-  warning?: boolean
-  info?: boolean
-  error?: boolean
-}>()
+  orientation?: 'horizontal' | 'vertical';
+  horizontal?: boolean;
+  vertical?: boolean;
+  align?: 'center' | 'start' | 'end';
+  center?: boolean;
+  start?: boolean;
+  end?: boolean;
+  color?: 'neutral' | 'primary' | 'secondary' | 'accent' | 'success' | 'warning' | 'info' | 'error';
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  info?: boolean;
+  error?: boolean;
+}>();
 </script>
 
 <template>
@@ -35,7 +35,7 @@ defineProps<{
       'divider-error': color === 'error' || error,
       'divider-start': align === 'start' || start,
       'divider-center': align === 'center' || center,
-      'divider-end': align === 'end' || end,
+      'divider-end': align === 'end' || end
     }"
   >
     <slot />

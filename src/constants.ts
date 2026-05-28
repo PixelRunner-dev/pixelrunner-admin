@@ -254,7 +254,8 @@ export const FEATURE_TOGGLE_LIST = [
   },
   {
     key: 'appletZaps',
-    label: 'Enable functionality to zap the creator of the applet via NWC and shows total amount of zapped sats on AppletDetails',
+    label:
+      'Enable functionality to zap the creator of the applet via NWC and shows total amount of zapped sats on AppletDetails',
     isPermanent: false,
     sinceVersion: '0.0.1'
   }

@@ -14,7 +14,9 @@ describe('LibrarySection.vue', () => {
         items: []
       }
     });
-    expect(wrapper.find('.component--library-section').exists() || wrapper.text().includes('Test')).toBe(true);
+    expect(
+      wrapper.find('.component--library-section').exists() || wrapper.text().includes('Test')
+    ).toBe(true);
   });
 
   it('displays section title', () => {
@@ -64,50 +66,45 @@ describe('LibrarySection.vue', () => {
     expect(wrapper.props('title')).toBe('Custom Title');
   });
 
-  it('accepts items prop', () => {
-    const items = [{ id: '1', name: 'Test' }];
-
+  it('accepts payoff prop', () => {
     const wrapper = mount(LibrarySection, {
       props: {
         title: 'Section',
-        items
+        payoff: 'Subtitle text'
       }
     });
 
-    expect(wrapper.props('items')).toEqual(items);
+    expect(wrapper.props('payoff')).toBe('Subtitle text');
   });
 
   it('handles different item types', () => {
-    const items = [
-      { id: '1', name: 'Item', type: 'applet' },
-      { id: '2', name: 'Item 2', type: 'collection' }
-    ];
-
     const wrapper = mount(LibrarySection, {
       props: {
-        title: 'Mixed',
-        items
+        title: 'Mixed'
+      },
+      slots: {
+        default: '<div>Item 1</div><div>Item 2</div>'
       }
     });
 
-    expect(wrapper.props('items')).toHaveLength(2);
+    expect(wrapper.text()).toContain('Item');
   });
 
   it('updates when props change', async () => {
     const wrapper = mount(LibrarySection, {
       props: {
         title: 'Original',
-        items: []
+        payoff: 'Old'
       }
     });
 
     await wrapper.setProps({
       title: 'Updated',
-      items: [{ id: '1', name: 'New Item' }]
+      payoff: 'New'
     });
 
     expect(wrapper.props('title')).toBe('Updated');
-    expect(wrapper.props('items')).toHaveLength(1);
+    expect(wrapper.props('payoff')).toBe('New');
   });
 
   it('emits events on item interaction', () => {
@@ -121,69 +118,52 @@ describe('LibrarySection.vue', () => {
     expect(wrapper.exists()).toBe(true);
   });
 
-  it('supports item selection', () => {
-    const items = [
-      { id: '1', name: 'Item 1' },
-      { id: '2', name: 'Item 2' }
-    ];
-
+  it('supports slot content', () => {
     const wrapper = mount(LibrarySection, {
       props: {
-        title: 'Selectable',
-        items
+        title: 'Selectable'
+      },
+      slots: {
+        default: '<ul><li>Item 1</li><li>Item 2</li></ul>'
       }
     });
 
-    expect(wrapper.props('items')).toHaveLength(2);
+    expect(wrapper.text()).toContain('Item');
   });
 
-  it('handles scrolling for many items', () => {
-    const items = Array.from({ length: 100 }, (_, i) => ({
-      id: `${i}`,
-      name: `Item ${i}`
-    }));
+  it('handles large slot content', () => {
+    const items = Array.from({ length: 10 }, (_, i) => `<li>Item ${i}</li>`).join('');
 
     const wrapper = mount(LibrarySection, {
       props: {
-        title: 'Many Items',
-        items
+        title: 'Many Items'
+      },
+      slots: {
+        default: `<ul>${items}</ul>`
       }
     });
 
-    expect(wrapper.props('items')).toHaveLength(100);
+    expect(wrapper.text()).toContain('Item');
   });
 
-  it('filters items when search applied', () => {
+  it('renders title in heading', () => {
     const wrapper = mount(LibrarySection, {
       props: {
-        title: 'Filterable',
-        items: [
-          { id: '1', name: 'Apple' },
-          { id: '2', name: 'Banana' },
-          { id: '3', name: 'Apricot' }
-        ]
+        title: 'Filterable'
       }
     });
 
-    expect(wrapper.props('items')).toHaveLength(3);
+    expect(wrapper.find('h2').text()).toBe('Filterable');
   });
 
-  it('maintains item order', () => {
-    const items = [
-      { id: '3', name: 'Third' },
-      { id: '1', name: 'First' },
-      { id: '2', name: 'Second' }
-    ];
-
+  it('displays payoff when provided', () => {
     const wrapper = mount(LibrarySection, {
       props: {
         title: 'Ordered',
-        items
+        payoff: 'Subtitle here'
       }
     });
 
-    expect(wrapper.props('items')[0].id).toBe('3');
-    expect(wrapper.props('items')[1].id).toBe('1');
-    expect(wrapper.props('items')[2].id).toBe('2');
+    expect(wrapper.text()).toContain('Subtitle here');
   });
 });

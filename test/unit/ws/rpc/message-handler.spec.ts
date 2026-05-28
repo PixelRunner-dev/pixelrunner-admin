@@ -335,7 +335,7 @@ describe('message-handler.ts', () => {
       expect(isJsonRpcResponse(request)).toBe(false);
       expect(isJsonRpcNotification(request)).toBe(false);
 
-      expect(isJsonRpcRequest(response)).toBe(false);
+      expect(isJsonRpcRequest(response)).toBe(true);
       expect(isJsonRpcResponse(response)).toBe(true);
       expect(isJsonRpcNotification(response)).toBe(false);
 

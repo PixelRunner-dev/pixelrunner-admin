@@ -1,22 +1,22 @@
 <script setup lang="ts">
 defineProps<{
-  color?: 'neutral' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error'
-  neutral?: boolean
-  primary?: boolean
-  secondary?: boolean
-  accent?: boolean
-  info?: boolean
-  success?: boolean
-  warning?: boolean
-  error?: boolean
+  color?: 'neutral' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error';
+  neutral?: boolean;
+  primary?: boolean;
+  secondary?: boolean;
+  accent?: boolean;
+  info?: boolean;
+  success?: boolean;
+  warning?: boolean;
+  error?: boolean;
 
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  xs?: boolean
-  sm?: boolean
-  md?: boolean
-  lg?: boolean
-  xl?: boolean
-}>()
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  xs?: boolean;
+  sm?: boolean;
+  md?: boolean;
+  lg?: boolean;
+  xl?: boolean;
+}>();
 </script>
 
 <template>
@@ -35,7 +35,7 @@ defineProps<{
       sm || size === 'sm' ? 'status-sm' : '',
       md || size === 'md' || (!xs && !sm && !lg && !xl && !size) ? 'status-md' : '',
       lg || size === 'lg' ? 'status-lg' : '',
-      xl || size === 'xl' ? 'status-xl' : '',
+      xl || size === 'xl' ? 'status-xl' : ''
     ]"
   >
     <slot />

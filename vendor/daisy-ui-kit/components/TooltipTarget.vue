@@ -1,8 +1,8 @@
 <script setup>
-import { inject } from 'vue'
+import { inject } from 'vue';
 
-const id = inject('tooltipId')
-const targetEl = inject('targetEl')
+const id = inject('tooltipId');
+const targetEl = inject('targetEl');
 </script>
 
 <template>

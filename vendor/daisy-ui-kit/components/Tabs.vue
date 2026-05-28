@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import { provide } from 'vue'
+import { provide } from 'vue';
 
 const { name } = defineProps<{
-  is?: any
-  name: string
+  is?: any;
+  name: string;
 
-  variant?: 'box' | 'border' | 'lift'
-  box?: boolean
-  border?: boolean
-  lift?: boolean
+  variant?: 'box' | 'border' | 'lift';
+  box?: boolean;
+  border?: boolean;
+  lift?: boolean;
 
-  placement?: 'top' | 'bottom'
-  top?: boolean
-  bottom?: boolean
+  placement?: 'top' | 'bottom';
+  top?: boolean;
+  bottom?: boolean;
 
-  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-  xl?: boolean
-  lg?: boolean
-  md?: boolean
-  sm?: boolean
-  xs?: boolean
-}>()
+  size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+  xl?: boolean;
+  lg?: boolean;
+  md?: boolean;
+  sm?: boolean;
+  xs?: boolean;
+}>();
 
-const currentTab = defineModel<string>('currentTab')
+const currentTab = defineModel<string>('currentTab');
 
 const tabManager = {
   name,
   currentTab,
-  tabs: [],
-}
-provide('tabManager', tabManager)
+  tabs: []
+};
+provide('tabManager', tabManager);
 </script>
 
 <template>
@@ -45,7 +45,7 @@ provide('tabManager', tabManager)
       'tabs-lg': size === 'lg' || lg,
       'tabs-md': size === 'md' || md,
       'tabs-sm': size === 'sm' || sm,
-      'tabs-xs': size === 'xs' || xs,
+      'tabs-xs': size === 'xs' || xs
     }"
   >
     <slot />

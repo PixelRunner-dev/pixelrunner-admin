@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject } from 'vue'
+import { computed, inject } from 'vue';
 
 // Map input type to value type
 type InputType =
@@ -15,54 +15,54 @@ type InputType =
   | 'url'
   | 'search'
   | 'time'
-  | 'color'
+  | 'color';
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string | number | null
-    type?: InputType
-    placeholder?: string
-    disabled?: boolean
-    validator?: boolean
-    join?: boolean
-    color?: string
-    primary?: boolean
-    secondary?: boolean
-    accent?: boolean
-    info?: boolean
-    success?: boolean
-    warning?: boolean
-    error?: boolean
-    ghost?: boolean
-    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs'
-    xl?: boolean
-    lg?: boolean
-    md?: boolean
-    sm?: boolean
-    xs?: boolean
+    modelValue?: string | number | null;
+    type?: InputType;
+    placeholder?: string;
+    disabled?: boolean;
+    validator?: boolean;
+    join?: boolean;
+    color?: string;
+    primary?: boolean;
+    secondary?: boolean;
+    accent?: boolean;
+    info?: boolean;
+    success?: boolean;
+    warning?: boolean;
+    error?: boolean;
+    ghost?: boolean;
+    size?: 'xl' | 'lg' | 'md' | 'sm' | 'xs';
+    xl?: boolean;
+    lg?: boolean;
+    md?: boolean;
+    sm?: boolean;
+    xs?: boolean;
   }>(),
   {
-    type: 'text',
-  },
-)
-const emit = defineEmits(['update:modelValue'])
+    type: 'text'
+  }
+);
+const emit = defineEmits(['update:modelValue']);
 
 // For slot context
 function setValue(val: string | number | null) {
-  emit('update:modelValue', val)
+  emit('update:modelValue', val);
 }
 
-const labelCtx = inject('labelCtx', null)
+const labelCtx = inject('labelCtx', null);
 
 function handleInput(event: Event) {
-  let val: string | number | null
+  let val: string | number | null;
   if (props.type === 'number') {
-    const inputVal = (event.target as HTMLInputElement).value
-    val = inputVal === '' ? null : Number(inputVal)
+    const inputVal = (event.target as HTMLInputElement).value;
+    val = inputVal === '' ? null : Number(inputVal);
   } else {
-    val = (event.target as HTMLInputElement).value
+    val = (event.target as HTMLInputElement).value;
   }
-  emit('update:modelValue', val)
+  emit('update:modelValue', val);
 }
 
 const inputAttrs = computed(() => {
@@ -70,8 +70,8 @@ const inputAttrs = computed(() => {
     return {
       type: props.type,
       placeholder: props.placeholder,
-      disabled: props.disabled,
-    }
+      disabled: props.disabled
+    };
   }
   return {
     type: props.type,
@@ -93,14 +93,14 @@ const inputAttrs = computed(() => {
       { 'input-md': props.md || props.size === 'md' },
       { 'input-sm': props.sm || props.size === 'sm' },
       { 'input-xs': props.xs || props.size === 'xs' },
-      { 'join-item': props.join },
-    ],
-  }
-})
+      { 'join-item': props.join }
+    ]
+  };
+});
 const inputModel = computed({
   get: () => props.modelValue,
-  set: setValue,
-})
+  set: setValue
+});
 </script>
 
 <template>

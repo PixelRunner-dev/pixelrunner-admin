@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, nextTick, watch, /* TransitionGroup */ } from 'vue';
+import { computed, ref, nextTick, watch /* TransitionGroup */ } from 'vue';
 import { useDraggable } from 'vue-draggable-plus';
 
 import AppletItem from './AppletItem.vue';
@@ -121,7 +121,6 @@ if (isDragable) {
   });
 }
 
-
 /*
 
 list item actief class toevoegen
@@ -130,11 +129,7 @@ list item actief class toevoegen
 </script>
 
 <template>
-  <component
-    v-if="!isDragable"
-    :is="hasSorting ? 'ol' : 'ul'"
-    :class="[classes?.list]"
-  >
+  <component v-if="!isDragable" :is="hasSorting ? 'ol' : 'ul'" :class="[classes?.list]">
     <TransitionGroup type="transition" name="fade">
       <li
         v-for="applet in visibleApplets"
@@ -159,10 +154,7 @@ list item actief class toevoegen
       <li
         v-for="applet in pinnedApplets"
         :key="applet.installationDetails?.uuid || applet.packageName"
-        :class="[
-          'bg-base-200 rounded-box my-2 shadow-sm is-pinned',
-          classes?.item
-        ]"
+        :class="['bg-base-200 rounded-box my-2 shadow-sm is-pinned', classes?.item]"
       >
         <AppletItem :applet>
           <template #item="applet">
@@ -181,12 +173,11 @@ list item actief class toevoegen
         <li
           v-for="applet in draggableApplets"
           :key="applet.installationDetails?.uuid || applet.packageName"
-          :class="[
-            'bg-base-200 rounded-box my-2 shadow-sm draggable-applet',
-            classes?.item
-          ]"
+          :class="['bg-base-200 rounded-box my-2 shadow-sm draggable-applet', classes?.item]"
         >
-          <span class="self-center-safe w-3 h-6 inline-block overflow-hidden text-[10px] leading-[5px] tracking-[2px] text-base-content cursor-grab drag-indicator"></span>
+          <span
+            class="self-center-safe w-3 h-6 inline-block overflow-hidden text-[10px] leading-[5px] tracking-[2px] text-base-content cursor-grab drag-indicator"
+          ></span>
           <AppletItem :applet>
             <template #item="applet">
               <slot name="item" v-bind="applet" />
@@ -219,7 +210,7 @@ list item actief class toevoegen
   content: '....';
 }
 
-li[draggable=true] .drag-indicator {
+li[draggable='true'] .drag-indicator {
   cursor: grabbing;
 }
 

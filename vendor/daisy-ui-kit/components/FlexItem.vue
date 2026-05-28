@@ -1,6 +1,6 @@
 <script lang="ts">
-import { computed, defineComponent, h, mergeProps } from 'vue'
-import { resolveIs } from '../utils/resolve-is'
+import { computed, defineComponent, h, mergeProps } from 'vue';
+import { resolveIs } from '../utils/resolve-is';
 
 export default defineComponent({
   inheritAttrs: false,
@@ -26,7 +26,7 @@ export default defineComponent({
     // https://tailwindcss.com/docs/flex-wrap
     wrap: Boolean,
     nowrap: Boolean,
-    wrapReverse: Boolean,
+    wrapReverse: Boolean
   },
   setup(props, { slots, attrs }) {
     const classes = computed(() => [
@@ -48,11 +48,12 @@ export default defineComponent({
 
         'flex-wrap': props.wrap,
         'flex-wrap-reverse': props.wrapReverse,
-        'flex-nowrap': props.nowrap,
-      },
-    ])
+        'flex-nowrap': props.nowrap
+      }
+    ]);
 
-    return () => h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.())
-  },
-})
+    return () =>
+      h(resolveIs(props.is), mergeProps(attrs, { class: classes.value }), slots.default?.());
+  }
+});
 </script>
