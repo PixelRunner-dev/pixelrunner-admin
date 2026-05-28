@@ -1,0 +1,1 @@
+import{m as a,a as t,b as n,o}from"./index--rcrO7mR.js";const r={};function s(c,e){return o(),t("main",null,[...e[0]||(e[0]=[n("h1",null,"Update",-1)])])}const d=a(r,[["render",s]]);export{d as default};
