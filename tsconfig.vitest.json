@@ -2,6 +2,7 @@
   "extends": "./tsconfig.app.json",
   "include": [
     "test/unit/**/*",
+    "test/mocks/**/*",
     "env.d.ts",
     "src/adapters/CarouselAdapter.ts",
     "src/App.vue",
