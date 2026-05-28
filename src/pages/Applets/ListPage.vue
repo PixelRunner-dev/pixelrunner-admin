@@ -55,7 +55,6 @@ const isSavingOrder = ref(false);
 const saveOrderError = ref<string | null>(null);
 const SAVE_ORDER_TIMEOUT_MS = 5000;
 const NOTIFICATION_DELAY_MS = 500;
-let saveOrderRequestId = 0;
 
 function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
   return applet.installationDetails?.uuid ?? null;
@@ -87,38 +86,23 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
 
   isSavingOrder.value = true;
   saveOrderError.value = null;
-  const requestId = ++saveOrderRequestId;
 
   try {
     await playlists.updateOrder(appletUuids as UUID[], {
       timeout: SAVE_ORDER_TIMEOUT_MS
     });
 
-    if (requestId !== saveOrderRequestId) {
-      return;
-    }
-
     activePlaylist.value = {
       ...activePlaylist.value,
       dateModified: new Date()
     };
   } catch (error) {
-    if (requestId !== saveOrderRequestId) {
-      return;
-    }
-
     const caughtErrorMessage = getErrorMessage(error);
-
-    if (requestId !== saveOrderRequestId) {
-      return;
-    }
 
     activePlaylist.value = previousPlaylist;
     saveOrderError.value = caughtErrorMessage;
   } finally {
-    if (requestId === saveOrderRequestId) {
-      isSavingOrder.value = false;
-    }
+    isSavingOrder.value = false;
   }
 }
 
