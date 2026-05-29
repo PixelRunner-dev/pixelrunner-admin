@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted } from 'vue';
 
-import { FALLBACK_IMAGE_SRC } from '@/constants.ts';
-
 import type { IAppletImage } from 'pixelrunner-shared';
 
 interface Props extends IAppletImage {
@@ -13,7 +11,6 @@ const TIMESTAMP_DEVIATION = 100000;
 const props = withDefaults(defineProps<Props>(), {
   showFrame: false
 });
-const hasImageError = ref(false);
 
 const isBase64 = computed(() => props.src.startsWith('data:image/'));
 
@@ -24,13 +21,8 @@ const timestamp = ref(
 );
 
 const imgSrc = computed(() => {
-  if (hasImageError.value) return FALLBACK_IMAGE_SRC;
   return isBase64.value ? props.src : `${props.src}?v=${timestamp.value}`;
 });
-
-function handleImageError() {
-  hasImageError.value = true;
-}
 
 onMounted(() => {
   setInterval(() => {
@@ -44,13 +36,6 @@ watch(
     timestamp.value = newDateModified
       ? Math.floor(newDateModified.getTime() / TIMESTAMP_DEVIATION)
       : Math.floor(Date.now() / TIMESTAMP_DEVIATION);
-  }
-);
-
-watch(
-  () => props.src,
-  () => {
-    hasImageError.value = false;
   }
 );
 </script>
@@ -68,7 +53,6 @@ watch(
             loading="lazy"
             :data-created="props.dateCreated"
             :data-modified="props.dateModified"
-            @error="handleImageError"
           />
         </div>
       </div>
@@ -83,7 +67,6 @@ watch(
       loading="lazy"
       :data-created="props.dateCreated"
       :data-modified="props.dateModified"
-      @error="handleImageError"
     />
   </div>
 </template>

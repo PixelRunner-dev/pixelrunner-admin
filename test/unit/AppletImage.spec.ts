@@ -43,21 +43,6 @@ describe('AppletImage', () => {
     expect(wrapper.get('img').attributes('src')).toBe(src);
   });
 
-  it('shows the placeholder image when the WebP asset is still pending', async () => {
-    const wrapper = mount(AppletImage, {
-      props: {
-        src: '/applets/pending.webp',
-        alt: 'Pending applet',
-        dateCreated: new Date('2026-01-01T00:00:00.000Z')
-      }
-    });
-    const image = wrapper.get('img');
-
-    await image.trigger('error');
-
-    expect(wrapper.get('img').attributes('src')).toBe('/broken-image.webp');
-  });
-
   it('refreshes timestamp without dateModified and resets error state when src changes', async () => {
     const wrapper = mount(AppletImage, {
       props: {
@@ -68,9 +53,6 @@ describe('AppletImage', () => {
     });
 
     expect(wrapper.get('img').attributes('src')).toBe('/applets/pending.webp?v=17673984');
-
-    await wrapper.get('img').trigger('error');
-    expect(wrapper.get('img').attributes('src')).toBe('/broken-image.webp');
 
     await wrapper.setProps({ src: '/applets/ready.webp' });
     expect(wrapper.get('img').attributes('src')).toBe('/applets/ready.webp?v=17673984');
