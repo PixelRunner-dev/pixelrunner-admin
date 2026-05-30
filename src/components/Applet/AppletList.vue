@@ -27,7 +27,7 @@ const {
   classes,
   sort,
   order,
-  limit = 0,
+  limit = 99,
   offset = 0,
   isDragable = false,
   isReorderPending = false
