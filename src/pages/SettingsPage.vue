@@ -35,6 +35,7 @@ import {
   type SyncedControllerSettingBinding
 } from '@/composables/useSyncedControllerSettings.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
+import { useNotifications } from '@/composables/useNotifications.ts';
 import { useClientApi } from '@/ws/index.ts';
 import type { WifiConfigureInput, WifiScanNetwork, WifiStatus } from '@/ws/api/settings.ts';
 import {
@@ -54,6 +55,7 @@ import {
 
 // Get WebSocket functionality
 const { device, isConnected, lastError, settings, state } = useClientApi();
+const notificationState = useNotifications();
 const route = useRoute();
 const isFirstTimeSetup = computed(() => route.query['first-time'] === '1');
 
@@ -96,24 +98,51 @@ function doFactoryReset() {
   return false;
 }
 
+const rebootIsPending = ref(false);
+const shutdownIsPending = ref(false);
+
 async function doReboot() {
-  alert(t('settingsPage.reboot.alert'));
-  // setTimeout(() => {
-  //   console.log('Rebooting device');
-  // }, 3000);
+  if (rebootIsPending.value || !device) return;
+  rebootIsPending.value = true;
+  const inProgressMsg = t('settingsPage.actions.reboot.inProgress');
+  notificationState?.addNotification({ type: 'info', message: inProgressMsg });
   try {
-    const result = await device?.reboot();
-    console.log('reboot result', result);
+    await device.reboot();
+    notificationState?.removeNotification(inProgressMsg);
+    notificationState?.addNotification({
+      type: 'success',
+      message: t('settingsPage.actions.reboot.success'),
+      timeoutToClose: 10000
+    });
   } catch (error) {
-    console.error('Reboot failed:', error);
-  }
+    notificationState?.removeNotification(inProgressMsg);
+    const msg = error instanceof Error ? error.message : t('settingsPage.actions.reboot.failure');
+    notificationState?.addNotification({ type: 'error', message: msg, hasCloseButton: true });
+  } finally {
+    rebootIsPending.value = false;
+}
 }
 
-function doShutdown() {
-  alert(t('settingsPage.shutdown.alert'));
-  setTimeout(() => {
-    console.log('Shutdown device');
-  }, 3000);
+async function doShutdown() {
+  if (shutdownIsPending.value || !device) return;
+  shutdownIsPending.value = true;
+  const inProgressMsg = t('settingsPage.actions.shutdown.inProgress');
+  notificationState?.addNotification({ type: 'info', message: inProgressMsg });
+  try {
+    await device.shutdown();
+    notificationState?.removeNotification(inProgressMsg);
+    notificationState?.addNotification({
+      type: 'success',
+      message: t('settingsPage.actions.shutdown.success'),
+      timeoutToClose: 10000
+    });
+  } catch (error) {
+    notificationState?.removeNotification(inProgressMsg);
+    const msg = error instanceof Error ? error.message : t('settingsPage.actions.shutdown.failure');
+    notificationState?.addNotification({ type: 'error', message: msg, hasCloseButton: true });
+  } finally {
+    shutdownIsPending.value = false;
+  }
 }
 
 function deviceNameOnBeforeInput(e: InputEvent) {
@@ -1106,6 +1135,7 @@ watchEffect(() => {
           btn
           secondary
           class="w-full"
+          :disabled="shutdownIsPending"
           @click="doShutdown"
           @touchstart="() => vibrateDevice(4)"
           @touchend="() => vibrateDevice(1)"
@@ -1117,6 +1147,7 @@ watchEffect(() => {
           btn
           accent
           class="w-full"
+          :disabled="rebootIsPending"
           @click="doReboot"
           @touchstart="() => vibrateDevice(4)"
           @touchend="() => vibrateDevice(1)"

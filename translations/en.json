@@ -295,11 +295,15 @@
       },
       "shutdown": {
         "button": "Shutdown Device",
-        "alert": "Device is shutting down..."
+        "inProgress": "Shutting down device...",
+        "success": "Device is shutting down",
+        "failure": "Failed to shut down device"
       },
       "reboot": {
         "button": "Reboot Device",
-        "alert": "Device is rebooting..."
+        "inProgress": "Rebooting device...",
+        "success": "Device is rebooting",
+        "failure": "Failed to reboot device"
       },
       "factoryReset": {
         "button": "Factory Reset",

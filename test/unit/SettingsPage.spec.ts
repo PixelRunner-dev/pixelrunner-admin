@@ -9,6 +9,13 @@ import { vibrateDevice } from '@/utils/generic.ts';
 
 import type { WifiScanNetwork, WifiStatus } from '@/ws/api/settings.ts';
 
+const notificationsMock = vi.hoisted(() => ({
+  addNotification: vi.fn(),
+  removeNotification: vi.fn(),
+  setNotification: vi.fn(),
+  notifications: { __v_isRef: true, value: [] as unknown[] }
+}));
+
 const settingsPageMock = vi.hoisted(() => ({
   route: {
     name: 'settings',
@@ -16,6 +23,7 @@ const settingsPageMock = vi.hoisted(() => ({
   },
   device: {
     reboot: vi.fn(),
+    shutdown: vi.fn(),
     status: vi.fn()
   },
   settings: {
@@ -27,6 +35,11 @@ const settingsPageMock = vi.hoisted(() => ({
   isConnected: { __v_isRef: true, value: true },
   lastError: { __v_isRef: true, value: null as Error | null },
   state: { __v_isRef: true, value: 'connected' }
+}));
+
+vi.mock('@/composables/useNotifications.ts', () => ({
+  useNotifications: () => notificationsMock,
+  provideNotifications: vi.fn(() => notificationsMock)
 }));
 
 vi.mock('@/ws/index.ts', () => ({
@@ -110,6 +123,7 @@ describe('SettingsPage', () => {
     document.documentElement.removeAttribute('data-theme');
     vi.useRealTimers();
     vi.restoreAllMocks();
+    vi.clearAllMocks();
   });
 
   it('wires controller settings, feature status query, and initial WiFi loads', async () => {
@@ -249,9 +263,7 @@ describe('SettingsPage', () => {
     expect(vibrateDevice).toHaveBeenCalledWith(1);
   });
 
-  it('handles firmware, reboot, shutdown, and factory reset actions', async () => {
-    vi.useFakeTimers();
-    const alert = vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+  it('handles firmware and factory reset actions', async () => {
     const confirm = vi
       .spyOn(window, 'confirm')
       .mockReturnValueOnce(true)
@@ -260,36 +272,134 @@ describe('SettingsPage', () => {
     const wrapper = await mountSettingsPage();
 
     await buttonByText(wrapper, 't:settingsPage.actions.update.button').trigger('click');
-    await buttonByText(wrapper, 't:settingsPage.actions.reboot.button').trigger('click');
-    await buttonByText(wrapper, 't:settingsPage.actions.shutdown.button').trigger('click');
     await buttonByText(wrapper, 't:settingsPage.actions.factoryReset.button').trigger('click');
     await buttonByText(wrapper, 't:settingsPage.actions.factoryReset.button').trigger('click');
     await flushPromises();
-    vi.advanceTimersByTime(3_000);
 
     expect(settingsPageMock.device.status).toHaveBeenCalledOnce();
-    expect(settingsPageMock.device.reboot).toHaveBeenCalledOnce();
-    expect(alert).toHaveBeenCalledWith('i18n:settingsPage.reboot.alert');
-    expect(alert).toHaveBeenCalledWith('i18n:settingsPage.shutdown.alert');
     expect(confirm).toHaveBeenCalledWith('i18n:settingsPage.factoryReset.confirm');
     expect(consoleLog).toHaveBeenCalledWith('reset device');
     expect(consoleLog).toHaveBeenCalledWith('reset device canceled');
-    expect(consoleLog).toHaveBeenCalledWith('Shutdown device');
   });
 
-  it('logs device action failures without throwing from the page', async () => {
-    settingsPageMock.device.status.mockRejectedValueOnce(new Error('status failed'));
-    settingsPageMock.device.reboot.mockRejectedValueOnce(new Error('reboot failed'));
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+  it('reboot calls device.reboot() and shows translated notifications', async () => {
     const wrapper = await mountSettingsPage();
 
-    await buttonByText(wrapper, 't:settingsPage.actions.update.button').trigger('click');
     await buttonByText(wrapper, 't:settingsPage.actions.reboot.button').trigger('click');
     await flushPromises();
 
-    expect(consoleError).toHaveBeenCalledWith('Failed to get device status:', expect.any(Error));
-    expect(consoleError).toHaveBeenCalledWith('Reboot failed:', expect.any(Error));
+    expect(settingsPageMock.device.reboot).toHaveBeenCalledOnce();
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
+      type: 'info',
+      message: 'i18n:settingsPage.actions.reboot.inProgress'
+    });
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
+      'i18n:settingsPage.actions.reboot.inProgress'
+    );
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'i18n:settingsPage.actions.reboot.success',
+      timeoutToClose: 10000
+    });
+  });
+
+  it('shutdown calls device.shutdown() and shows translated notifications', async () => {
+    const wrapper = await mountSettingsPage();
+
+    await buttonByText(wrapper, 't:settingsPage.actions.shutdown.button').trigger('click');
+    await flushPromises();
+
+    expect(settingsPageMock.device.shutdown).toHaveBeenCalledOnce();
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
+      type: 'info',
+      message: 'i18n:settingsPage.actions.shutdown.inProgress'
+    });
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
+      'i18n:settingsPage.actions.shutdown.inProgress'
+    );
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'i18n:settingsPage.actions.shutdown.success',
+      timeoutToClose: 10000
+    });
+  });
+
+  it('shows error notification on reboot failure', async () => {
+    settingsPageMock.device.reboot.mockRejectedValueOnce(new Error('reboot failed'));
+    const wrapper = await mountSettingsPage();
+
+    await buttonByText(wrapper, 't:settingsPage.actions.reboot.button').trigger('click');
+    await flushPromises();
+
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
+      'i18n:settingsPage.actions.reboot.inProgress'
+    );
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'reboot failed',
+      hasCloseButton: true
+    });
+  });
+
+  it('shows error notification on shutdown failure', async () => {
+    settingsPageMock.device.shutdown.mockRejectedValueOnce(new Error('shutdown failed'));
+    const wrapper = await mountSettingsPage();
+
+    await buttonByText(wrapper, 't:settingsPage.actions.shutdown.button').trigger('click');
+    await flushPromises();
+
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
+      'i18n:settingsPage.actions.shutdown.inProgress'
+    );
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'shutdown failed',
+      hasCloseButton: true
+    });
+  });
+
+  it('reboot button is disabled while pending and ignores duplicate clicks', async () => {
+    let resolveReboot!: () => void;
+    settingsPageMock.device.reboot.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        resolveReboot = resolve;
+      })
+    );
+    const wrapper = await mountSettingsPage();
+    const rebootBtn = buttonByText(wrapper, 't:settingsPage.actions.reboot.button');
+
+    await rebootBtn.trigger('click');
+
+    expect((rebootBtn.element as HTMLButtonElement).disabled).toBe(true);
+
+    await rebootBtn.trigger('click');
+    resolveReboot();
+    await flushPromises();
+
+    expect(settingsPageMock.device.reboot).toHaveBeenCalledOnce();
+    expect((rebootBtn.element as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('shutdown button is disabled while pending and ignores duplicate clicks', async () => {
+    let resolveShutdown!: () => void;
+    settingsPageMock.device.shutdown.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        resolveShutdown = resolve;
+      })
+    );
+    const wrapper = await mountSettingsPage();
+    const shutdownBtn = buttonByText(wrapper, 't:settingsPage.actions.shutdown.button');
+
+    await shutdownBtn.trigger('click');
+
+    expect((shutdownBtn.element as HTMLButtonElement).disabled).toBe(true);
+
+    await shutdownBtn.trigger('click');
+    resolveShutdown();
+    await flushPromises();
+
+    expect(settingsPageMock.device.shutdown).toHaveBeenCalledOnce();
+    expect((shutdownBtn.element as HTMLButtonElement).disabled).toBe(false);
   });
 });
 
@@ -319,6 +429,7 @@ function resetSettingsPageMocks(options: { firstTime?: boolean; connected?: bool
   settingsPageMock.lastError.value = null;
   settingsPageMock.state.value = 'connected';
   settingsPageMock.device.reboot.mockResolvedValue(undefined);
+  settingsPageMock.device.shutdown.mockResolvedValue(undefined);
   settingsPageMock.device.status.mockResolvedValue({ versions: { controller: '1.0.0' } });
   settingsPageMock.settings.configureWifi.mockResolvedValue(connectedStatus);
   settingsPageMock.settings.getWifiStatus.mockResolvedValue(connectedStatus);
