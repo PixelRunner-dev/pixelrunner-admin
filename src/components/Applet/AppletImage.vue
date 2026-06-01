@@ -7,7 +7,7 @@ interface Props extends IAppletImage {
   showFrame?: boolean;
 }
 
-const TIMESTAMP_DEVIATION = 100000;
+const TIMESTAMP_DEVIATION = 100_000;
 const props = withDefaults(defineProps<Props>(), {
   showFrame: false
 });

@@ -23,6 +23,7 @@ function handleReordered(orderedApplets: IFullApplet[]) {
     <AppletList
       v-if="applets.length"
       :applets
+      :limit="99"
       :isDragable="true"
       :isReorderPending="isSavingOrder"
       :classes="{ list: 'playlist list', item: 'playlist__item list-row' }"
