@@ -1,5 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { computed, ref } from 'vue';
 import { MockRpcClient } from '@/../test/mocks/transport';
+import { AppletAPI } from '@/ws/api/applets.ts';
+
+import type { IRpcClient } from '@/ws/api/client.ts';
+import type { UUID } from 'pixelrunner-shared';
 
 describe('src/ws/api/applets.ts', () => {
   let mockRpc: MockRpcClient;
@@ -100,6 +105,37 @@ describe('src/ws/api/applets.ts', () => {
       expect(requests[1]?.method).toBe('applets.get');
       expect(requests[2]?.method).toBe('applets.enable');
     });
+
+    it('formats installed hidden and pinned update actions', async () => {
+      const request = vi.fn(async () => ({
+        method: 'updateAppletVisibility',
+        data: null
+      }));
+      const api = new AppletAPI(createApiClient(request));
+      const uuid = '11111111-1111-4111-8111-111111111111' as UUID;
+
+      await api.updateHidden(uuid, true);
+      await api.updatePinned(uuid, false);
+
+      expect(request).toHaveBeenNthCalledWith(
+        1,
+        'applets.action',
+        {
+          method: 'updateAppletVisibility',
+          params: { uuid, isHidden: true }
+        },
+        undefined
+      );
+      expect(request).toHaveBeenNthCalledWith(
+        2,
+        'applets.action',
+        {
+          method: 'updateAppletPinned',
+          params: { uuid, isPinned: false }
+        },
+        undefined
+      );
+    });
   });
 
   describe('response handling', () => {
@@ -155,9 +191,7 @@ describe('src/ws/api/applets.ts', () => {
     });
 
     it('handles batched applet operations', async () => {
-      const requests = Array.from({ length: 5 }, (_, i) =>
-        mockRpc.request(`applets.get${i}`)
-      );
+      const requests = Array.from({ length: 5 }, (_, i) => mockRpc.request(`applets.get${i}`));
       const results = await Promise.all(requests);
       expect(results).toHaveLength(5);
     });
@@ -173,3 +207,19 @@ describe('src/ws/api/applets.ts', () => {
     });
   });
 });
+
+function createApiClient(request: ReturnType<typeof vi.fn>): IRpcClient {
+  return {
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    isConnected: computed(() => true),
+    isConnecting: computed(() => false),
+    lastError: ref(null),
+    off: vi.fn(),
+    on: vi.fn(() => vi.fn()),
+    once: vi.fn(),
+    reconnect: vi.fn(),
+    request,
+    state: ref('connected')
+  } as unknown as IRpcClient;
+}

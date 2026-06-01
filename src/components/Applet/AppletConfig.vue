@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router';
 import FormField from '../Form/FormField.vue';
 import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
 import FeatureToggle from '../FeatureToggle.vue';
+import IconImage from '../Icon/IconImage.vue';
 
 import { useClientApi } from '@/ws/index.ts';
 import { useNotifications } from '@/composables/useNotifications.ts';
@@ -22,8 +23,12 @@ import type { Notification } from '@/utils/notifications.ts';
 import {
   Button as DButton,
   Divider as DDivider,
-  Flex as DFlex
+  Fieldset as DFieldset,
+  Flex as DFlex,
+  Label as DLabel,
+  Text as DText
 } from '(vendor)/daisy-ui-kit/index.ts';
+import DToggle from '(vendor)/daisy-ui-kit/components/Toggle.vue';
 
 export interface Props {
   applet: IFullApplet;
@@ -67,15 +72,26 @@ const schemaError = ref<string | null>(null);
 const isSchemaLoading = ref(false);
 const isSubmitting = ref(false);
 const isRemoving = ref(false);
+const isUpdatingHidden = ref(false);
+const isUpdatingPinned = ref(false);
 const formRef = ref<HTMLFormElement | null>(null);
 const configurationValues = ref<Record<string, AppletConfigurationValue>>({});
 const controllerLocation = ref<AppletConfigurationValue | null>(null);
+const isHidden = ref(Boolean(applet.installationDetails?.isHidden));
+const isPinned = ref(Boolean(applet.installationDetails?.isPinned));
 
 const schemaItems = computed(() => appletSchema.value?.schema ?? []);
 const hasSchemaItems = computed(() => schemaItems.value.length > 0);
 const installedUuid = computed(() => applet.installationDetails?.uuid as UUID | undefined);
 const isEditMode = computed(() => applet.isInstalled && Boolean(installedUuid.value));
-const isBusy = computed(() => isSchemaLoading.value || isSubmitting.value || isRemoving.value);
+const isBusy = computed(
+  () =>
+    isSchemaLoading.value ||
+    isSubmitting.value ||
+    isRemoving.value ||
+    isUpdatingHidden.value ||
+    isUpdatingPinned.value
+);
 
 const isAppletSchemaItem = (item: unknown): item is RawAppletSchemaItem => {
   if (!item || typeof item !== 'object') return false;
@@ -320,12 +336,84 @@ const handleRemove = async () => {
   }
 };
 
+const updateHiddenState = async (nextValue: boolean) => {
+  if (!applets || !installedUuid.value || isUpdatingHidden.value) return;
+
+  const previousValue = isHidden.value;
+  const previousPinned = isPinned.value;
+  isHidden.value = nextValue;
+  if (nextValue) isPinned.value = false;
+  isUpdatingHidden.value = true;
+
+  try {
+    const updatedApplet = await applets.updateHidden(installedUuid.value, nextValue);
+    isHidden.value = Boolean(updatedApplet?.installationDetails?.isHidden ?? nextValue);
+    notify({
+      type: 'success',
+      message: nextValue ? 'Applet hidden from playback.' : 'Applet visible in playback.',
+      hasCloseButton: true
+    });
+  } catch (error) {
+    isHidden.value = previousValue;
+    isPinned.value = previousPinned;
+    notify({
+      type: 'error',
+      message: getErrorMessage(error, 'Failed to update applet visibility.'),
+      hasCloseButton: true
+    });
+  } finally {
+    isUpdatingHidden.value = false;
+  }
+};
+
+const updatePinnedState = async (nextValue: boolean) => {
+  if (!applets || !installedUuid.value || isUpdatingPinned.value) return;
+
+  const previousValue = isPinned.value;
+  isPinned.value = nextValue;
+  isUpdatingPinned.value = true;
+
+  try {
+    const updatedApplet = await applets.updatePinned(installedUuid.value, nextValue);
+    isPinned.value = Boolean(updatedApplet?.installationDetails?.isPinned ?? nextValue);
+    notify({
+      type: 'success',
+      message: nextValue ? 'Applet pinned to the top of the playlist.' : 'Applet unpinned.',
+      hasCloseButton: true
+    });
+  } catch (error) {
+    isPinned.value = previousValue;
+    notify({
+      type: 'error',
+      message: getErrorMessage(error, 'Failed to update applet pin state.'),
+      hasCloseButton: true
+    });
+  } finally {
+    isUpdatingPinned.value = false;
+  }
+};
+
 watch(
   () => [isConnected.value, applet.packageName],
   () => {
     void loadAppletSchema();
   },
   { immediate: true }
+);
+
+watch(
+  () => applet.installationDetails?.isHidden,
+  (nextValue) => {
+    isHidden.value = Boolean(nextValue);
+    isPinned.value = false;
+  }
+);
+
+watch(
+  () => applet.installationDetails?.isPinned,
+  (nextValue) => {
+    isPinned.value = Boolean(nextValue);
+  }
 );
 </script>
 
@@ -355,6 +443,29 @@ watch(
       <FeatureToggle features="appletScheduler">
         <FieldSchedule />
       </FeatureToggle>
+
+      <DFieldset v-if="installedUuid" legend="fdsfs" class="w-80 my-4 gap-4">
+        <DLabel label>
+          <DToggle
+          :model-value="isHidden"
+          :disabled="!isConnected || isBusy"
+          aria-label="Toggle applet visibility"
+          @update:model-value="(value) => updateHiddenState(Boolean(value))"
+          />
+          <DText>[Hide applet in playlist]</DText>
+        </DLabel>
+
+        <DLabel label>
+          <DToggle
+          :model-value="isPinned"
+          :disabled="!isConnected || isHidden || isBusy"
+          :title="isHidden ? 'Cannot pin applet when it is hidden' : ''"
+          aria-label="Toggle applet pin"
+          @update:model-value="(value) => updatePinnedState(Boolean(value))"
+          />
+          <DText>[Pin applet in playlist]</DText>
+        </DLabel>
+      </DFieldset>
 
       <DFlex class="gap-4">
         <DButton type="submit" primary wide :disabled="!isConnected || isBusy">

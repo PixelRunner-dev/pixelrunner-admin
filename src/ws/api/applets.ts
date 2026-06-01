@@ -127,6 +127,20 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
     await this.action<unknown>('removeApplet', { uuid });
   }
 
+  async updateHidden(uuid: UUID, isHidden: boolean): Promise<IFullAppletRecord | null> {
+    return this.action<IFullAppletRecord | null>('updateAppletVisibility', {
+      uuid,
+      isHidden
+    });
+  }
+
+  async updatePinned(uuid: UUID, isPinned: boolean): Promise<IFullAppletRecord | null> {
+    return this.action<IFullAppletRecord | null>('updateAppletPinned', {
+      uuid,
+      isPinned
+    });
+  }
+
   async getAllApplets(options: AppletQueryOptions = {}): Promise<IFullApplet[]> {
     return this.action<IFullApplet[]>('getAllApplets', options);
   }

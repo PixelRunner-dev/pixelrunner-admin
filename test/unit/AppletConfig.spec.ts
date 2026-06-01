@@ -11,7 +11,9 @@ const appletApiMock = vi.hoisted(() => ({
     getSchema: vi.fn(),
     install: vi.fn(),
     remove: vi.fn(),
-    saveConfig: vi.fn()
+    saveConfig: vi.fn(),
+    updateHidden: vi.fn(),
+    updatePinned: vi.fn()
   },
   settings: {
     get: vi.fn()
@@ -59,6 +61,8 @@ describe('AppletConfig', () => {
     appletApiMock.applets.install.mockReset();
     appletApiMock.applets.remove.mockReset();
     appletApiMock.applets.saveConfig.mockReset();
+    appletApiMock.applets.updateHidden.mockReset();
+    appletApiMock.applets.updatePinned.mockReset();
     appletApiMock.settings.get.mockReset();
     appletApiMock.notifications.addNotification.mockReset();
     appletApiMock.router.replace.mockReset();
@@ -67,6 +71,12 @@ describe('AppletConfig', () => {
     appletApiMock.applets.install.mockResolvedValue(undefined);
     appletApiMock.applets.remove.mockResolvedValue(undefined);
     appletApiMock.applets.saveConfig.mockResolvedValue(undefined);
+    appletApiMock.applets.updateHidden.mockImplementation(async (_uuid: UUID, isHidden: boolean) =>
+      makeApplet({ installed: true, isHidden })
+    );
+    appletApiMock.applets.updatePinned.mockImplementation(async (_uuid: UUID, isPinned: boolean) =>
+      makeApplet({ installed: true, isPinned })
+    );
   });
 
   afterEach(() => {
@@ -243,6 +253,118 @@ describe('AppletConfig', () => {
     });
     expect(appletApiMock.router.replace).not.toHaveBeenCalled();
   });
+
+  it('shows installed-only hidden and pinned toggles', async () => {
+    const libraryWrapper = mountConfig(makeApplet({ installed: false }));
+    await flushPromises();
+
+    expect(libraryWrapper.find('[aria-label="Toggle applet visibility"]').exists()).toBe(false);
+    expect(libraryWrapper.find('[aria-label="Toggle applet pin"]').exists()).toBe(false);
+
+    const installedWrapper = mountConfig(
+      makeApplet({ installed: true, isHidden: true, isPinned: true })
+    );
+    await flushPromises();
+
+    expect(
+      (installedWrapper.get('[aria-label="Toggle applet visibility"]').element as HTMLInputElement)
+        .checked
+    ).toBe(true);
+    expect(
+      (installedWrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
+    ).toBe(true);
+  });
+
+  it('persists hidden toggle changes with uuid and keeps success state', async () => {
+    const wrapper = mountConfig(makeApplet({ installed: true, isHidden: false }));
+    await flushPromises();
+
+    await wrapper.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await flushPromises();
+
+    expect(appletApiMock.applets.updateHidden).toHaveBeenCalledWith('weather-uuid', true);
+    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'Applet hidden from playback.',
+      hasCloseButton: true
+    });
+  });
+
+  it('rolls back hidden toggle changes on failure', async () => {
+    appletApiMock.applets.updateHidden.mockRejectedValueOnce(new Error('visibility failed'));
+    const wrapper = mountConfig(makeApplet({ installed: true, isHidden: false }));
+    await flushPromises();
+
+    await wrapper.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await flushPromises();
+
+    expect(
+      (wrapper.get('[aria-label="Toggle applet visibility"]').element as HTMLInputElement).checked
+    ).toBe(false);
+    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'visibility failed',
+      hasCloseButton: true
+    });
+  });
+
+  it('clears isPinned when isHidden is toggled on and restores it if the update fails', async () => {
+    const wrapper = mountConfig(makeApplet({ installed: true, isHidden: false, isPinned: true }));
+    await flushPromises();
+
+    expect(
+      (wrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
+    ).toBe(true);
+
+    await wrapper.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await flushPromises();
+
+    expect(
+      (wrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
+    ).toBe(false);
+
+    appletApiMock.applets.updateHidden.mockRejectedValueOnce(new Error('visibility failed'));
+    appletApiMock.notifications.addNotification.mockClear();
+    const wrapper2 = mountConfig(makeApplet({ installed: true, isHidden: false, isPinned: true }));
+    await flushPromises();
+
+    await wrapper2.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await flushPromises();
+
+    expect(
+      (wrapper2.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
+    ).toBe(true);
+  });
+
+  it('persists pinned toggle changes with uuid and rolls back on failure', async () => {
+    const wrapper = mountConfig(makeApplet({ installed: true, isPinned: false }));
+    await flushPromises();
+
+    await wrapper.get('[aria-label="Toggle applet pin"]').setValue(true);
+    await flushPromises();
+
+    expect(appletApiMock.applets.updatePinned).toHaveBeenCalledWith('weather-uuid', true);
+    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
+      type: 'success',
+      message: 'Applet pinned to the top of the playlist.',
+      hasCloseButton: true
+    });
+
+    appletApiMock.applets.updatePinned.mockRejectedValueOnce(new Error('pin failed'));
+    appletApiMock.notifications.addNotification.mockClear();
+
+    await wrapper.get('[aria-label="Toggle applet pin"]').setValue(false);
+    await flushPromises();
+
+    expect(
+      (wrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
+    ).toBe(true);
+    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
+      type: 'error',
+      message: 'pin failed',
+      hasCloseButton: true
+    });
+  });
 });
 
 type MountOptions = {
@@ -264,6 +386,12 @@ function mountConfig(applet: IFullApplet, options: MountOptions = {}) {
         },
         DDivider: { template: '<hr />' },
         DFlex: { template: '<div><slot /></div>' },
+        DToggle: {
+          props: ['disabled', 'modelValue'],
+          emits: ['update:modelValue'],
+          template:
+            '<input type="checkbox" :aria-label="$attrs[`aria-label`]" :checked="modelValue" :disabled="disabled" @change="$emit(`update:modelValue`, $event.target.checked)" />'
+        },
         FeatureToggle: { template: '<section data-testid="feature-toggle"><slot /></section>' },
         FieldSchedule: { template: '<div data-testid="schedule-field" />' },
         FormField: {
@@ -285,6 +413,8 @@ function setReportValidity(wrapper: ReturnType<typeof mount>, result: boolean) {
 
 function makeApplet(options: {
   config?: IAppletConfigurations['config'];
+  isHidden?: boolean;
+  isPinned?: boolean;
   installed: boolean;
 }): IFullApplet {
   const applet: IFullApplet = {
@@ -317,8 +447,8 @@ function makeApplet(options: {
         appId: 'weather',
         config: options.config ?? {}
       },
-      isHidden: false,
-      isPinned: false
+      isHidden: options.isHidden ?? false,
+      isPinned: options.isPinned ?? false
     };
   }
 

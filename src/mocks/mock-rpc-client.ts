@@ -689,6 +689,14 @@ export class MockRpcClient {
       return { method, data: cloneMockData(this.saveAppletConfig(params)) };
     }
 
+    if (method === 'updateAppletVisibility') {
+      return { method, data: cloneMockData(this.updateAppletHidden(params)) };
+    }
+
+    if (method === 'updateAppletPinned') {
+      return { method, data: cloneMockData(this.updateAppletPinned(params)) };
+    }
+
     if (method === 'removeApplet') {
       this.removeApplet(params);
       return { method, data: null };
@@ -763,7 +771,9 @@ export class MockRpcClient {
           alt: `${applet.details.name} installed preview`,
           dateCreated: mockDate
         },
-        appliedConfigurations: this.getAppliedConfigurations(params, packageName)
+        appliedConfigurations: this.getAppliedConfigurations(params, packageName),
+        isHidden: false,
+        isPinned: false
       }
     };
 
@@ -798,6 +808,50 @@ export class MockRpcClient {
           ? (applet as IPlaylist['applets'][number])
           : playlistApplet
       ),
+      dateModified: new Date()
+    };
+
+    return applet;
+  }
+
+  private updateAppletHidden(params: Record<string, unknown>): IFullApplet {
+    return this.updateInstalledAppletBoolean(params, 'isHidden');
+  }
+
+  private updateAppletPinned(params: Record<string, unknown>): IFullApplet {
+    return this.updateInstalledAppletBoolean(params, 'isPinned');
+  }
+
+  private updateInstalledAppletBoolean(
+    params: Record<string, unknown>,
+    field: 'isHidden' | 'isPinned'
+  ): IFullApplet {
+    const applet = this.applets.find(
+      (candidate) => candidate.installationDetails?.uuid === params.uuid
+    );
+
+    if (!applet?.installationDetails) {
+      throw new MockJsonRpcError('Mock applet not installed', 'not_found');
+    }
+
+    const value = params[field];
+    if (typeof value !== 'boolean') {
+      throw new MockJsonRpcError(`${field} must be a boolean`, 'invalid_params');
+    }
+
+    applet.installationDetails[field] = value;
+    this.activePlaylist = {
+      ...this.activePlaylist,
+      applets: this.activePlaylist.applets
+        .map((playlistApplet) =>
+          playlistApplet.installationDetails.uuid === params.uuid
+            ? (applet as IPlaylist['applets'][number])
+            : playlistApplet
+        )
+        .sort(
+          (first, second) =>
+            Number(second.installationDetails.isPinned) - Number(first.installationDetails.isPinned)
+        ),
       dateModified: new Date()
     };
 

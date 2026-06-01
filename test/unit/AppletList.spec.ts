@@ -25,7 +25,7 @@ vi.mock('@/utils/generic.ts', () => ({
   vibrateDevice: vi.fn()
 }));
 
-function makeApplet(packageName: string): IFullApplet {
+function makeApplet(packageName: string, options: { isPinned?: boolean } = {}): IFullApplet {
   return {
     packageName,
     fileName: `${packageName}.star`,
@@ -47,7 +47,8 @@ function makeApplet(packageName: string): IFullApplet {
         src: `${packageName}.webp`,
         alt: packageName,
         dateCreated: new Date('2026-01-01T00:00:00.000Z')
-      }
+      },
+      isPinned: options.isPinned ?? false
     },
     isInstalled: true
   };
@@ -123,5 +124,15 @@ describe('AppletList reorder save state', () => {
     });
 
     expect(renderedAppletOrder(wrapper)).toEqual(['second', 'first']);
+  });
+
+  it('renders persisted pinned applets before unpinned applets', () => {
+    const wrapper = mountList([
+      makeApplet('first'),
+      makeApplet('pinned', { isPinned: true }),
+      makeApplet('second')
+    ]);
+
+    expect(renderedAppletOrder(wrapper)).toEqual(['pinned', 'first', 'second']);
   });
 });
