@@ -367,6 +367,23 @@ const mockAppletSchemas = new Map<string, IAppletSchema>([
         }
       ]
     } as unknown as IAppletSchema
+  ],
+  [
+    'bitcointicker',
+    {
+      version: '1',
+      notifications: [],
+      schema: [
+        {
+          type: 'locationbased',
+          id: 'location',
+          name: 'Location',
+          description: 'Location used for timezone and currency display',
+          icon: 'map-pin',
+          default: null
+        }
+      ]
+    } as unknown as IAppletSchema
   ]
 ]);
 
