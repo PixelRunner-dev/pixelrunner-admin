@@ -28,7 +28,6 @@ watch(
   }
 );
 
- 
 const isCurrent = computed(() => props.modelValue == props.tick);
 </script>
 
