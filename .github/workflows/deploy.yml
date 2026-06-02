@@ -26,6 +26,9 @@ jobs:
       - name: Install artifacts
         run: npm run update-geo
 
+      - name: Test
+        run: npm run ci
+
       - name: Build
         run: npm run build-only
 
