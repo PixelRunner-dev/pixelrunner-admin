@@ -1135,7 +1135,7 @@ watchEffect(() => {
           btn
           secondary
           class="w-full"
-          :disabled="shutdownIsPending"
+          :disabled="!isConnected || shutdownIsPending"
           @click="doShutdown"
           @touchstart="() => vibrateDevice(4)"
           @touchend="() => vibrateDevice(1)"
@@ -1147,7 +1147,7 @@ watchEffect(() => {
           btn
           accent
           class="w-full"
-          :disabled="rebootIsPending"
+          :disabled="!isConnected || rebootIsPending"
           @click="doReboot"
           @touchstart="() => vibrateDevice(4)"
           @touchend="() => vibrateDevice(1)"
