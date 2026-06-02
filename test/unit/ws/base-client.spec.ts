@@ -7,7 +7,9 @@ class TestWebSocketClient extends BaseWebSocketClient<IWebSocketConfig> {
   async connect(): Promise<void> {}
   disconnect(): void {}
   protected send(_message: string): void {}
-  protected isTransportConnected(): boolean { return false; }
+  protected isTransportConnected(): boolean {
+    return false;
+  }
   protected handleTransportError(_error: unknown): void {}
   protected handleTransportMessage(_data: unknown): void {}
   protected handleTransportClose(_code: number, _reason: string, _wasClean: boolean): void {}
