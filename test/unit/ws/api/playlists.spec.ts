@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MockRpcClient } from '@/../test/mocks/transport';
 
 describe('src/ws/api/playlists.ts', () => {
@@ -7,6 +7,10 @@ describe('src/ws/api/playlists.ts', () => {
   beforeEach(() => {
     mockRpc = new MockRpcClient();
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   describe('playlist API methods', () => {
@@ -105,12 +109,21 @@ describe('src/ws/api/playlists.ts', () => {
     });
 
     it('handles delayed responses', async () => {
+      vi.useFakeTimers();
       const client = new MockRpcClient({ delay: 50 });
-      const start = Date.now();
-      await client.request('playlist.list');
-      const duration = Date.now() - start;
+      const request = client.request('playlist.list');
+      let resolved = false;
 
-      expect(duration).toBeGreaterThanOrEqual(50);
+      request.then(() => {
+        resolved = true;
+      });
+
+      await vi.advanceTimersByTimeAsync(49);
+      expect(resolved).toBe(false);
+
+      await vi.advanceTimersByTimeAsync(1);
+      await expect(request).resolves.toBeDefined();
+      expect(resolved).toBe(true);
     });
   });
 
