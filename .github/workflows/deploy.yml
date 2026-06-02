@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main # Replace with your branch
+      - main
   workflow_dispatch:
 
 concurrency:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.60.0-noble
-      options: --user 1001
+      # options: --user 1001
 
     steps:
       - name: Checkout code
