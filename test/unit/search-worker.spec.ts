@@ -2,7 +2,28 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Place } from '@/workers/search-worker.ts';
 
-const geoDbModule = '@/geo_db.json';
+type GeoDbModuleEntry = {
+  country: string;
+  name: string;
+  lat: string;
+  lng: string;
+};
+
+const geoDbImportPath = '@/geo_db.json';
+const geoDbModule: GeoDbModuleEntry[] = [
+  {
+    country: 'NL',
+    name: 'Amsterdam',
+    lat: '52.36757',
+    lng: '4.90414'
+  },
+  {
+    country: 'NL',
+    name: 'Rotterdam',
+    lat: '51.92442',
+    lng: '4.47773'
+  }
+];
 
 type SearchWorkerIncoming =
   | { type: 'init'; data?: Place[] }
@@ -20,17 +41,9 @@ type WorkerScope = {
 const originalSelfPostMessage = globalThis.self.postMessage;
 const originalSelfOnMessage = globalThis.self.onmessage;
 
-const defaultPlaces: Place[] = [
-  createPlace('Amsterdam', 'Netherlands'),
-  createPlace('Athens', 'Greece'),
-  createPlace('Austin', 'United States'),
-  createPlace('Berlin', 'Germany'),
-  createPlace('Rotterdam', 'Netherlands')
-];
-
 describe('search worker', () => {
   afterEach(() => {
-    vi.doUnmock(geoDbModule);
+    vi.doUnmock(geoDbImportPath);
     Object.defineProperty(globalThis.self, 'postMessage', {
       configurable: true,
       writable: true,
@@ -101,7 +114,11 @@ describe('search worker', () => {
   });
 
   it('returns prefix matches directly when enough results satisfy the limit', async () => {
-    const worker = await loadWorker();
+    const worker = await loadWorker([
+      createPlace('Amsterdam', 'Netherlands'),
+      createPlace('Athens', 'Greece'),
+      createPlace('Austin', 'United States')
+    ]);
 
     worker.send({ type: 'search', q: 'A', limit: 2 });
 
@@ -112,7 +129,11 @@ describe('search worker', () => {
   });
 
   it('falls back to Fuse country/name search when prefix matches are insufficient', async () => {
-    const worker = await loadWorker();
+    const worker = await loadWorker([
+      createPlace('Amsterdam', 'Netherlands'),
+      createPlace('Athens', 'Greece'),
+      createPlace('Rotterdam', 'Netherlands')
+    ]);
 
     worker.send({ type: 'search', q: 'Netherlands', limit: 2 });
 
@@ -153,7 +174,7 @@ describe('search worker', () => {
   });
 });
 
-async function loadWorker(data: Place[] = defaultPlaces) {
+async function loadWorker(data: ReadonlyArray<GeoDbModuleEntry | Place> = geoDbModule) {
   const messages: SearchWorkerMessage[] = [];
   const selfScope = globalThis.self as typeof globalThis.self & WorkerScope;
 
@@ -166,7 +187,7 @@ async function loadWorker(data: Place[] = defaultPlaces) {
     })
   });
 
-  vi.doMock(geoDbModule, () => ({ default: data }));
+  vi.doMock(geoDbImportPath, () => ({ default: data }));
 
   await import('@/workers/search-worker.ts');
 

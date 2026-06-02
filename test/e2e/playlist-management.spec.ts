@@ -61,7 +61,8 @@ test.describe('Playlist management', () => {
 
   test('navigating to non-existent applet UUID shows not-found state', async ({ page }) => {
     await page.goto('/applets/00000000-0000-0000-0000-000000000000');
-    await expect(page.locator('h1', { hasText: 'Applet not found' })).toBeVisible();
+    await expect(page).toHaveURL(/\/applets\/00000000-0000-0000-0000-000000000000$/);
+    await expect(page.getByRole('main')).toContainText('Applet not found');
   });
 
   test('remove applet via AppletConfig removes it from playlist (SPA)', async ({ page }) => {

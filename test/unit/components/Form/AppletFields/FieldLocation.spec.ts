@@ -14,24 +14,27 @@ vi.stubGlobal(
 
 describe('FieldLocation.vue', () => {
   const i18nMock = { $t: (key: string) => key };
+  const defaultProps = {
+    id: 'test-field-location'
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('renders location field component', () => {
-    const wrapper = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const wrapper = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
     expect(wrapper.exists()).toBe(true);
     expect(wrapper.find('.component--field-location').exists()).toBe(true);
   });
 
   it('mounts successfully', () => {
-    const wrapper = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const wrapper = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
     expect(wrapper.vm).toBeDefined();
   });
 
   it('has valid DOM structure', () => {
-    const wrapper = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const wrapper = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
     expect(wrapper.html().length > 0).toBe(true);
   });
 
@@ -52,29 +55,32 @@ describe('FieldLocation.vue', () => {
   });
 
   it('renders as valid Vue component', () => {
-    const wrapper = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const wrapper = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
     expect(wrapper.isVisible()).toBe(true);
   });
 
   it('has interactive elements', () => {
-    const wrapper = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const wrapper = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
     expect(wrapper.findAll('*').length > 0).toBe(true);
   });
 
   it('contains expected container', () => {
-    const wrapper = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const wrapper = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
     const div = wrapper.find('div');
     expect(div.exists()).toBe(true);
   });
 
   it('has location field class', () => {
-    const wrapper = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const wrapper = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
     expect(wrapper.html()).toContain('component--field-location');
   });
 
   it('can be rendered multiple times', () => {
-    const w1 = mount(FieldLocation, { global: { mocks: i18nMock } });
-    const w2 = mount(FieldLocation, { global: { mocks: i18nMock } });
+    const w1 = mount(FieldLocation, { props: defaultProps, global: { mocks: i18nMock } });
+    const w2 = mount(FieldLocation, {
+      props: { id: 'something-else' },
+      global: { mocks: i18nMock }
+    });
     expect(w1.exists() && w2.exists()).toBe(true);
   });
 });

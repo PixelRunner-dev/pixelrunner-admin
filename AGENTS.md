@@ -105,18 +105,24 @@ behind the compile-time flag and keep its API responses aligned with
 
 - **Never use `page.waitForTimeout` in committed test code.** It is permitted
   temporarily during local debugging but must be replaced before committing.
+- Prefer Playwright auto-waiting through user-visible, observable conditions:
+  assert the exact element or state the test needs instead of inserting a
+  generic gate such as `await expect(page.locator('h1')).toBeVisible()`.
+- Use resilient locators first: roles, labels, accessible names, visible text,
+  URL state, and form values. Use implementation classes only when the test is
+  explicitly covering component structure.
 - Replace fixed delays with observable conditions instead:
-  - `await expect(locator).toBeVisible()` / `.toHaveValue(...)` — retries
-    automatically until condition or timeout.
-  - `page.waitForEvent('console', msg => msg.text().includes('...'))` — wait
-    for a specific console log emitted after an async operation completes. Set
-    up the listener _before_ triggering the action to avoid the race window.
-  - `page.waitForURL(...)` — wait for SPA navigation to settle.
-  - `page.waitForSelector(...)` — wait for a DOM node to appear or disappear.
-- When a Vue component has no observable DOM side-effect after an async save,
-  add a `console.log` in the production code so tests can wait on it. Follow
-  the `[ComponentName] Saved <key>` log pattern already used in
-  `useSyncedControllerSettings` and `saveFeatureToggleSetting`.
+  - `await expect(locator).toBeVisible()` / `.toHaveValue(...)` / `.toHaveCount(...)`
+    retries automatically until the condition is met or the configured timeout
+    expires.
+  - `page.waitForURL(...)` waits for SPA navigation to settle.
+  - `page.waitForSelector(...)` is acceptable when a DOM attach/detach state is
+    the behavior under test, but a locator assertion is usually clearer.
+  - `page.waitForResponse(...)` is acceptable for API/network completion when
+    no DOM state changes until the response resolves.
+- Do not use `page.waitForEvent('console', ...)` to prove app state. Console
+  output is an implementation detail and makes tests brittle. Treat console
+  waits as temporary diagnostics only, and remove them from committed tests.
 - Use SPA link clicks (`page.locator('a[href="..."]').click()`) rather than
   `page.goto()` when in-memory mock state must survive navigation. `page.goto()`
   triggers a full page reload, destroying the mock client and its settings.

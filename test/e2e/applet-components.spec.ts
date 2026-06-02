@@ -24,13 +24,13 @@ test.describe('AppletImage', () => {
 
   test('every image has non-empty alt text', async ({ page }) => {
     await page.goto('/applets');
-    await expect(page.locator('img.applet-image').first()).toBeVisible();
-    const imgs = page.locator('img.applet-image');
+    await expect(page.locator('.component--playlist li.draggable-applet')).toHaveCount(5);
+
+    const imgs = page.locator('.component--playlist img.applet-image');
+    await expect(imgs).toHaveCount(5);
     const count = await imgs.count();
-    expect(count).toBeGreaterThan(0);
     for (let i = 0; i < count; i++) {
-      const alt = await imgs.nth(i).getAttribute('alt');
-      expect(alt).toBeTruthy();
+      await expect(imgs.nth(i)).toHaveAttribute('alt', /.+/);
     }
   });
 

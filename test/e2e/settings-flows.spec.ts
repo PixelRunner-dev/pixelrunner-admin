@@ -57,7 +57,6 @@ test.describe('Settings page flows', () => {
 
   test('WiFi scan error is shown and retry is available', async ({ page }) => {
     await page.goto('/settings');
-    await expect(page.locator('h1')).toBeVisible();
 
     // Refresh networks button triggers a scan (mock returns success)
     const refreshBtn = page.locator('button', { hasText: 'Refresh networks' });
@@ -90,7 +89,6 @@ test.describe('Settings page flows', () => {
 
   test('language selector and location search rendered on settings page', async ({ page }) => {
     await page.goto('/settings');
-    await expect(page.locator('h1')).toBeVisible();
 
     await expect(page.locator('select#language')).toBeVisible();
     await expect(page.locator('#location')).toBeVisible();

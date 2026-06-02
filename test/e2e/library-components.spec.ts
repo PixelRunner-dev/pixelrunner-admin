@@ -63,6 +63,7 @@ test.describe('CategoryList', () => {
     await page.goto('/library');
     // Library categories section uses isInteractive — items link to /library/categories/:key
     const categoryLinks = page.locator('.component--category-list a[href*="/library/categories/"]');
+    await expect(categoryLinks).not.toHaveCount(0);
     await expect(categoryLinks.first()).toBeVisible();
   });
 
@@ -71,6 +72,7 @@ test.describe('CategoryList', () => {
     const firstCategoryLink = page
       .locator('.component--category-list a[href*="/library/categories/"]')
       .first();
+    await expect(firstCategoryLink).toBeVisible();
     await firstCategoryLink.click();
     await page.waitForURL(/\/library\/categories\/.+/);
     await expect(page.locator('h1')).toBeVisible();
@@ -114,6 +116,6 @@ test.describe('CallToAction', () => {
       hasText: 'Configure'
     });
     await expect(configureLinks.first()).toBeVisible();
-    expect(await configureLinks.count()).toBe(5);
+    await expect(configureLinks).toHaveCount(5);
   });
 });

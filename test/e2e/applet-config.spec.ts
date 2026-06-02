@@ -108,9 +108,9 @@ test.describe('FieldOnoff', () => {
   test('toggle changes checked state', async ({ page }) => {
     await goToAppletDetail(page, 'Clock By Henry');
     const toggle = page.locator('.component--field-onoff input[type="checkbox"]');
-    const initial = await toggle.isChecked();
+    const wasInitiallyChecked = await toggle.isChecked();
     await toggle.click();
-    expect(await toggle.isChecked()).toBe(!initial);
+    await expect(toggle).toBeChecked({ checked: !wasInitiallyChecked });
   });
 });
 
@@ -194,19 +194,12 @@ test.describe('FieldLocation', () => {
       has: page.locator('label', { hasText: 'Location' })
     });
     await expect(field).toBeVisible();
-    // LocationSearch renders its own input inside the FormField slot
-    await expect(field.locator('input')).toBeVisible();
+    await expect(page.getByLabel('Location')).toBeVisible();
   });
 
   test('location input accepts text input', async ({ page }) => {
     await goToAppletDetail(page, 'Buienradar');
-    const locationInput = page
-      .locator('.component--form-field')
-      .filter({
-        has: page.locator('label', { hasText: 'Location' })
-      })
-      .locator('input')
-      .first();
+    const locationInput = page.getByLabel('Location');
 
     await expect(page.locator('#deviceName')).toHaveCount(0); // not on detail page, just await
     await locationInput.fill('Rotterdam');

@@ -68,28 +68,20 @@ test.describe('FeatureToggle', () => {
     await page.goto('/settings');
     await expect(page.locator('h1')).toBeVisible();
 
-    // Enable experimental features checkbox — set up console listener first
-    const experimentalSaved = page.waitForEvent('console', (msg) =>
-      msg.text().includes('Saved device setting: experimentalFeatures')
-    );
+    // Enable experimental features checkbox
     const experimentalCheckbox = page.locator('#experimentalFeatures');
     await expect(experimentalCheckbox).toBeVisible();
     await experimentalCheckbox.check();
 
-    // Wait for feature list to appear and the debounced save to complete
+    // Wait for feature list to appear
     await expect(page.locator('text=Enable debug tool')).toBeVisible();
-    await experimentalSaved;
 
-    // Enable the debug feature toggle — set up console listener first
+    // Enable the debug feature toggle
     const debugToggle = page
       .locator('dl div')
       .filter({ hasText: 'Enable debug tool' })
       .locator('input[type="checkbox"]');
-    const debugSaved = page.waitForEvent('console', (msg) =>
-      msg.text().includes('Saved feature toggle setting: debug')
-    );
     await debugToggle.check();
-    await debugSaved;
 
     // Navigate via SPA link (not page.goto) to preserve in-memory mock state
     await page.locator('header a[href="/"]').click();
@@ -114,25 +106,17 @@ test.describe('DebugSection', () => {
     await page.goto('/settings');
     await expect(page.locator('h1')).toBeVisible();
 
-    // Enable experimental features — set up console listener first
-    const experimentalSaved = page.waitForEvent('console', (msg) =>
-      msg.text().includes('Saved device setting: experimentalFeatures')
-    );
+    // Enable experimental features
     const experimentalCheckbox = page.locator('#experimentalFeatures');
     await experimentalCheckbox.check();
     await expect(page.locator('text=Enable debug tool')).toBeVisible();
-    await experimentalSaved;
 
-    // Enable debug toggle — set up console listener first
+    // Enable debug toggle
     const debugToggle = page
       .locator('dl div')
       .filter({ hasText: 'Enable debug tool' })
       .locator('input[type="checkbox"]');
-    const debugSaved = page.waitForEvent('console', (msg) =>
-      msg.text().includes('Saved feature toggle setting: debug')
-    );
     await debugToggle.check();
-    await debugSaved;
 
     // Navigate via SPA link to preserve in-memory mock state
     await page.locator('header a[href="/"]').click();
