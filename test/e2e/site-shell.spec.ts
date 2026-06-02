@@ -22,14 +22,20 @@ test.describe('SiteHeader', () => {
 
   test('back link appears after navigating to a child route', async ({ page }) => {
     await page.goto('/applets');
-    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page
+      .locator('article.component--applet-card a', { hasText: 'Configure' })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
     await expect(page.locator('[data-test="router-back-link"]')).toBeVisible();
   });
 
   test('back link navigates to previous page', async ({ page }) => {
     await page.goto('/applets');
-    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page
+      .locator('article.component--applet-card a', { hasText: 'Configure' })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
     await page.locator('[data-test="router-back-link"]').click();
     await page.waitForURL('/applets');
@@ -48,7 +54,9 @@ test.describe('SiteNotifications', () => {
   test('no notification area on fresh page load', async ({ page }) => {
     await page.goto('/applets');
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('[role="alert"]').filter({ hasText: /Rebooting|Shutting|Failed/ })).toHaveCount(0);
+    await expect(
+      page.locator('[role="alert"]').filter({ hasText: /Rebooting|Shutting|Failed/ })
+    ).toHaveCount(0);
   });
 
   test('shows success notification after reboot completes', async ({ page }) => {

@@ -62,9 +62,7 @@ test.describe('CategoryList', () => {
   test('interactive mode renders router-links to category pages', async ({ page }) => {
     await page.goto('/library');
     // Library categories section uses isInteractive — items link to /library/categories/:key
-    const categoryLinks = page.locator(
-      '.component--category-list a[href*="/library/categories/"]'
-    );
+    const categoryLinks = page.locator('.component--category-list a[href*="/library/categories/"]');
     await expect(categoryLinks.first()).toBeVisible();
   });
 
@@ -80,7 +78,10 @@ test.describe('CategoryList', () => {
 
   test('renders inline with hasItemsInline on applet detail page', async ({ page }) => {
     await page.goto('/applets');
-    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page
+      .locator('article.component--applet-card a', { hasText: 'Configure' })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
     // Detail page renders CategoryList with hasItemsInline — uses menu-horizontal class
     const inlineList = page.locator('.component--category-list.menu-horizontal');

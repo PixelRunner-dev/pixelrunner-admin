@@ -62,7 +62,9 @@ test.describe('App shell smoke', () => {
     for (const route of ['/applets', '/library', '/settings', '/update']) {
       await page.goto(route);
       await expect(page.locator('header')).toBeVisible();
-      await expect(page.locator('header svg title').filter({ hasText: 'Go to the settings page' })).toBeAttached();
+      await expect(
+        page.locator('header svg title').filter({ hasText: 'Go to the settings page' })
+      ).toBeAttached();
     }
 
     expect(errors).toHaveLength(0);

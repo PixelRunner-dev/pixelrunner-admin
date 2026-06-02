@@ -110,7 +110,7 @@ behind the compile-time flag and keep its API responses aligned with
     automatically until condition or timeout.
   - `page.waitForEvent('console', msg => msg.text().includes('...'))` — wait
     for a specific console log emitted after an async operation completes. Set
-    up the listener *before* triggering the action to avoid the race window.
+    up the listener _before_ triggering the action to avoid the race window.
   - `page.waitForURL(...)` — wait for SPA navigation to settle.
   - `page.waitForSelector(...)` — wait for a DOM node to appear or disappear.
 - When a Vue component has no observable DOM side-effect after an async save,

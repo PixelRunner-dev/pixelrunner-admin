@@ -112,7 +112,9 @@ describe('src/ws/api/client.ts', () => {
     it('stores client and is accessible via subclass', () => {
       const client = makeValidClient();
       const api = new (class TestApi extends ApiClientBase<IRpcClient> {
-        getClient() { return this.client; }
+        getClient() {
+          return this.client;
+        }
       })(client);
       expect(api.getClient()).toBe(client);
     });
@@ -120,7 +122,9 @@ describe('src/ws/api/client.ts', () => {
     it('delegates request to underlying client', async () => {
       const client = makeValidClient();
       const api = new (class TestApi extends ApiClientBase<IRpcClient> {
-        doRequest() { return this.request('test.method', { key: 'val' }); }
+        doRequest() {
+          return this.request('test.method', { key: 'val' });
+        }
       })(client);
 
       await api.doRequest();
@@ -130,7 +134,9 @@ describe('src/ws/api/client.ts', () => {
     it('delegates request with options', async () => {
       const client = makeValidClient();
       const api = new (class TestApi extends ApiClientBase<IRpcClient> {
-        doRequest() { return this.request('m', {}, { timeout: 5000 }); }
+        doRequest() {
+          return this.request('m', {}, { timeout: 5000 });
+        }
       })(client);
 
       await api.doRequest();
@@ -143,7 +149,9 @@ describe('src/ws/api/client.ts', () => {
       (client.on as ReturnType<typeof vi.fn>).mockReturnValue(unsubFn);
 
       const api = new (class TestApi extends ApiClientBase<IRpcClient> {
-        subscribe() { return this.on('message', vi.fn()); }
+        subscribe() {
+          return this.on('message', vi.fn());
+        }
       })(client);
 
       const unsub = api.subscribe();
@@ -156,7 +164,9 @@ describe('src/ws/api/client.ts', () => {
       (client.isConnected as ReturnType<typeof computed>) = computed(() => isConnectedRef.value);
 
       const api = new (class TestApi extends ApiClientBase<IRpcClient> {
-        get isConn() { return this.connected; }
+        get isConn() {
+          return this.connected;
+        }
       })(client);
 
       expect(api.isConn).toBe(false);

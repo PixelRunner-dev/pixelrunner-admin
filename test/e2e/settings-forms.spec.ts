@@ -103,7 +103,9 @@ test.describe('FormField', () => {
 
     // Buienradar schema has a 'Location' field (name: 'Location')
     const formField = page.locator('.component--form-field');
-    await expect(formField.filter({ has: page.locator('label', { hasText: 'Location' }) })).toBeVisible();
+    await expect(
+      formField.filter({ has: page.locator('label', { hasText: 'Location' }) })
+    ).toBeVisible();
   });
 });
 

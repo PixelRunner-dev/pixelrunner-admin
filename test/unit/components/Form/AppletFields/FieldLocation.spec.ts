@@ -2,12 +2,15 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import FieldLocation from '@/components/Form/AppletFields/FieldLocation.vue';
 
-vi.stubGlobal('Worker', class MockWorker {
-  postMessage = vi.fn();
-  terminate = vi.fn();
-  addEventListener = vi.fn();
-  removeEventListener = vi.fn();
-});
+vi.stubGlobal(
+  'Worker',
+  class MockWorker {
+    postMessage = vi.fn();
+    terminate = vi.fn();
+    addEventListener = vi.fn();
+    removeEventListener = vi.fn();
+  }
+);
 
 describe('FieldLocation.vue', () => {
   const i18nMock = { $t: (key: string) => key };

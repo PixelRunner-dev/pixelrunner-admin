@@ -11,7 +11,10 @@ test.describe('AppletImage', () => {
 
   test('renders with frame on applet detail page', async ({ page }) => {
     await page.goto('/applets');
-    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page
+      .locator('article.component--applet-card a', { hasText: 'Configure' })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
     const container = page.locator('.component--applet-image.is-showing-frame');
     await expect(container).toBeVisible();
@@ -37,10 +40,7 @@ test.describe('AppletImage', () => {
       has: page.locator('h2', { hasText: 'KNMIalert' })
     });
     await expect(knmiCard).toBeVisible();
-    await expect(knmiCard.locator('img.applet-image')).toHaveAttribute(
-      'src',
-      /broken-image\.webp/
-    );
+    await expect(knmiCard.locator('img.applet-image')).toHaveAttribute('src', /broken-image\.webp/);
   });
 });
 
@@ -48,7 +48,10 @@ test.describe('AppletImage — no horizontal scroll with frame (375 px viewport)
   test('detail page has no horizontal scroll at mobile width', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/applets');
-    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page
+      .locator('article.component--applet-card a', { hasText: 'Configure' })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
 
     await expect(page.locator('.component--applet-image.is-showing-frame')).toBeVisible();
@@ -96,7 +99,10 @@ test.describe('AppletCard', () => {
       .first()
       .getAttribute('href');
     expect(href).toMatch(/^\/applets\/.+/);
-    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page
+      .locator('article.component--applet-card a', { hasText: 'Configure' })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
     await expect(page.locator('h1')).toBeVisible();
   });
@@ -128,13 +134,7 @@ test.describe('AppletItem', () => {
   test('passes correct applet data through slot for all installed applets', async ({ page }) => {
     await page.goto('/applets');
     const playlist = page.locator('.component--playlist');
-    for (const name of [
-      'Clock By Henry',
-      'Buienradar',
-      'Bitcoin Ticker',
-      'Textbyt',
-      'KNMIalert'
-    ]) {
+    for (const name of ['Clock By Henry', 'Buienradar', 'Bitcoin Ticker', 'Textbyt', 'KNMIalert']) {
       await expect(playlist.locator('h2', { hasText: name })).toBeVisible();
     }
   });

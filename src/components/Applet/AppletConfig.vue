@@ -447,21 +447,21 @@ watch(
       <DFieldset v-if="installedUuid" legend="fdsfs" class="w-80 my-4 gap-4">
         <DLabel label>
           <DToggle
-          :model-value="isHidden"
-          :disabled="!isConnected || isBusy"
-          aria-label="Toggle applet visibility"
-          @update:model-value="(value) => updateHiddenState(Boolean(value))"
+            :model-value="isHidden"
+            :disabled="!isConnected || isBusy"
+            aria-label="Toggle applet visibility"
+            @update:model-value="(value) => updateHiddenState(Boolean(value))"
           />
           <DText>[Hide applet in playlist]</DText>
         </DLabel>
 
         <DLabel label>
           <DToggle
-          :model-value="isPinned"
-          :disabled="!isConnected || isHidden || isBusy"
-          :title="isHidden ? 'Cannot pin applet when it is hidden' : ''"
-          aria-label="Toggle applet pin"
-          @update:model-value="(value) => updatePinnedState(Boolean(value))"
+            :model-value="isPinned"
+            :disabled="!isConnected || isHidden || isBusy"
+            :title="isHidden ? 'Cannot pin applet when it is hidden' : ''"
+            aria-label="Toggle applet pin"
+            @update:model-value="(value) => updatePinnedState(Boolean(value))"
           />
           <DText>[Pin applet in playlist]</DText>
         </DLabel>

@@ -95,8 +95,6 @@ describe('FieldLocationbased.vue', () => {
       props: { id: 'my-location' },
       global: globalMocks
     });
-    expect(wrapper.find('input[type="checkbox"]').attributes('id')).toBe(
-      'my-location-use-device'
-    );
+    expect(wrapper.find('input[type="checkbox"]').attributes('id')).toBe('my-location-use-device');
   });
 });

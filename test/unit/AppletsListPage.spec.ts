@@ -97,7 +97,9 @@ describe('Applets ListPage', () => {
     expect(listPageMock.playlists.activePlaylist).toHaveBeenCalledOnce();
     expect(consoleLog).toHaveBeenCalledWith('[ListPage] Active playlist applet count:', 0);
     expect(consoleLog).toHaveBeenCalledWith('[ListPage] Active playlist applet count:', 2);
-    expect(consoleWarn).toHaveBeenCalledExactlyOnceWith('[ListPage] Active playlist received but contains no applets');
+    expect(consoleWarn).toHaveBeenCalledExactlyOnceWith(
+      '[ListPage] Active playlist received but contains no applets'
+    );
   });
 
   it('renders the playlist, library shortcut, debug state and touch feedback', async () => {
@@ -169,9 +171,12 @@ describe('Applets ListPage', () => {
     await wrapper.get('[data-testid="reorder-reverse"]').trigger('click');
     await flushPromises();
 
-    expect(listPageMock.playlists.updateOrder).toHaveBeenCalledExactlyOnceWith(['uuid-weather', 'uuid-clock'], {
+    expect(listPageMock.playlists.updateOrder).toHaveBeenCalledExactlyOnceWith(
+      ['uuid-weather', 'uuid-clock'],
+      {
         timeout: 5000
-      });
+      }
+    );
     expect(wrapper.text()).toContain('order:weather,clock');
     expect(wrapper.text()).toContain('saving:true');
     expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(

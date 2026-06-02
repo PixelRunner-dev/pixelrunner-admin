@@ -105,9 +105,7 @@ describe('src/ws/api/device.ts', () => {
     });
 
     it('handles batched requests', async () => {
-      const requests = Array.from({ length: 5 }, (_, i) =>
-        mockRpc.request(`device.method${i}`)
-      );
+      const requests = Array.from({ length: 5 }, (_, i) => mockRpc.request(`device.method${i}`));
       const results = await Promise.all(requests);
       expect(results).toHaveLength(5);
     });

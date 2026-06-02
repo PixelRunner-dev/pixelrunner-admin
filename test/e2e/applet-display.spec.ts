@@ -75,7 +75,10 @@ test.describe('AppletDetails', () => {
 
   test('renders h1 with author and description in full-detail view', async ({ page }) => {
     await page.goto('/applets');
-    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page
+      .locator('article.component--applet-card a', { hasText: 'Configure' })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
 
     const details = page.locator('.component--applet-details');

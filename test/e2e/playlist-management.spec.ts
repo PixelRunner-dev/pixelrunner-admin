@@ -5,9 +5,7 @@ test.describe('Playlist management', () => {
     await page.goto('/applets');
     await expect(page.locator('.component--playlist li.draggable-applet')).toHaveCount(5);
     for (const name of ['Clock By Henry', 'Buienradar', 'Bitcoin Ticker', 'Textbyt', 'KNMIalert']) {
-      await expect(
-        page.locator('.component--playlist h2', { hasText: name })
-      ).toBeVisible();
+      await expect(page.locator('.component--playlist h2', { hasText: name })).toBeVisible();
     }
   });
 
@@ -18,18 +16,24 @@ test.describe('Playlist management', () => {
 
   test('clicking Configure navigates to applet detail page', async ({ page }) => {
     await page.goto('/applets');
-    await page.locator('.component--playlist article.component--applet-card a', {
-      hasText: 'Configure'
-    }).first().click();
+    await page
+      .locator('.component--playlist article.component--applet-card a', {
+        hasText: 'Configure'
+      })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
     await expect(page.locator('h1')).toBeVisible();
   });
 
   test('applet detail page shows image, title, author, and config form', async ({ page }) => {
     await page.goto('/applets');
-    await page.locator('.component--playlist article.component--applet-card a', {
-      hasText: 'Configure'
-    }).first().click();
+    await page
+      .locator('.component--playlist article.component--applet-card a', {
+        hasText: 'Configure'
+      })
+      .first()
+      .click();
     await page.waitForURL(/\/applets\/.+/);
 
     await expect(page.locator('.component--applet-image.is-showing-frame')).toBeVisible();
@@ -44,19 +48,14 @@ test.describe('Playlist management', () => {
       has: page.locator('h2', { hasText: 'KNMIalert' })
     });
     await expect(knmiCard).toBeVisible();
-    await expect(knmiCard.locator('img.applet-image')).toHaveAttribute(
-      'src',
-      /broken-image\.webp/
-    );
+    await expect(knmiCard.locator('img.applet-image')).toHaveAttribute('src', /broken-image\.webp/);
   });
 
   test('broken image element has CSS fallback background-image', async ({ page }) => {
     await page.goto('/applets');
     const img = page.locator('img.applet-image').first();
     await expect(img).toBeVisible();
-    const backgroundImage = await img.evaluate(
-      (el) => window.getComputedStyle(el).backgroundImage
-    );
+    const backgroundImage = await img.evaluate((el) => window.getComputedStyle(el).backgroundImage);
     expect(backgroundImage).toContain('broken-image.webp');
   });
 
@@ -73,7 +72,9 @@ test.describe('Playlist management', () => {
     await knmiCard.locator('a', { hasText: 'Configure' }).click();
     await page.waitForURL(/\/applets\/.+/);
 
-    await expect(page.locator('.component--applet-config button', { hasText: 'Remove' })).toBeVisible();
+    await expect(
+      page.locator('.component--applet-config button', { hasText: 'Remove' })
+    ).toBeVisible();
     await page.locator('.component--applet-config button', { hasText: 'Remove' }).click();
 
     // After remove — SPA navigation back to /applets

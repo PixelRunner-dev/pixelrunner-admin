@@ -200,9 +200,13 @@ test.describe('FieldLocation', () => {
 
   test('location input accepts text input', async ({ page }) => {
     await goToAppletDetail(page, 'Buienradar');
-    const locationInput = page.locator('.component--form-field').filter({
-      has: page.locator('label', { hasText: 'Location' })
-    }).locator('input').first();
+    const locationInput = page
+      .locator('.component--form-field')
+      .filter({
+        has: page.locator('label', { hasText: 'Location' })
+      })
+      .locator('input')
+      .first();
 
     await expect(page.locator('#deviceName')).toHaveCount(0); // not on detail page, just await
     await locationInput.fill('Rotterdam');

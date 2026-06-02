@@ -120,7 +120,7 @@ async function doReboot() {
     notificationState?.addNotification({ type: 'error', message: msg, hasCloseButton: true });
   } finally {
     rebootIsPending.value = false;
-}
+  }
 }
 
 async function doShutdown() {
