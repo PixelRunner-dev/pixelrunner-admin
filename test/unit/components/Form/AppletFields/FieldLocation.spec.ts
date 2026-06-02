@@ -37,7 +37,7 @@ describe('FieldLocation.vue', () => {
 
   it('handles optional props', () => {
     const wrapper = mount(FieldLocation, {
-      props: {},
+      props: { id: 'loc-test' },
       global: { mocks: i18nMock }
     });
     expect(wrapper.exists()).toBe(true);

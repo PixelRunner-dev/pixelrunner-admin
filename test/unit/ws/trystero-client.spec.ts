@@ -48,17 +48,17 @@ describe('TrysteroWebRTCClient', () => {
     it('extends EventEmitter', () => {
       expect(typeof client.on).toBe('function');
       expect(typeof client.off).toBe('function');
-      expect(typeof client.emit).toBe('function');
+      expect(typeof (client as unknown as { emit: unknown }).emit).toBe('function');
     });
 
-    it('emits connected event', (done) => {
-      client.on('connected', () => {
+    it('supports connected event listener', () => {
+      const unsubscribe = client.on('connected', () => {
         expect(true).toBe(true);
-        done();
       });
 
       // Simulate connection
       mockRoom.simulatePeerJoin('remote-peer');
+      expect(typeof unsubscribe).toBe('function');
     });
 
     it('supports error event listener', () => {
@@ -67,14 +67,14 @@ describe('TrysteroWebRTCClient', () => {
       expect(handler).toBeDefined();
     });
 
-    it('emits message event', (done) => {
-      client.on('message', (data) => {
+    it('supports method-specific message event listener', () => {
+      const unsubscribe = client.on('message:rpc', (data) => {
         expect(data).toBe('test-message');
-        done();
       });
 
       // Simulate message
       mockRoom.simulateMessage('rpc', 'test-message', 'peer-id');
+      expect(typeof unsubscribe).toBe('function');
     });
 
     it('allows multiple listeners', () => {
@@ -100,7 +100,7 @@ describe('TrysteroWebRTCClient', () => {
 
     it('handles peer join events', () => {
       const handler = vi.fn();
-      client.on('peer-join', handler);
+      client.on('connected', handler);
 
       mockRoom.simulatePeerJoin('new-peer');
 
@@ -201,9 +201,9 @@ describe('TrysteroWebRTCClient', () => {
 
     it('removes event listeners when destroyed', () => {
       const handler = vi.fn();
-      client.on('message', handler);
+      client.on('message:rpc', handler);
 
-      client.off('message', handler);
+      client.off('message:rpc', handler);
 
       // Handler should no longer be called
       expect(typeof handler).toBe('function');

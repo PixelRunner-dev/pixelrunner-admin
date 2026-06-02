@@ -176,13 +176,9 @@ describe('action.ts', () => {
       const config: TrysteroRoomConfig = { roomId: 'test-room' };
 
       // Mock import of trystero
-      vi.doMock(
-        'trystero',
-        () => ({
-          joinRoom: vi.fn(() => mockRoom)
-        }),
-        { virtual: true }
-      );
+      vi.doMock('trystero', () => ({
+        joinRoom: vi.fn(() => mockRoom)
+      }));
 
       try {
         const instance = await createTrysteroRoomInstance(config);

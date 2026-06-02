@@ -150,7 +150,7 @@ describe('src/ws/api/client.ts', () => {
 
       const api = new (class TestApi extends ApiClientBase<IRpcClient> {
         subscribe() {
-          return this.on('message', vi.fn());
+          return this.on('message:test', vi.fn());
         }
       })(client);
 
@@ -160,8 +160,10 @@ describe('src/ws/api/client.ts', () => {
 
     it('connected getter reflects isConnected state', () => {
       const isConnectedRef = ref(false);
-      const client = makeValidClient();
-      (client.isConnected as ReturnType<typeof computed>) = computed(() => isConnectedRef.value);
+      const client: IRpcClient = {
+        ...makeValidClient(),
+        isConnected: computed(() => isConnectedRef.value)
+      };
 
       const api = new (class TestApi extends ApiClientBase<IRpcClient> {
         get isConn() {

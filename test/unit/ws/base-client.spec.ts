@@ -1,12 +1,18 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { IWebSocketConfig, IConnectionState } from 'pixelrunner-shared';
+import type { IWebSocketConfig } from 'pixelrunner-shared';
 import { BaseWebSocketClient } from '@/ws/base-client';
 
 // Create concrete test implementation
 class TestWebSocketClient extends BaseWebSocketClient<IWebSocketConfig> {
   async connect(): Promise<void> {}
   disconnect(): void {}
-  protected handleMessage(data: string): void {}
+  protected send(_message: string): void {}
+  protected isTransportConnected(): boolean { return false; }
+  protected handleTransportError(_error: unknown): void {}
+  protected handleTransportMessage(_data: unknown): void {}
+  protected handleTransportClose(_code: number, _reason: string, _wasClean: boolean): void {}
+  /** @deprecated kept for legacy tests only */
+  protected handleMessage(_data: string): void {}
 }
 
 describe('base-client.ts', () => {
