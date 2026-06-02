@@ -1,4 +1,5 @@
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { IInstalledApplet, IPlaylist, UUID } from 'pixelrunner-shared';
@@ -68,6 +69,55 @@ vi.mock('@/composables/useControllerQuery.ts', () => ({
 
 vi.mock('@/utils/generic.ts', () => ({
   vibrateDevice: vi.fn()
+}));
+
+vi.mock('@/components/DebugSection.vue', () => ({
+  default: {
+    props: ['data'],
+    template:
+      '<pre data-testid="debug-section">debug:{{ data.playlistName }}:{{ data.playlistAppletCount }}:{{ data.isSavingOrder.value }}</pre>'
+  }
+}));
+
+vi.mock('@/components/FeatureToggle.vue', () => ({
+  default: {
+    template: '<div><slot /></div>'
+  }
+}));
+
+vi.mock('@/components/PlayList.vue', () => ({
+  default: {
+    emits: ['reorder'],
+    props: ['applets', 'isSavingOrder', 'name'],
+    template: `
+      <section data-testid="playlist">
+        <p>playlist:{{ name }}</p>
+        <p>order:{{ applets.map((applet) => applet.packageName).join(',') }}</p>
+        <p>saving:{{ isSavingOrder }}</p>
+        <button
+          data-testid="reorder-reverse"
+          type="button"
+          @click="$emit('reorder', [...applets].reverse())"
+        >
+          reorder
+        </button>
+        <button
+          data-testid="reorder-missing-uuid"
+          type="button"
+          @click="$emit('reorder', [{ ...applets[0], installationDetails: undefined }, applets[1]])"
+        >
+          missing uuid
+        </button>
+      </section>
+    `
+  }
+}));
+
+vi.mock('(vendor)/daisy-ui-kit/index.ts', () => ({
+  Text: {
+    props: ['is'],
+    template: '<component :is="is || `span`"><slot /></component>'
+  }
 }));
 
 describe('Applets ListPage', () => {
@@ -169,7 +219,7 @@ describe('Applets ListPage', () => {
 
     await wrapper.get('[data-testid="reorder-reverse"]').trigger('click');
     await wrapper.get('[data-testid="reorder-reverse"]').trigger('click');
-    await flushPromises();
+    await settleVueUpdates();
 
     expect(listPageMock.playlists.updateOrder).toHaveBeenCalledExactlyOnceWith(
       ['uuid-weather', 'uuid-clock'],
@@ -186,7 +236,8 @@ describe('Applets ListPage', () => {
     );
 
     updateOrder.resolve();
-    await flushPromises();
+    await updateOrder.promise;
+    await settleVueUpdates();
 
     expect(wrapper.text()).toContain('order:weather,clock');
     expect(wrapper.text()).toContain('saving:false');
@@ -199,7 +250,7 @@ describe('Applets ListPage', () => {
     });
 
     await wrapper.get('[data-testid="reorder-missing-uuid"]').trigger('click');
-    await flushPromises();
+    await settleVueUpdates();
 
     expect(listPageMock.playlists.updateOrder).not.toHaveBeenCalled();
     expect(reload).toHaveBeenCalledOnce();
@@ -220,7 +271,7 @@ describe('Applets ListPage', () => {
     listPageMock.playlists.updateOrder.mockRejectedValue(new Error('update failed'));
 
     await wrapper.get('[data-testid="reorder-reverse"]').trigger('click');
-    await flushPromises();
+    await settleVueUpdates();
 
     expect(wrapper.text()).toContain('order:clock,weather');
     expect(wrapper.text()).toContain('saving:false');
@@ -236,7 +287,7 @@ describe('Applets ListPage', () => {
     listPageMock.playlists.updateOrder.mockRejectedValue('network unavailable');
 
     await wrapper.get('[data-testid="reorder-reverse"]').trigger('click');
-    await flushPromises();
+    await settleVueUpdates();
 
     expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
       true,
@@ -280,9 +331,15 @@ async function mountListPage(
     }
   });
 
-  await flushPromises();
+  await settleVueUpdates();
 
   return wrapper;
+}
+
+async function settleVueUpdates(): Promise<void> {
+  await Promise.resolve();
+  await Promise.resolve();
+  await nextTick();
 }
 
 function resetListPageMocks(

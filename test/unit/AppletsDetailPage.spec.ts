@@ -1,4 +1,4 @@
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -74,6 +74,65 @@ vi.mock('@/composables/useControllerQuery.ts', () => ({
       reload: state.reload
     };
   })
+}));
+
+vi.mock('@/components/Applet/AppletConfig.vue', () => ({
+  default: {
+    props: ['applet'],
+    template:
+      '<section data-testid="config">config:{{ applet.packageName }}:{{ applet.installationDetails?.uuid || "none" }}</section>'
+  }
+}));
+
+vi.mock('@/components/Applet/AppletDetails.vue', () => ({
+  default: {
+    props: ['name', 'view'],
+    template: '<section data-testid="details">details:{{ name }}:{{ view }}</section>'
+  }
+}));
+
+vi.mock('@/components/Applet/AppletImage.vue', () => ({
+  default: {
+    props: {
+      alt: String,
+      showFrame: Boolean,
+      src: String
+    },
+    template: '<section data-testid="image">image:{{ src }}:{{ alt }}:{{ showFrame }}</section>'
+  }
+}));
+
+vi.mock('@/components/Applet/AppletItem.vue', () => ({
+  default: {
+    props: ['applet'],
+    template:
+      '<article data-testid="item">item:{{ applet.packageName }}<slot name="item" v-bind="applet" /></article>'
+  }
+}));
+
+vi.mock('@/components/CategoryList.vue', () => ({
+  default: {
+    props: {
+      categories: Array,
+      hasItemsInline: Boolean
+    },
+    template:
+      '<section data-testid="categories">categories:{{ categories.map((category) => category.key).join(",") }}:{{ hasItemsInline }}</section>'
+  }
+}));
+
+vi.mock('@/components/DebugSection.vue', () => ({
+  default: {
+    props: ['data'],
+    template:
+      '<pre data-testid="debug">debug:{{ data.packageName }}:{{ data.uuid }}:{{ data.loadedPackageName }}:{{ data.loadedUuid }}</pre>'
+  }
+}));
+
+vi.mock('@/components/FeatureToggle.vue', () => ({
+  default: {
+    template: '<section data-testid="feature-toggle"><slot /></section>'
+  }
 }));
 
 describe('Applets DetailPage', () => {
@@ -255,9 +314,14 @@ async function mountDetailPage(
     }
   });
 
-  await flushPromises();
+  await settleVueUpdates();
 
   return wrapper;
+}
+
+async function settleVueUpdates(): Promise<void> {
+  await Promise.resolve();
+  await nextTick();
 }
 
 function resetDetailPageMocks(options: {

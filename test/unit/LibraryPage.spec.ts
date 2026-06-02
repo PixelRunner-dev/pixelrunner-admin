@@ -1,4 +1,5 @@
-import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
+import { mount, type VueWrapper } from '@vue/test-utils';
+import { nextTick } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { ICategory, IFullApplet } from 'pixelrunner-shared';
@@ -59,6 +60,69 @@ vi.mock('@/composables/useControllerQuery.ts', () => ({
       reload: state.reload
     };
   })
+}));
+
+vi.mock('@/components/Applet/AppletCard.vue', () => ({
+  default: {
+    props: ['applet', 'hasCategories', 'view'],
+    template: '<article>card:{{ applet.packageName }}:{{ view }}</article>'
+  }
+}));
+
+vi.mock('@/components/Applet/AppletCarousel.vue', () => ({
+  default: {
+    props: ['applets', 'itemWidth'],
+    template:
+      '<div>carousel:{{ applets.map((applet) => applet.packageName).join(",") }}:<slot name="item" v-bind="applets[0]" /></div>'
+  }
+}));
+
+vi.mock('@/components/CategoryList.vue', () => ({
+  default: {
+    props: ['categories', 'isInteractive'],
+    template:
+      '<div>categories:{{ categories.map((category) => category.key).join(",") }}:{{ isInteractive }}</div>'
+  }
+}));
+
+vi.mock('@/components/DebugSection.vue', () => ({
+  default: {
+    props: ['data'],
+    template: '<pre data-testid="debug-section">{{ JSON.stringify(data) }}</pre>'
+  }
+}));
+
+vi.mock('@/components/FeatureToggle.vue', () => ({
+  default: {
+    template: '<div><slot /></div>'
+  }
+}));
+
+vi.mock('@/components/Library/LibrarySearch.vue', () => ({
+  default: {
+    template: '<div>library-search</div>'
+  }
+}));
+
+vi.mock('@/components/Library/LibrarySection.vue', () => ({
+  default: {
+    props: ['payoff', 'title'],
+    template: '<section><h2>{{ title }}</h2><p v-if="payoff">{{ payoff }}</p><slot /></section>'
+  }
+}));
+
+vi.mock('(vendor)/daisy-ui-kit/index.ts', () => ({
+  Button: {
+    emits: ['click'],
+    template: '<button type="button" @click="$emit(\'click\', $event)"><slot /></button>'
+  },
+  Flex: {
+    template: '<ul><slot /></ul>'
+  },
+  Text: {
+    props: ['is'],
+    template: '<component :is="is || `span`"><slot /></component>'
+  }
 }));
 
 const clockApplet = createApplet('clock', 'Clock');
@@ -223,9 +287,14 @@ async function mountLibraryPage(
     }
   });
 
-  await flushPromises();
+  await settleVueUpdates();
 
   return wrapper;
+}
+
+async function settleVueUpdates(): Promise<void> {
+  await Promise.resolve();
+  await nextTick();
 }
 
 function resetLibraryPageMocks(options: {
