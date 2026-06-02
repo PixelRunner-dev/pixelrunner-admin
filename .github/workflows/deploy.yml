@@ -25,10 +25,12 @@ jobs:
           check-latest: true
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Install artifacts
-        run: npm run update-geo && npx playwright install --with-deps
+        run: |
+          npm install
+          npm run update-geo
+          npx playwright install --with-deps
+          ls -alh ./
+          ls -alh ./playwright-report/
 
       - name: Test
         env:
