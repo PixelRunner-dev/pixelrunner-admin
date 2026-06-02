@@ -10,7 +10,7 @@ export default mergeConfig(
       exclude: [...configDefaults.exclude, 'test/e2e/**', 'vendor/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
       coverage: {
-        exclude: ['vendor/**']
+        exclude: ['vendor/**', 'translations/*.json']
       }
     }
   })

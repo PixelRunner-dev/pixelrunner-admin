@@ -100,3 +100,23 @@ behind the compile-time flag and keep its API responses aligned with
   defaults.
 - If type-check fails on unrelated existing files, report exact failures and
   still verify changed files with focused tests or lint where possible.
+
+### Playwright E2E
+
+- **Never use `page.waitForTimeout` in committed test code.** It is permitted
+  temporarily during local debugging but must be replaced before committing.
+- Replace fixed delays with observable conditions instead:
+  - `await expect(locator).toBeVisible()` / `.toHaveValue(...)` — retries
+    automatically until condition or timeout.
+  - `page.waitForEvent('console', msg => msg.text().includes('...'))` — wait
+    for a specific console log emitted after an async operation completes. Set
+    up the listener *before* triggering the action to avoid the race window.
+  - `page.waitForURL(...)` — wait for SPA navigation to settle.
+  - `page.waitForSelector(...)` — wait for a DOM node to appear or disappear.
+- When a Vue component has no observable DOM side-effect after an async save,
+  add a `console.log` in the production code so tests can wait on it. Follow
+  the `[ComponentName] Saved <key>` log pattern already used in
+  `useSyncedControllerSettings` and `saveFeatureToggleSetting`.
+- Use SPA link clicks (`page.locator('a[href="..."]').click()`) rather than
+  `page.goto()` when in-memory mock state must survive navigation. `page.goto()`
+  triggers a full page reload, destroying the mock client and its settings.

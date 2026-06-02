@@ -297,6 +297,76 @@ const mockAppletSchemas = new Map<string, IAppletSchema>([
         }
       ]
     } as unknown as IAppletSchema
+  ],
+  [
+    'clockbyhenry',
+    {
+      version: '1',
+      notifications: [],
+      schema: [
+        {
+          type: 'dropdown',
+          id: 'format',
+          name: 'Format',
+          description: 'Clock format',
+          icon: 'clock',
+          default: '24h',
+          options: [
+            { display: '24 hour', value: '24h' },
+            { display: '12 hour', value: '12h' }
+          ]
+        },
+        {
+          type: 'onoff',
+          id: 'showSeconds',
+          name: 'Show seconds',
+          description: 'Show seconds in the clock.',
+          icon: 'timer',
+          default: true
+        }
+      ]
+    } as unknown as IAppletSchema
+  ],
+  [
+    'textbyt',
+    {
+      version: '1',
+      notifications: [],
+      schema: [
+        {
+          type: 'text',
+          id: 'message',
+          name: 'Message',
+          description: 'Text to display on screen',
+          icon: 'text',
+          default: 'Hello World'
+        },
+        {
+          type: 'color',
+          id: 'textColor',
+          name: 'Text Color',
+          description: 'Color of the displayed text',
+          icon: 'color',
+          default: '#ffffff'
+        },
+        {
+          type: 'datetime',
+          id: 'showUntil',
+          name: 'Show Until',
+          description: 'Hide the applet after this date and time',
+          icon: 'calendar',
+          default: ''
+        },
+        {
+          type: 'photoselect',
+          id: 'background',
+          name: 'Background Image',
+          description: 'Optional background image',
+          icon: 'image',
+          default: null
+        }
+      ]
+    } as unknown as IAppletSchema
   ]
 ]);
 
