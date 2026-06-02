@@ -35,9 +35,13 @@ const globalMocks = {
 };
 
 describe('FieldLocationbased.vue', () => {
+  const defaultProps = {
+    id: 'loc-1'
+  };
+
   it('renders wrapper with correct class', () => {
     const wrapper = mount(FieldLocationbased, {
-      props: { id: 'loc-1' },
+      props: defaultProps,
       global: globalMocks
     });
     expect(wrapper.find('.component--field-locationbased').exists()).toBe(true);
@@ -45,7 +49,7 @@ describe('FieldLocationbased.vue', () => {
 
   it('renders use-device-location toggle and label', () => {
     const wrapper = mount(FieldLocationbased, {
-      props: { id: 'loc-1' },
+      props: defaultProps,
       global: globalMocks
     });
     expect(wrapper.find('input[type="checkbox"]').exists()).toBe(true);
@@ -54,7 +58,7 @@ describe('FieldLocationbased.vue', () => {
 
   it('shows LocationSearch by default (toggle off)', () => {
     const wrapper = mount(FieldLocationbased, {
-      props: { id: 'loc-1' },
+      props: defaultProps,
       global: globalMocks
     });
     expect(wrapper.find('[data-testid="location-search"]').exists()).toBe(true);
@@ -62,7 +66,7 @@ describe('FieldLocationbased.vue', () => {
 
   it('hides LocationSearch when use-device-location toggle is enabled', async () => {
     const wrapper = mount(FieldLocationbased, {
-      props: { id: 'loc-1' },
+      props: defaultProps,
       global: globalMocks
     });
     const toggle = wrapper.find('input[type="checkbox"]');
@@ -72,7 +76,7 @@ describe('FieldLocationbased.vue', () => {
 
   it('restores LocationSearch when toggle is turned off again', async () => {
     const wrapper = mount(FieldLocationbased, {
-      props: { id: 'loc-1' },
+      props: defaultProps,
       global: globalMocks
     });
     const toggle = wrapper.find('input[type="checkbox"]');
@@ -84,7 +88,7 @@ describe('FieldLocationbased.vue', () => {
   it('accepts default prop and passes it to LocationSearch', () => {
     const defaultLoc = { lat: '52.3676', lng: '4.9041' };
     const wrapper = mount(FieldLocationbased, {
-      props: { id: 'loc-1', default: defaultLoc },
+      props: { ...defaultProps, default: defaultLoc },
       global: globalMocks
     });
     expect(wrapper.find('.component--field-locationbased').exists()).toBe(true);
