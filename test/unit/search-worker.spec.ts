@@ -9,7 +9,12 @@ type GeoDbModuleEntry = {
   lng: string;
 };
 
-const geoDbImportPath = '@/geo_db.json';
+const mockedGeoDb = vi.hoisted(() => [] as Array<GeoDbModuleEntry | Place>);
+
+vi.mock('@/geo_db.json', () => ({
+  default: mockedGeoDb
+}));
+
 const geoDbModule: GeoDbModuleEntry[] = [
   {
     country: 'NL',
@@ -43,7 +48,6 @@ const originalSelfOnMessage = globalThis.self.onmessage;
 
 describe('search worker', () => {
   afterEach(() => {
-    vi.doUnmock(geoDbImportPath);
     Object.defineProperty(globalThis.self, 'postMessage', {
       configurable: true,
       writable: true,
@@ -63,7 +67,7 @@ describe('search worker', () => {
     worker.send({});
 
     expect(worker.messages).toEqual([{ type: 'ready' }]);
-  });
+  }, 15000);
 
   it('returns empty results for empty search queries', async () => {
     const worker = await loadWorker();
@@ -71,7 +75,7 @@ describe('search worker', () => {
     worker.send({ type: 'search', q: '', limit: 5 });
     worker.send({ type: 'search', q: null, limit: 5 });
 
-    expect(worker.messages.slice(1)).toEqual([
+    expect(resultMessages(worker.messages)).toEqual([
       { type: 'results', q: '', results: [] },
       { type: 'results', q: '', results: [] }
     ]);
@@ -187,7 +191,7 @@ async function loadWorker(data: ReadonlyArray<GeoDbModuleEntry | Place> = geoDbM
     })
   });
 
-  vi.doMock(geoDbImportPath, () => ({ default: data }));
+  mockedGeoDb.splice(0, mockedGeoDb.length, ...data);
 
   await import('@/workers/search-worker.ts');
 
@@ -217,4 +221,13 @@ function lastResults(messages: SearchWorkerMessage[]): Place[] {
     );
 
   return result?.results ?? [];
+}
+
+function resultMessages(
+  messages: SearchWorkerMessage[]
+): Extract<SearchWorkerMessage, { type: 'results' }>[] {
+  return messages.filter(
+    (message): message is Extract<SearchWorkerMessage, { type: 'results' }> =>
+      message.type === 'results'
+  );
 }

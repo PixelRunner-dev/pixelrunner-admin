@@ -100,5 +100,5 @@ export function provideNotifications() {
 }
 
 export function useNotifications() {
-  return inject(notificationsInjectionKey);
+  return inject(notificationsInjectionKey, undefined);
 }
