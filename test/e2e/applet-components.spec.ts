@@ -44,6 +44,35 @@ test.describe('AppletImage', () => {
   });
 });
 
+test.describe('AppletImage — no horizontal scroll with frame (375 px viewport)', () => {
+  test('detail page has no horizontal scroll at mobile width', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/applets');
+    await page.locator('article.component--applet-card a', { hasText: 'Configure' }).first().click();
+    await page.waitForURL(/\/applets\/.+/);
+
+    await expect(page.locator('.component--applet-image.is-showing-frame')).toBeVisible();
+
+    // Compare against innerWidth (not clientWidth, which is reduced by scrollbar width)
+    const hasHorizontalScroll = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth
+    );
+    expect(hasHorizontalScroll).toBe(false);
+  });
+
+  test('library detail page has no horizontal scroll at mobile width', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/library/applets/clockbyhenry');
+    await expect(page.locator('.component--applet-image.is-showing-frame')).toBeVisible();
+
+    // Compare against innerWidth (not clientWidth, which is reduced by scrollbar width)
+    const hasHorizontalScroll = await page.evaluate(
+      () => document.documentElement.scrollWidth > window.innerWidth
+    );
+    expect(hasHorizontalScroll).toBe(false);
+  });
+});
+
 test.describe('AppletCard', () => {
   test('renders as article with applet name heading in playlist', async ({ page }) => {
     await page.goto('/applets');

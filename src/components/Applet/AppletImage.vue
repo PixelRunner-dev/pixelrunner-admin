@@ -86,6 +86,7 @@ watch(
 
   aspect-ratio: 2 / 1;
   margin-top: 4rem;
+  margin-right: var(--_d);
   position: relative;
 }
 
