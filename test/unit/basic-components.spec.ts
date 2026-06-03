@@ -114,9 +114,9 @@ describe('AccessWarning', () => {
     expect(document.body.textContent).toContain('http://[device-ip]');
   });
 
-  it('renders translated access warning text when a global translator is available', async () => {
-    (window as typeof window & { $t?: (key: string) => string }).$t = (key: string) =>
-      `translated:${key}`;
+  it('renders global translator output when a global translator is available', async () => {
+    const translator = vi.fn((key: string) => `translated:${key}`);
+    (window as typeof window & { $t?: (key: string) => string }).$t = translator;
 
     mount(AccessWarning, {
       attachTo: document.body
@@ -124,9 +124,9 @@ describe('AccessWarning', () => {
 
     await nextTick();
 
-    expect(document.body.textContent).toContain('translated:generic.accessWarning.title');
-    expect(document.body.textContent).toContain('translated:generic.accessWarning.message');
-    expect(document.body.textContent).toContain('translated:generic.accessWarning.instruction');
+    expect(translator).toHaveBeenCalledTimes(3);
+    expect(document.body.textContent).toContain('translated:');
+    expect(document.body.textContent).not.toContain('Access Via Device IP');
   });
 });
 

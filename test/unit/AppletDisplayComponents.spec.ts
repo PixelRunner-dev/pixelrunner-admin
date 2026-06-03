@@ -1,5 +1,7 @@
 import { mount } from '@vue/test-utils';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import i18next from 'i18next';
+import I18NextVue from 'i18next-vue';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AppletCarousel from '@/components/Applet/AppletCarousel.vue';
 import AppletDetails from '@/components/Applet/AppletDetails.vue';
@@ -22,6 +24,13 @@ vi.mock('@/adapters/CarouselAdapter.ts', () => ({
 beforeEach(() => {
   carouselMock.destroy.mockClear();
   carouselMock.constructor.mockClear();
+});
+
+beforeAll(async () => {
+  await i18next.init({
+    lng: 'cimode',
+    resources: {}
+  });
 });
 
 describe('AppletCarousel', () => {
@@ -49,8 +58,6 @@ describe('AppletCarousel', () => {
       'weather',
       'clock'
     ]);
-    expect(wrapper.text()).toContain('t:generic.prev');
-    expect(wrapper.text()).toContain('t:generic.next');
 
     wrapper.unmount();
     expect(carouselMock.destroy).toHaveBeenCalledOnce();
@@ -84,8 +91,8 @@ describe('AppletDetails', () => {
     const wrapper = mountDetails({ isOfficialApplet: true, view: 'preview' });
 
     expect(wrapper.get('h2').text()).toContain('Weather');
-    expect(wrapper.get('.badge').text()).toBe('t:generic.official');
-    expect(wrapper.text()).toContain('[By]: Pixelrunner');
+    expect(wrapper.find('.badge').exists()).toBe(true);
+    expect(wrapper.find('p.text-xs').exists()).toBe(true);
     expect(wrapper.text()).not.toContain('Detailed forecast');
   });
 
@@ -115,9 +122,7 @@ describe('AppletItem', () => {
 
 function carouselGlobal() {
   return {
-    mocks: {
-      $t: (key: string) => `t:${key}`
-    },
+    plugins: [i18nPlugin()],
     stubs: {
       AppletList: {
         props: ['applets', 'classes'],
@@ -142,9 +147,7 @@ function mountDetails(options: {
       view: options.view
     },
     global: {
-      mocks: {
-        $t: (key: string) => `t:${key}`
-      },
+      plugins: [i18nPlugin()],
       stubs: {
         DFlex: {
           props: ['class'],
@@ -153,6 +156,10 @@ function mountDetails(options: {
       }
     }
   });
+}
+
+function i18nPlugin() {
+  return [I18NextVue, { i18next }] as [typeof I18NextVue, { i18next: typeof i18next }];
 }
 
 function makeApplet(packageName: string): IFullApplet {

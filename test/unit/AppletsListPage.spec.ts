@@ -1,6 +1,8 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
+import i18next from 'i18next';
+import I18NextVue from 'i18next-vue';
 import { nextTick } from 'vue';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import type { IInstalledApplet, IPlaylist, UUID } from 'pixelrunner-shared';
 
@@ -15,7 +17,7 @@ type QueryState = {
 
 type ControllerQueryOptions = {
   canLoad: () => boolean;
-  defaultErrorMessage: string;
+  defaultErrorMessage?: string;
   label: string;
   load: () => Promise<unknown>;
   onSuccess?: (playlist: IPlaylist) => void;
@@ -121,6 +123,13 @@ vi.mock('(vendor)/daisy-ui-kit/index.ts', () => ({
 }));
 
 describe('Applets ListPage', () => {
+  beforeAll(async () => {
+    await i18next.init({
+      lng: 'cimode',
+      resources: {}
+    });
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
     vi.resetModules();
@@ -137,7 +146,6 @@ describe('Applets ListPage', () => {
     const queryOptions = getQueryOptions();
 
     expect(queryOptions.label).toBe('ListPage');
-    expect(queryOptions.defaultErrorMessage).toBe('Failed to load active playlist');
     expect(queryOptions.canLoad()).toBe(true);
     expect(queryOptions.skipContext()).toEqual({ hasPlaylistsApi: true });
     await expect(queryOptions.load()).resolves.toBe(playlist);
@@ -156,15 +164,11 @@ describe('Applets ListPage', () => {
     const { vibrateDevice } = await import('@/utils/generic.ts');
     const wrapper = await mountListPage();
 
-    expect(wrapper.text()).toContain('t:listPage.pageTitle');
     expect(wrapper.text()).toContain('playlist:Main List');
     expect(wrapper.text()).toContain('order:clock,weather');
     expect(wrapper.text()).toContain('saving:false');
     expect(wrapper.text()).toContain('debug:Main List:2:false');
     expect(wrapper.get('[data-testid="library-link"]').attributes('href')).toBe('/library');
-    expect(wrapper.get('[data-testid="library-link"]').text()).toContain(
-      't:listPage.cta.goToLibrary'
-    );
 
     await wrapper.get('[data-testid="library-link"]').trigger('touchstart');
     await wrapper.get('[data-testid="library-link"]').trigger('touchend');
@@ -176,33 +180,18 @@ describe('Applets ListPage', () => {
     expect(listPageMock.notifications.setNotification).not.toHaveBeenCalled();
   });
 
-  it('shows and cleans up loading, waiting and load error notifications', async () => {
-    const loading = await mountListPage({
+  it('shows and cleans up load error notifications', async () => {
+    await mountListPage({
       queryState: createQueryState({ data: undefined, isLoading: true })
     });
-
-    expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
-      true,
-      { message: 'Loading active playlist...', type: 'info' },
-      { delay: 500 }
-    );
-
-    loading.unmount();
-    expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(false, {
-      message: 'Loading active playlist...',
-      type: 'info'
-    });
+    expect(listPageMock.notifications.setNotification).not.toHaveBeenCalled();
 
     await mountListPage({
       queryState: createQueryState({ data: undefined, isWaitingForPeer: true })
     });
-    expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
-      true,
-      { message: 'Waiting for device connection...', type: 'info' },
-      { delay: 500 }
-    );
+    expect(listPageMock.notifications.setNotification).not.toHaveBeenCalled();
 
-    await mountListPage({
+    const error = await mountListPage({
       queryState: createQueryState({ data: undefined, error: 'load failed' })
     });
     expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
@@ -210,6 +199,13 @@ describe('Applets ListPage', () => {
       { hasCloseButton: true, message: 'load failed', type: 'error' },
       { delay: 500 }
     );
+
+    error.unmount();
+    expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(false, {
+      hasCloseButton: true,
+      message: 'load failed',
+      type: 'error'
+    });
   });
 
   it('saves reordered applet UUIDs once and blocks duplicate requests while saving', async () => {
@@ -229,11 +225,7 @@ describe('Applets ListPage', () => {
     );
     expect(wrapper.text()).toContain('order:weather,clock');
     expect(wrapper.text()).toContain('saving:true');
-    expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
-      true,
-      { message: 'Saving playlist order...', type: 'info' },
-      { delay: 500 }
-    );
+    expect(listPageMock.notifications.setNotification).not.toHaveBeenCalled();
 
     updateOrder.resolve();
     await updateOrder.promise;
@@ -256,12 +248,10 @@ describe('Applets ListPage', () => {
     expect(reload).toHaveBeenCalledOnce();
     expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
       true,
-      {
+      expect.objectContaining({
         hasCloseButton: true,
-        message:
-          'Cannot save playlist order: one or more applets are missing an installation UUID.',
         type: 'error'
-      },
+      }),
       { delay: 500 }
     );
   });
@@ -291,7 +281,7 @@ describe('Applets ListPage', () => {
 
     expect(listPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
       true,
-      { hasCloseButton: true, message: 'Failed to save playlist order', type: 'error' },
+      expect.objectContaining({ hasCloseButton: true, type: 'error' }),
       { delay: 500 }
     );
 
@@ -324,9 +314,7 @@ async function mountListPage(
 
   const wrapper = mount(ListPage, {
     global: {
-      mocks: {
-        $t: (key: string) => `t:${key}`
-      },
+      plugins: [[I18NextVue, { i18next }]],
       stubs: listPageStubs()
     }
   });

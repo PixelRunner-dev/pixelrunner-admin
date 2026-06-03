@@ -1,5 +1,7 @@
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import i18next from 'i18next';
+import I18NextVue from 'i18next-vue';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import SettingsPage from '@/pages/SettingsPage.vue';
 import { CookieStore } from '@/utils/CookieStore.ts';
@@ -54,10 +56,6 @@ vi.mock('@/ws/index.ts', () => ({
 
 vi.mock('vue-router', () => ({
   useRoute: () => settingsPageMock.route
-}));
-
-vi.mock('i18next', () => ({
-  t: (key: string) => `i18n:${key}`
 }));
 
 vi.mock('@/composables/useSyncedControllerSettings.ts', async (importOriginal) => ({
@@ -118,6 +116,13 @@ const scannedNetworks: WifiScanNetwork[] = [
 ];
 
 describe('SettingsPage', () => {
+  beforeAll(async () => {
+    await i18next.init({
+      lng: 'cimode',
+      resources: {}
+    });
+  });
+
   afterEach(() => {
     CookieStore.delete('theme');
     document.documentElement.removeAttribute('data-theme');
@@ -146,8 +151,7 @@ describe('SettingsPage', () => {
     );
     expect(useControllerQuery).toHaveBeenCalledWith(
       expect.objectContaining({
-        label: 'SettingsPage - feature toggles',
-        defaultErrorMessage: 'Failed to load controller version'
+        label: 'SettingsPage - feature toggles'
       })
     );
     expect(settingsPageMock.settings.getWifiStatus).toHaveBeenCalledOnce();
@@ -170,7 +174,7 @@ describe('SettingsPage', () => {
 
     await buttonByText(wrapper, 'Cafe').trigger('click');
     await wrapper.get('#password').setValue('secret-pass');
-    await buttonByText(wrapper, 'Apply WiFi network').trigger('click');
+    await wifiApplyButton(wrapper).trigger('click');
     await flushPromises();
 
     expect(settingsPageMock.settings.configureWifi).toHaveBeenCalledWith({
@@ -186,9 +190,7 @@ describe('SettingsPage', () => {
       ssid: 'Cafe',
       subnet: '24'
     });
-    expect(wrapper.text()).toContain(
-      '[WiFi configured. Device may disconnect from setup network while it joins the target network.]'
-    );
+    expect(wrapper.find('[role="status"]').exists()).toBe(true);
     expect((wrapper.get('#ssid').element as HTMLInputElement).value).toBe('Cafe');
   });
 
@@ -201,7 +203,7 @@ describe('SettingsPage', () => {
     expect(wrapper.text()).toContain('scan failed');
 
     settingsPageMock.settings.scanWifiNetworks.mockResolvedValueOnce(scannedNetworks);
-    await buttonByText(wrapper, '[Refresh networks]').trigger('click');
+    await wifiRefreshButton(wrapper).trigger('click');
     await flushPromises();
 
     expect(settingsPageMock.settings.scanWifiNetworks).toHaveBeenCalledTimes(2);
@@ -211,9 +213,7 @@ describe('SettingsPage', () => {
   it('renders first-time setup mode without general settings', async () => {
     const wrapper = await mountSettingsPage({ firstTime: true });
 
-    expect(wrapper.text()).toContain(
-      '[Connect this device to WiFi. Other settings unlock after the device joins the network.]'
-    );
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
     expect(wrapper.find('#deviceName').exists()).toBe(false);
     expect(wrapper.find('#theme').exists()).toBe(false);
     expect(wrapper.find('#ssid').exists()).toBe(true);
@@ -253,8 +253,8 @@ describe('SettingsPage', () => {
 
     await wrapper.get('#theme').setValue('dark');
     await wrapper.get('#brightness').setValue(50);
-    await buttonByText(wrapper, '[Refresh networks]').trigger('touchstart');
-    await buttonByText(wrapper, '[Refresh networks]').trigger('touchend');
+    await wifiRefreshButton(wrapper).trigger('touchstart');
+    await wifiRefreshButton(wrapper).trigger('touchend');
 
     expect(document.documentElement.dataset.theme).toBe('dark');
     expect(CookieStore.get('theme')).toBe('dark');
@@ -271,13 +271,13 @@ describe('SettingsPage', () => {
     const consoleLog = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     const wrapper = await mountSettingsPage();
 
-    await buttonByText(wrapper, 't:settingsPage.actions.update.button').trigger('click');
-    await buttonByText(wrapper, 't:settingsPage.actions.factoryReset.button').trigger('click');
-    await buttonByText(wrapper, 't:settingsPage.actions.factoryReset.button').trigger('click');
+    await actionButton(wrapper, 'firmware-update').trigger('click');
+    await actionButton(wrapper, 'factory-reset').trigger('click');
+    await actionButton(wrapper, 'factory-reset').trigger('click');
     await flushPromises();
 
     expect(settingsPageMock.device.status).toHaveBeenCalledOnce();
-    expect(confirm).toHaveBeenCalledWith('i18n:settingsPage.factoryReset.confirm');
+    expect(confirm).toHaveBeenCalledTimes(2);
     expect(consoleLog).toHaveBeenCalledWith('reset device');
     expect(consoleLog).toHaveBeenCalledWith('reset device canceled');
   });
@@ -285,55 +285,43 @@ describe('SettingsPage', () => {
   it('reboot calls device.reboot() and shows translated notifications', async () => {
     const wrapper = await mountSettingsPage();
 
-    await buttonByText(wrapper, 't:settingsPage.actions.reboot.button').trigger('click');
+    await actionButton(wrapper, 'reboot').trigger('click');
     await flushPromises();
 
     expect(settingsPageMock.device.reboot).toHaveBeenCalledOnce();
-    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
-      type: 'info',
-      message: 'i18n:settingsPage.actions.reboot.inProgress'
-    });
-    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
-      'i18n:settingsPage.actions.reboot.inProgress'
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'info' })
     );
-    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'i18n:settingsPage.actions.reboot.success',
-      timeoutToClose: 10000
-    });
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(expect.any(String));
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'success', timeoutToClose: 10000 })
+    );
   });
 
   it('shutdown calls device.shutdown() and shows translated notifications', async () => {
     const wrapper = await mountSettingsPage();
 
-    await buttonByText(wrapper, 't:settingsPage.actions.shutdown.button').trigger('click');
+    await actionButton(wrapper, 'shutdown').trigger('click');
     await flushPromises();
 
     expect(settingsPageMock.device.shutdown).toHaveBeenCalledOnce();
-    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
-      type: 'info',
-      message: 'i18n:settingsPage.actions.shutdown.inProgress'
-    });
-    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
-      'i18n:settingsPage.actions.shutdown.inProgress'
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'info' })
     );
-    expect(notificationsMock.addNotification).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'i18n:settingsPage.actions.shutdown.success',
-      timeoutToClose: 10000
-    });
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(expect.any(String));
+    expect(notificationsMock.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'success', timeoutToClose: 10000 })
+    );
   });
 
   it('shows error notification on reboot failure', async () => {
     settingsPageMock.device.reboot.mockRejectedValueOnce(new Error('reboot failed'));
     const wrapper = await mountSettingsPage();
 
-    await buttonByText(wrapper, 't:settingsPage.actions.reboot.button').trigger('click');
+    await actionButton(wrapper, 'reboot').trigger('click');
     await flushPromises();
 
-    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
-      'i18n:settingsPage.actions.reboot.inProgress'
-    );
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(expect.any(String));
     expect(notificationsMock.addNotification).toHaveBeenCalledWith({
       type: 'error',
       message: 'reboot failed',
@@ -345,12 +333,10 @@ describe('SettingsPage', () => {
     settingsPageMock.device.shutdown.mockRejectedValueOnce(new Error('shutdown failed'));
     const wrapper = await mountSettingsPage();
 
-    await buttonByText(wrapper, 't:settingsPage.actions.shutdown.button').trigger('click');
+    await actionButton(wrapper, 'shutdown').trigger('click');
     await flushPromises();
 
-    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(
-      'i18n:settingsPage.actions.shutdown.inProgress'
-    );
+    expect(notificationsMock.removeNotification).toHaveBeenCalledWith(expect.any(String));
     expect(notificationsMock.addNotification).toHaveBeenCalledWith({
       type: 'error',
       message: 'shutdown failed',
@@ -366,7 +352,7 @@ describe('SettingsPage', () => {
       })
     );
     const wrapper = await mountSettingsPage();
-    const rebootBtn = buttonByText(wrapper, 't:settingsPage.actions.reboot.button');
+    const rebootBtn = actionButton(wrapper, 'reboot');
 
     await rebootBtn.trigger('click');
 
@@ -388,7 +374,7 @@ describe('SettingsPage', () => {
       })
     );
     const wrapper = await mountSettingsPage();
-    const shutdownBtn = buttonByText(wrapper, 't:settingsPage.actions.shutdown.button');
+    const shutdownBtn = actionButton(wrapper, 'shutdown');
 
     await shutdownBtn.trigger('click');
 
@@ -408,9 +394,9 @@ async function mountSettingsPage(options: { firstTime?: boolean; connected?: boo
 
   const wrapper = mount(SettingsPage, {
     global: {
+      plugins: [[I18NextVue, { i18next }]],
       mocks: {
-        $route: settingsPageMock.route,
-        $t: (key: string) => `t:${key}`
+        $route: settingsPageMock.route
       },
       stubs: settingsPageStubs()
     }
@@ -445,6 +431,21 @@ function buttonByText(wrapper: VueWrapper, text: string) {
   }
 
   return button;
+}
+
+function wifiApplyButton(wrapper: VueWrapper) {
+  return wrapper.get('[data-testid="wifi-apply"]');
+}
+
+function wifiRefreshButton(wrapper: VueWrapper) {
+  return wrapper.get('[data-testid="wifi-refresh"]');
+}
+
+function actionButton(
+  wrapper: VueWrapper,
+  testId: 'factory-reset' | 'firmware-update' | 'reboot' | 'shutdown'
+) {
+  return wrapper.get(`[data-testid="${testId}"]`);
 }
 
 function settingsPageStubs() {

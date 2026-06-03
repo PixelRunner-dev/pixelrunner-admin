@@ -597,6 +597,7 @@ watchEffect(() => {
           secondary
           sm
           class="w-80"
+          data-testid="wifi-refresh"
           :disabled="wifiIsScanning || !isConnected"
           @click="loadWifiNetworks"
           @touchstart="() => vibrateDevice(4)"
@@ -889,6 +890,7 @@ watchEffect(() => {
         btn
         primary
         wide
+        data-testid="wifi-apply"
         :disabled="wifiIsSaving || !isConnected"
         @click="saveWifiNetwork"
         @touchstart="() => vibrateDevice(4)"
@@ -1127,6 +1129,7 @@ watchEffect(() => {
             btn
             primary
             class="w-full"
+            data-testid="firmware-update"
             @click="doFirmwareUpdate"
             @touchstart="() => vibrateDevice(4)"
             @touchend="() => vibrateDevice(1)"
@@ -1139,6 +1142,7 @@ watchEffect(() => {
           btn
           secondary
           class="w-full"
+          data-testid="shutdown"
           :disabled="!isConnected || shutdownIsPending"
           @click="doShutdown"
           @touchstart="() => vibrateDevice(4)"
@@ -1151,6 +1155,7 @@ watchEffect(() => {
           btn
           accent
           class="w-full"
+          data-testid="reboot"
           :disabled="!isConnected || rebootIsPending"
           @click="doReboot"
           @touchstart="() => vibrateDevice(4)"
@@ -1164,6 +1169,7 @@ watchEffect(() => {
             btn
             error
             dash
+            data-testid="factory-reset"
             @click="doFactoryReset"
             @touchstart="() => vibrateDevice(4)"
             @touchend="() => vibrateDevice(1)"

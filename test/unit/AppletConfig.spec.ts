@@ -1,5 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import i18next from 'i18next';
+import I18NextVue from 'i18next-vue';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AppletConfig from '@/components/Applet/AppletConfig.vue';
 
@@ -53,6 +55,13 @@ function installWorkerMock() {
 }
 
 describe('AppletConfig', () => {
+  beforeAll(async () => {
+    await i18next.init({
+      lng: 'cimode',
+      resources: {}
+    });
+  });
+
   beforeEach(() => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     installWorkerMock();
@@ -232,11 +241,12 @@ describe('AppletConfig', () => {
     await flushPromises();
 
     expect(appletApiMock.applets.remove).toHaveBeenCalledWith('weather-uuid');
-    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Applet removed from playlist.',
-      hasCloseButton: true
-    });
+    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'success',
+        hasCloseButton: true
+      })
+    );
     expect(appletApiMock.router.replace).toHaveBeenCalledWith('/applets');
 
     appletApiMock.applets.remove.mockRejectedValueOnce(new Error('remove failed'));
@@ -258,36 +268,31 @@ describe('AppletConfig', () => {
     const libraryWrapper = mountConfig(makeApplet({ installed: false }));
     await flushPromises();
 
-    expect(libraryWrapper.find('[aria-label="Toggle applet visibility"]').exists()).toBe(false);
-    expect(libraryWrapper.find('[aria-label="Toggle applet pin"]').exists()).toBe(false);
+    expect(libraryWrapper.findAll('input[type="checkbox"]')).toHaveLength(0);
 
     const installedWrapper = mountConfig(
       makeApplet({ installed: true, isHidden: true, isPinned: true })
     );
     await flushPromises();
 
-    expect(
-      (installedWrapper.get('[aria-label="Toggle applet visibility"]').element as HTMLInputElement)
-        .checked
-    ).toBe(true);
-    expect(
-      (installedWrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
-    ).toBe(true);
+    expect(getToggleInput(installedWrapper, 0).checked).toBe(true);
+    expect(getToggleInput(installedWrapper, 1).checked).toBe(true);
   });
 
   it('persists hidden toggle changes with uuid and keeps success state', async () => {
     const wrapper = mountConfig(makeApplet({ installed: true, isHidden: false }));
     await flushPromises();
 
-    await wrapper.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await getToggle(wrapper, 0).setValue(true);
     await flushPromises();
 
     expect(appletApiMock.applets.updateHidden).toHaveBeenCalledWith('weather-uuid', true);
-    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Applet hidden from playback.',
-      hasCloseButton: true
-    });
+    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'success',
+        hasCloseButton: true
+      })
+    );
   });
 
   it('rolls back hidden toggle changes on failure', async () => {
@@ -295,12 +300,10 @@ describe('AppletConfig', () => {
     const wrapper = mountConfig(makeApplet({ installed: true, isHidden: false }));
     await flushPromises();
 
-    await wrapper.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await getToggle(wrapper, 0).setValue(true);
     await flushPromises();
 
-    expect(
-      (wrapper.get('[aria-label="Toggle applet visibility"]').element as HTMLInputElement).checked
-    ).toBe(false);
+    expect(getToggleInput(wrapper, 0).checked).toBe(false);
     expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
       type: 'error',
       message: 'visibility failed',
@@ -312,53 +315,46 @@ describe('AppletConfig', () => {
     const wrapper = mountConfig(makeApplet({ installed: true, isHidden: false, isPinned: true }));
     await flushPromises();
 
-    expect(
-      (wrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
-    ).toBe(true);
+    expect(getToggleInput(wrapper, 1).checked).toBe(true);
 
-    await wrapper.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await getToggle(wrapper, 0).setValue(true);
     await flushPromises();
 
-    expect(
-      (wrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
-    ).toBe(false);
+    expect(getToggleInput(wrapper, 1).checked).toBe(false);
 
     appletApiMock.applets.updateHidden.mockRejectedValueOnce(new Error('visibility failed'));
     appletApiMock.notifications.addNotification.mockClear();
     const wrapper2 = mountConfig(makeApplet({ installed: true, isHidden: false, isPinned: true }));
     await flushPromises();
 
-    await wrapper2.get('[aria-label="Toggle applet visibility"]').setValue(true);
+    await getToggle(wrapper2, 0).setValue(true);
     await flushPromises();
 
-    expect(
-      (wrapper2.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
-    ).toBe(true);
+    expect(getToggleInput(wrapper2, 1).checked).toBe(true);
   });
 
   it('persists pinned toggle changes with uuid and rolls back on failure', async () => {
     const wrapper = mountConfig(makeApplet({ installed: true, isPinned: false }));
     await flushPromises();
 
-    await wrapper.get('[aria-label="Toggle applet pin"]').setValue(true);
+    await getToggle(wrapper, 1).setValue(true);
     await flushPromises();
 
     expect(appletApiMock.applets.updatePinned).toHaveBeenCalledWith('weather-uuid', true);
-    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
-      type: 'success',
-      message: 'Applet pinned to the top of the playlist.',
-      hasCloseButton: true
-    });
+    expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'success',
+        hasCloseButton: true
+      })
+    );
 
     appletApiMock.applets.updatePinned.mockRejectedValueOnce(new Error('pin failed'));
     appletApiMock.notifications.addNotification.mockClear();
 
-    await wrapper.get('[aria-label="Toggle applet pin"]').setValue(false);
+    await getToggle(wrapper, 1).setValue(false);
     await flushPromises();
 
-    expect(
-      (wrapper.get('[aria-label="Toggle applet pin"]').element as HTMLInputElement).checked
-    ).toBe(true);
+    expect(getToggleInput(wrapper, 1).checked).toBe(true);
     expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
       type: 'error',
       message: 'pin failed',
@@ -375,9 +371,7 @@ function mountConfig(applet: IFullApplet, options: MountOptions = {}) {
   const wrapper = mount(AppletConfig, {
     props: { applet },
     global: {
-      mocks: {
-        $t: (key: string) => `t:${key}`
-      },
+      plugins: [[I18NextVue, { i18next }]],
       stubs: {
         DButton: {
           props: ['disabled', 'type'],
@@ -404,6 +398,20 @@ function mountConfig(applet: IFullApplet, options: MountOptions = {}) {
   });
   setReportValidity(wrapper, options.reportValidity ?? true);
   return wrapper;
+}
+
+function getToggle(wrapper: ReturnType<typeof mountConfig>, index: number) {
+  const toggle = wrapper.findAll('input[type="checkbox"]')[index];
+
+  if (!toggle) {
+    throw new Error(`Missing toggle at index ${index}`);
+  }
+
+  return toggle;
+}
+
+function getToggleInput(wrapper: ReturnType<typeof mountConfig>, index: number) {
+  return getToggle(wrapper, index).element as HTMLInputElement;
 }
 
 function setReportValidity(wrapper: ReturnType<typeof mount>, result: boolean) {

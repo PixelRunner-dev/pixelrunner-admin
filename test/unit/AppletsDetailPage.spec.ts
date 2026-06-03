@@ -35,6 +35,9 @@ const detailPageMock = vi.hoisted(() => ({
   hasAppletsApi: true,
   isConnected: { __v_isRef: true, value: true },
   lastError: { __v_isRef: true, value: null as Error | null },
+  notifications: {
+    setNotification: vi.fn()
+  },
   queryOptions: [] as ControllerQueryOptions[],
   queryState: undefined as QueryState | undefined,
   route: null as ReactiveRoute | null,
@@ -74,6 +77,10 @@ vi.mock('@/composables/useControllerQuery.ts', () => ({
       reload: state.reload
     };
   })
+}));
+
+vi.mock('@/composables/useNotifications.ts', () => ({
+  useNotifications: () => detailPageMock.notifications
 }));
 
 vi.mock('@/components/Applet/AppletConfig.vue', () => ({
@@ -223,26 +230,49 @@ describe('Applets DetailPage', () => {
     expect(wrapper.find('[data-testid="categories"]').exists()).toBe(false);
   });
 
-  it('renders loading, waiting, error and not-found states', async () => {
-    const loading = await mountDetailPage({
+  it('reports loading, waiting, error and not-found states through notifications', async () => {
+    await mountDetailPage({
       queryState: createQueryState({ data: null, isLoading: true })
     });
-    expect(loading.text()).toContain('Loading applet...');
+    expect(detailPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
+      true,
+      { message: 'Loading applet...', type: 'info' },
+      { delay: 500 }
+    );
 
-    const waiting = await mountDetailPage({
+    await mountDetailPage({
       queryState: createQueryState({ data: null, isWaitingForPeer: true })
     });
-    expect(waiting.text()).toContain('Waiting for device connection...');
+    expect(detailPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
+      true,
+      { message: 'Waiting for device connection...', type: 'info' },
+      { delay: 500 }
+    );
 
-    const error = await mountDetailPage({
+    await mountDetailPage({
       queryState: createQueryState({ data: null, error: 'load failed' })
     });
-    expect(error.text()).toContain('load failed');
+    expect(detailPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
+      true,
+      { hasCloseButton: true, message: 'load failed', type: 'error' },
+      { delay: 500 }
+    );
 
     const notFound = await mountDetailPage({
       queryState: createQueryState({ data: null })
     });
-    expect(notFound.text()).toContain('Applet not found');
+    expect(detailPageMock.notifications.setNotification).toHaveBeenLastCalledWith(
+      true,
+      { hasCloseButton: true, message: 'Applet not found', type: 'warning' },
+      { delay: 500 }
+    );
+
+    notFound.unmount();
+    expect(detailPageMock.notifications.setNotification).toHaveBeenLastCalledWith(false, {
+      hasCloseButton: true,
+      message: 'Applet not found',
+      type: 'warning'
+    });
   });
 
   it('throws explicit loader errors for missing API and missing route identifiers', async () => {
@@ -334,6 +364,7 @@ function resetDetailPageMocks(options: {
   detailPageMock.hasAppletsApi = options.hasAppletsApi ?? true;
   detailPageMock.isConnected.value = options.isConnected ?? true;
   detailPageMock.lastError.value = null;
+  detailPageMock.notifications.setNotification.mockReset();
   detailPageMock.state.value = 'connected';
   detailPageMock.queryOptions = [];
   detailPageMock.queryState = options.queryState ?? createQueryState();

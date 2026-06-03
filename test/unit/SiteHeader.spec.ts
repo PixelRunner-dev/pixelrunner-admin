@@ -27,6 +27,9 @@ vi.mock('vue-router', () => ({
 function mountHeader() {
   return mount(SiteHeader, {
     global: {
+      mocks: {
+        $t: (key: string) => key
+      },
       stubs: {
         RouterLink: {
           props: ['to'],
