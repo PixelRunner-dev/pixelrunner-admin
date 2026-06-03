@@ -80,7 +80,9 @@ watch(query, (newQuery) => {
         </label>
       </DFormControl>
 
-      <DButton type="submit" color="primary" size="lg" join>{{ $t('librarySearchComponent.submitButton.label') }}</DButton>
+      <DButton type="submit" color="primary" size="lg" join>{{
+        $t('librarySearchComponent.submitButton.label')
+      }}</DButton>
     </DJoin>
   </form>
 </template>

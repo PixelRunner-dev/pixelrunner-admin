@@ -20,7 +20,10 @@ const scheduleDays = ref([false, true, true, true, true, true, false]);
 </script>
 
 <template>
-  <DFieldset :legend="$t('fieldScheduleComponent.legend')" class="component--field-schedule my-4 gap-4">
+  <DFieldset
+    :legend="$t('fieldScheduleComponent.legend')"
+    class="component--field-schedule my-4 gap-4"
+  >
     <DFormControl class="gap-1">
       <DLabel for="schedule">
         <DCheckbox id="schedule" name="schedule" v-model="schedule" />

@@ -304,7 +304,9 @@ const handleSubmit = async () => {
       type: 'error',
       message: getErrorMessage(
         error,
-        isEditMode.value ? 'Failed to save applet configuration.' : t('applet.notification.playlist.install.error')
+        isEditMode.value
+          ? 'Failed to save applet configuration.'
+          : t('applet.notification.playlist.install.error')
       ),
       hasCloseButton: true
     });

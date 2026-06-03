@@ -357,7 +357,8 @@ async function loadWifiStatus() {
     wifiStatusError.value = '';
     applyWifiStatus(await settings.getWifiStatus());
   } catch (error) {
-    wifiStatusError.value = error instanceof Error ? error.message : 'TRANS: Failed to load WiFi status';
+    wifiStatusError.value =
+      error instanceof Error ? error.message : 'TRANS: Failed to load WiFi status';
   }
 }
 
@@ -388,7 +389,8 @@ async function loadWifiNetworks() {
   try {
     wifiNetworks.value = await settings.scanWifiNetworks();
   } catch (error) {
-    wifiStatusError.value = error instanceof Error ? error.message : 'TRANS: Failed to scan WiFi networks';
+    wifiStatusError.value =
+      error instanceof Error ? error.message : 'TRANS: Failed to scan WiFi networks';
   } finally {
     wifiIsScanning.value = false;
   }
@@ -570,7 +572,9 @@ watchEffect(() => {
             class="btn-xs items-center cursor-pointer flex justify-between w-full text-left"
             :class="{ 'btn-accent': network.ssid === ssid }"
             :title="
-              network.ssid === ssid ? t('settingsPage.wifiNetwork.search.connectedNetwork') : t('settingsPage.wifiNetwork.search.connectToNetwork', { ssid: network.ssid })
+              network.ssid === ssid
+                ? t('settingsPage.wifiNetwork.search.connectedNetwork')
+                : t('settingsPage.wifiNetwork.search.connectToNetwork', { ssid: network.ssid })
             "
             :disabled="network.ssid === ssid"
             @click="selectWifiNetwork(network)"
