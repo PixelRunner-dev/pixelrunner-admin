@@ -1,5 +1,19 @@
 import { test, expect } from '@playwright/test';
 
+async function goToApplets(page: import('@playwright/test').Page) {
+  await page.goto('/applets');
+  await expect(page.locator('.component--playlist')).toBeVisible({ timeout: 15000 });
+}
+
+function getAppletCard(page: import('@playwright/test').Page, packageName: string) {
+  return page.locator(`[data-testid="applet-card"][data-applet-package-name="${packageName}"]`);
+}
+
+async function goToLibrary(page: import('@playwright/test').Page) {
+  await page.goto('/library');
+  await expect(page.locator('.component--carousel').first()).toBeVisible({ timeout: 15000 });
+}
+
 // ──────────────────────────────────────────────
 // AppletList
 // ──────────────────────────────────────────────
@@ -15,7 +29,7 @@ test.describe('AppletList', () => {
   });
 
   test('renders non-draggable list inside carousel on library page', async ({ page }) => {
-    await page.goto('/library');
+    await goToLibrary(page);
     // AppletCarousel wraps AppletList without isDragable → renders ul.carousel__track
     const carouselTrack = page.locator('.component--carousel ul.carousel__track').first();
     await expect(carouselTrack).toBeVisible();
@@ -35,7 +49,7 @@ test.describe('AppletList', () => {
 
 test.describe('AppletCarousel', () => {
   test('renders carousel wrapper with track and nav buttons', async ({ page }) => {
-    await page.goto('/library');
+    await goToLibrary(page);
     const carousel = page.locator('.component--carousel').first();
     await expect(carousel).toBeVisible();
     await expect(carousel.locator('.carousel__track')).toBeVisible();
@@ -44,14 +58,14 @@ test.describe('AppletCarousel', () => {
   });
 
   test('carousel contains applet cards', async ({ page }) => {
-    await page.goto('/library');
+    await goToLibrary(page);
     const carousel = page.locator('.component--carousel').first();
     await expect(carousel).toBeVisible();
     await expect(carousel.locator('article.component--applet-card').first()).toBeVisible();
   });
 
   test('wide variant applies wider item class', async ({ page }) => {
-    await page.goto('/library');
+    await goToLibrary(page);
     // LibraryPage has one carousel with itemWidth="wide"
     await expect(
       page.locator('.component--carousel .carousel__item-width--wide').first()
@@ -65,34 +79,32 @@ test.describe('AppletCarousel', () => {
 
 test.describe('AppletDetails', () => {
   test('renders h2 with applet name in playlist (horizontal view)', async ({ page }) => {
-    await page.goto('/applets');
-    const details = page.locator('.component--applet-details').first();
+    await goToApplets(page);
+    const details = page.getByTestId('applet-details').first();
     await expect(details).toBeVisible();
-    await expect(details.locator('h2')).toBeVisible();
+    await expect(details).toHaveAttribute('data-view', 'horizontal');
+    await expect(details.getByTestId('applet-details-title')).toBeVisible();
     // Author not shown in horizontal view
-    await expect(details.locator('p').filter({ hasText: '[By]:' })).toHaveCount(0);
+    await expect(details.getByTestId('applet-details-author')).toHaveCount(0);
   });
 
   test('renders h1 with author and description in full-detail view', async ({ page }) => {
-    await page.goto('/applets');
-    await page
-      .locator('article.component--applet-card a', { hasText: 'Configure' })
-      .first()
-      .click();
+    await goToApplets(page);
+    await getAppletCard(page, 'clockbyhenry').getByTestId('applet-configure-link').click();
     await page.waitForURL(/\/applets\/.+/);
 
-    const details = page.locator('.component--applet-details');
-    await expect(details.locator('h1')).toBeVisible();
-    await expect(details.locator('p', { hasText: '[By]:' })).toBeVisible();
-    await expect(details.locator('p.text-xl')).toBeVisible();
+    const details = page.locator('[data-testid="applet-details"][data-view="full-detail"]');
+    await expect(details).toHaveAttribute('data-view', 'full-detail');
+    await expect(details.getByTestId('applet-details-title')).toBeVisible();
+    await expect(details.getByTestId('applet-details-author')).toBeVisible();
+    await expect(details.getByTestId('applet-details-summary')).toBeVisible();
+    await expect(details.getByTestId('applet-details-description')).toBeVisible();
   });
 
   test('shows official badge for official applets', async ({ page }) => {
-    await page.goto('/library');
-    // Official applets have badge — at least some mock applets are official (random, but likely)
-    const officialBadge = page.locator('.component--applet-details .badge-primary');
+    await goToLibrary(page);
     // Not guaranteed to be present (random), just assert the element type is correct if present
-    await expect(page.locator('.component--applet-details h2').first()).toBeVisible();
+    await expect(page.getByTestId('applet-details-title').first()).toBeVisible();
   });
 });
 
@@ -116,9 +128,9 @@ test.describe('PlayList', () => {
   });
 
   test('each playlist item contains an AppletCard with Configure CTA', async ({ page }) => {
-    await page.goto('/applets');
+    await goToApplets(page);
     const items = page.locator('.component--playlist li.draggable-applet');
     await expect(items.first().locator('article.component--applet-card')).toBeVisible();
-    await expect(items.first().locator('a', { hasText: 'Configure' })).toBeVisible();
+    await expect(items.first().getByTestId('applet-configure-link')).toBeVisible();
   });
 });

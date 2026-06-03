@@ -46,7 +46,7 @@ watch(useDeviceLocation, async (enabled) => {
   <div class="component--field-locationbased">
     <label class="flex items-center gap-2 mb-2 text-sm cursor-pointer">
       <DToggle v-model="useDeviceLocation" :id="`${id}-use-device`" />
-      <span>[Use device location]</span>
+      <span data-testid="use-device-location-label">[Use device location]</span>
     </label>
     <LocationSearch v-if="!useDeviceLocation" :id v-model="location" :default="defaultValue" />
   </div>

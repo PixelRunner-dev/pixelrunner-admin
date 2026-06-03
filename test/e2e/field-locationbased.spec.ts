@@ -1,33 +1,33 @@
 import { test, expect } from '@playwright/test';
 
+async function goToLocationbasedApplet(page: import('@playwright/test').Page) {
+  await page.goto('/applets');
+  await expect(page.locator('.component--playlist')).toBeVisible({ timeout: 15000 });
+  await page
+    .locator('[data-testid="applet-card"][data-applet-package-name="bitcointicker"]')
+    .getByTestId('applet-configure-link')
+    .click();
+  await page.waitForURL(/\/applets\/.+/);
+}
+
 test.describe('FieldLocationbased', () => {
   test('renders device-location toggle and LocationSearch input by default', async ({ page }) => {
     // bitcointicker has a locationbased schema field
-    await page.goto('/applets');
-    const card = page.locator('article.component--applet-card').filter({
-      has: page.locator('h2', { hasText: 'Bitcoin Ticker' })
-    });
-    await card.locator('a', { hasText: 'Configure' }).click();
-    await page.waitForURL(/\/applets\/.+/);
+    await goToLocationbasedApplet(page);
 
     const field = page.locator('.component--field-locationbased');
     await expect(field).toBeVisible();
 
     // Toggle to use device location
     await expect(field.locator('input[type="checkbox"]')).toBeVisible();
-    await expect(field.locator('span', { hasText: '[Use device location]' })).toBeVisible();
+    await expect(field.getByTestId('use-device-location-label')).toBeVisible();
 
     // LocationSearch input visible when toggle is off (default)
     await expect(field.locator('input[type="text"]')).toBeVisible();
   });
 
   test('enabling use-device-location toggle hides LocationSearch', async ({ page }) => {
-    await page.goto('/applets');
-    const card = page.locator('article.component--applet-card').filter({
-      has: page.locator('h2', { hasText: 'Bitcoin Ticker' })
-    });
-    await card.locator('a', { hasText: 'Configure' }).click();
-    await page.waitForURL(/\/applets\/.+/);
+    await goToLocationbasedApplet(page);
 
     const field = page.locator('.component--field-locationbased');
     const toggle = field.locator('input[type="checkbox"]');
@@ -38,12 +38,7 @@ test.describe('FieldLocationbased', () => {
   });
 
   test('disabling use-device-location restores LocationSearch', async ({ page }) => {
-    await page.goto('/applets');
-    const card = page.locator('article.component--applet-card').filter({
-      has: page.locator('h2', { hasText: 'Bitcoin Ticker' })
-    });
-    await card.locator('a', { hasText: 'Configure' }).click();
-    await page.waitForURL(/\/applets\/.+/);
+    await goToLocationbasedApplet(page);
 
     const field = page.locator('.component--field-locationbased');
     const toggle = field.locator('input[type="checkbox"]');
@@ -58,12 +53,7 @@ test.describe('FieldLocationbased', () => {
   test('enabling device-location toggle loads device location from mock settings', async ({
     page
   }) => {
-    await page.goto('/applets');
-    const card = page.locator('article.component--applet-card').filter({
-      has: page.locator('h2', { hasText: 'Bitcoin Ticker' })
-    });
-    await card.locator('a', { hasText: 'Configure' }).click();
-    await page.waitForURL(/\/applets\/.+/);
+    await goToLocationbasedApplet(page);
 
     const field = page.locator('.component--field-locationbased');
     const toggle = field.locator('input[type="checkbox"]');

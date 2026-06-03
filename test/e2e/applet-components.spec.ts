@@ -1,5 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+async function goToApplets(page: import('@playwright/test').Page) {
+  await page.goto('/applets');
+  await expect(page.locator('.component--playlist')).toBeVisible({ timeout: 15000 });
+}
+
+function getAppletCard(page: import('@playwright/test').Page, packageName: string) {
+  return page.locator(`[data-testid="applet-card"][data-applet-package-name="${packageName}"]`);
+}
+
 test.describe('AppletImage', () => {
   test('renders without frame in playlist', async ({ page }) => {
     await page.goto('/applets');
@@ -10,11 +19,8 @@ test.describe('AppletImage', () => {
   });
 
   test('renders with frame on applet detail page', async ({ page }) => {
-    await page.goto('/applets');
-    await page
-      .locator('article.component--applet-card a', { hasText: 'Configure' })
-      .first()
-      .click();
+    await goToApplets(page);
+    await page.getByTestId('applet-configure-link').first().click();
     await page.waitForURL(/\/applets\/.+/);
     const container = page.locator('.component--applet-image.is-showing-frame');
     await expect(container).toBeVisible();
@@ -35,10 +41,8 @@ test.describe('AppletImage', () => {
   });
 
   test('zero-byte broken applet uses broken-image src', async ({ page }) => {
-    await page.goto('/applets');
-    const knmiCard = page.locator('article').filter({
-      has: page.locator('h2', { hasText: 'KNMIalert' })
-    });
+    await goToApplets(page);
+    const knmiCard = getAppletCard(page, 'knmialert');
     await expect(knmiCard).toBeVisible();
     await expect(knmiCard.locator('img.applet-image')).toHaveAttribute('src', /broken-image\.webp/);
   });
@@ -47,11 +51,8 @@ test.describe('AppletImage', () => {
 test.describe('AppletImage — no horizontal scroll with frame (375 px viewport)', () => {
   test('detail page has no horizontal scroll at mobile width', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/applets');
-    await page
-      .locator('article.component--applet-card a', { hasText: 'Configure' })
-      .first()
-      .click();
+    await goToApplets(page);
+    await page.getByTestId('applet-configure-link').first().click();
     await page.waitForURL(/\/applets\/.+/);
 
     await expect(page.locator('.component--applet-image.is-showing-frame')).toBeVisible();
@@ -86,23 +87,18 @@ test.describe('AppletCard', () => {
   });
 
   test('installed playlist card has Configure CTA link', async ({ page }) => {
-    await page.goto('/applets');
+    await goToApplets(page);
     const card = page.locator('article.component--applet-card').first();
     await expect(card).toBeVisible();
-    await expect(card.locator('a', { hasText: 'Configure' })).toBeVisible();
+    await expect(card.getByTestId('applet-configure-link')).toBeVisible();
   });
 
   test('Configure CTA link navigates to applet detail page', async ({ page }) => {
-    await page.goto('/applets');
-    const href = await page
-      .locator('article.component--applet-card a', { hasText: 'Configure' })
-      .first()
-      .getAttribute('href');
+    await goToApplets(page);
+    const configureLink = page.getByTestId('applet-configure-link').first();
+    const href = await configureLink.getAttribute('href');
     expect(href).toMatch(/^\/applets\/.+/);
-    await page
-      .locator('article.component--applet-card a', { hasText: 'Configure' })
-      .first()
-      .click();
+    await configureLink.click();
     await page.waitForURL(/\/applets\/.+/);
     await expect(page.locator('h1')).toBeVisible();
   });
@@ -132,10 +128,18 @@ test.describe('AppletItem', () => {
   });
 
   test('passes correct applet data through slot for all installed applets', async ({ page }) => {
-    await page.goto('/applets');
+    await goToApplets(page);
     const playlist = page.locator('.component--playlist');
-    for (const name of ['Clock By Henry', 'Buienradar', 'Bitcoin Ticker', 'Textbyt', 'KNMIalert']) {
-      await expect(playlist.locator('h2', { hasText: name })).toBeVisible();
+    for (const packageName of [
+      'clockbyhenry',
+      'buienradar',
+      'bitcointicker',
+      'textbyt',
+      'knmialert'
+    ]) {
+      await expect(
+        playlist.locator(`[data-testid="applet-card"][data-applet-package-name="${packageName}"]`)
+      ).toBeVisible();
     }
   });
 });

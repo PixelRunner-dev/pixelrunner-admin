@@ -1091,6 +1091,8 @@ watchEffect(() => {
             <div
               v-for="feature in availableFeatureToggleList"
               :key="'feature-toggle-' + feature.key"
+              data-testid="feature-toggle-row"
+              :data-feature-key="feature.key"
               class="flex items-center gap-2 py-2"
             >
               <dt class="flex-1">
@@ -1100,7 +1102,7 @@ watchEffect(() => {
                 </DText>
                 <DText is="p" size="xs">Since controller v{{ feature.sinceVersion }}</DText>
               </dt>
-              <dd class="w-12">
+              <dd class="w-12" data-testid="feature-toggle-control" :data-feature-key="feature.key">
                 <DToggle
                   :key="
                     'feature-toggle-input-' +

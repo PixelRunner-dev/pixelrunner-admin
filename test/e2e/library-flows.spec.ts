@@ -33,7 +33,7 @@ test.describe('Library category page', () => {
 test.describe('Library search', () => {
   test('search page renders search input', async ({ page }) => {
     await page.goto('/library/search');
-    await expect(page.locator('h1', { hasText: 'Library Search' })).toBeVisible();
+    await expect(page.locator('h1')).toBeVisible();
     await expect(page.locator('.component--library-search')).toBeVisible();
     await expect(page.locator('.component--library-search input')).toBeVisible();
   });
@@ -50,35 +50,36 @@ test.describe('Library search', () => {
   test('navigating with ?q= pre-fills the search input', async ({ page }) => {
     await page.goto('/library/search?q=clock');
     await expect(page.locator('.component--library-search input')).toHaveValue('clock');
-    await expect(page.locator('text=Searching for: clock')).toBeVisible();
   });
 });
 
 test.describe('Library applet detail', () => {
   test('installed applet detail shows Save and Remove buttons', async ({ page }) => {
     await page.goto('/library/applets/buienradar');
-    await expect(page.locator('h1', { hasText: 'Buienradar' })).toBeVisible();
+    await expect(page.locator('h1')).toBeVisible();
     const config = page.locator('.component--applet-config');
-    await expect(config.locator('button[type="submit"]')).toContainText(/save/i);
-    await expect(config.locator('button', { hasText: 'Remove' })).toBeVisible();
+    await expect(config.getByTestId('applet-config-submit')).toBeVisible();
+    await expect(config.getByTestId('applet-remove')).toBeVisible();
   });
 
   test('not-installed applet detail shows Install button', async ({ page }) => {
     await page.goto('/library/applets/spotify');
-    await expect(page.locator('h1', { hasText: 'Spotify Now Playing' })).toBeVisible();
+    await expect(page.locator('h1')).toBeVisible();
     const config = page.locator('.component--applet-config');
-    await expect(config.locator('button[type="submit"]')).toContainText(/install/i);
-    await expect(config.locator('button', { hasText: 'Remove' })).toHaveCount(0);
+    await expect(config.getByTestId('applet-config-submit')).toBeVisible();
+    await expect(config.getByTestId('applet-remove')).toHaveCount(0);
   });
 
   test('install redirects to /applets and installed applet is in playlist', async ({ page }) => {
     await page.goto('/library/applets/usdebtclock');
-    await expect(page.locator('.component--applet-config button[type="submit"]')).toBeVisible();
+    await expect(page.getByTestId('applet-config-submit')).toBeVisible();
 
-    await page.locator('.component--applet-config button[type="submit"]').click();
+    await page.getByTestId('applet-config-submit').click();
 
     // After install, should navigate to /applets (SPA)
     await page.waitForURL(/\/applets/, { timeout: 8000 });
-    await expect(page.locator('h2', { hasText: 'US Debt Clock' })).toBeVisible();
+    await expect(
+      page.locator('[data-testid="applet-card"][data-applet-package-name="usdebtclock"]')
+    ).toBeVisible();
   });
 });

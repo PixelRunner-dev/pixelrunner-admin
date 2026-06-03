@@ -5,9 +5,7 @@ test.describe('Connection states', () => {
     await page.goto('/applets');
     await expect(page.locator('h1')).toBeVisible();
     // No connection-error banners or retry buttons in the connected state
-    await expect(
-      page.locator('[role="alert"]').filter({ hasText: /connection|reconnect|retry/i })
-    ).toHaveCount(0);
+    await expect(page.locator('[role="alert"]')).toHaveCount(0);
   });
 
   test('?via=proxy param does not cause errors and keeps app in local mode', async ({ page }) => {

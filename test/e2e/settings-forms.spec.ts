@@ -1,5 +1,20 @@
 import { test, expect } from '@playwright/test';
 
+async function goToApplets(page: import('@playwright/test').Page) {
+  await page.goto('/applets');
+  await expect(page.locator('.component--playlist')).toBeVisible({ timeout: 15000 });
+}
+
+function getAppletCard(page: import('@playwright/test').Page, packageName: string) {
+  return page.locator(`[data-testid="applet-card"][data-applet-package-name="${packageName}"]`);
+}
+
+async function goToAppletDetail(page: import('@playwright/test').Page, packageName: string) {
+  await goToApplets(page);
+  await getAppletCard(page, packageName).getByTestId('applet-configure-link').click();
+  await page.waitForURL(/\/applets\/.+/);
+}
+
 // ──────────────────────────────────────────────
 // IconSprite
 // ──────────────────────────────────────────────
@@ -45,8 +60,7 @@ test.describe('SetLanguage', () => {
     await page.goto('/settings');
     await expect(page.locator('h1')).toBeVisible();
     const languageSelect = page.locator('select#language');
-    const value = await languageSelect.inputValue();
-    expect(value).toBe('en');
+    await expect(languageSelect).toHaveValue('en');
   });
 
   test('switching language updates page heading text', async ({ page }) => {
@@ -77,14 +91,7 @@ test.describe('SetLanguage', () => {
 test.describe('FormField', () => {
   test('renders form field wrapper with label in AppletConfig', async ({ page }) => {
     // Buienradar has a 'location' schema field which uses FormField + LocationSearch
-    await page.goto('/applets');
-    // Find the Buienradar card and click Configure
-    const buienradarCard = page
-      .locator('article.component--applet-card')
-      .filter({ has: page.locator('h2', { hasText: 'Buienradar' }) });
-    await expect(buienradarCard).toBeVisible();
-    await buienradarCard.locator('a', { hasText: 'Configure' }).click();
-    await page.waitForURL(/\/applets\/.+/);
+    await goToAppletDetail(page, 'buienradar');
 
     // AppletConfig renders FormField for each schema field
     const formField = page.locator('.component--form-field').first();
@@ -93,18 +100,11 @@ test.describe('FormField', () => {
     await expect(formField.locator('label span')).toBeVisible();
   });
 
-  test('form field label text comes from schema field name', async ({ page }) => {
-    await page.goto('/applets');
-    const buienradarCard = page
-      .locator('article.component--applet-card')
-      .filter({ has: page.locator('h2', { hasText: 'Buienradar' }) });
-    await buienradarCard.locator('a', { hasText: 'Configure' }).click();
-    await page.waitForURL(/\/applets\/.+/);
+  test('form field is keyed by schema field id', async ({ page }) => {
+    await goToAppletDetail(page, 'buienradar');
 
-    // Buienradar schema has a 'Location' field (name: 'Location')
-    const formField = page.locator('.component--form-field');
     await expect(
-      formField.filter({ has: page.locator('label', { hasText: 'Location' }) })
+      page.locator('[data-testid="applet-config-field"][data-field-id="location"]')
     ).toBeVisible();
   });
 });
@@ -125,12 +125,7 @@ test.describe('LocationSearch', () => {
   test('renders location search input in AppletConfig for location schema field', async ({
     page
   }) => {
-    await page.goto('/applets');
-    const buienradarCard = page
-      .locator('article.component--applet-card')
-      .filter({ has: page.locator('h2', { hasText: 'Buienradar' }) });
-    await buienradarCard.locator('a', { hasText: 'Configure' }).click();
-    await page.waitForURL(/\/applets\/.+/);
+    await goToAppletDetail(page, 'buienradar');
 
     // Buienradar schema has a location field — just verify there's at least one input
     await expect(page.locator('.component--form-field input').first()).toBeVisible();

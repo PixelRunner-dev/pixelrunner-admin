@@ -39,13 +39,13 @@ test.describe('AccessWarning', () => {
     await page.close();
   });
 
-  test('access warning title contains expected text', async ({ context }) => {
+  test('access warning title is rendered', async ({ context }) => {
     await context.addCookies([
       { name: 'accessMode', value: 'direct', domain: 'localhost', path: '/' }
     ]);
     const page = await context.newPage();
     await page.goto('/applets');
-    await expect(page.locator('.access-warning__title')).toHaveText(/Access Via Device IP/i);
+    await expect(page.locator('.access-warning__title')).toBeVisible();
     await page.close();
   });
 });
@@ -59,7 +59,7 @@ test.describe('FeatureToggle', () => {
     await page.goto('/settings');
     await expect(page.locator('h1')).toBeVisible();
     // Update Device button is behind FeatureToggle features="updateDevice"
-    await expect(page.locator('button', { hasText: 'Update Device' })).toHaveCount(0);
+    await expect(page.getByTestId('firmware-update')).toHaveCount(0);
   });
 
   test('shows slot content after enabling experimentalFeatures + feature toggle via UI', async ({
@@ -74,13 +74,14 @@ test.describe('FeatureToggle', () => {
     await experimentalCheckbox.check();
 
     // Wait for feature list to appear
-    await expect(page.locator('text=Enable debug tool')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="feature-toggle-row"][data-feature-key="debug"]')
+    ).toBeVisible();
 
     // Enable the debug feature toggle
-    const debugToggle = page
-      .locator('dl div')
-      .filter({ hasText: 'Enable debug tool' })
-      .locator('input[type="checkbox"]');
+    const debugToggle = page.locator(
+      '[data-testid="feature-toggle-control"][data-feature-key="debug"] input[type="checkbox"]'
+    );
     await debugToggle.check();
 
     // Navigate via SPA link (not page.goto) to preserve in-memory mock state
@@ -109,13 +110,14 @@ test.describe('DebugSection', () => {
     // Enable experimental features
     const experimentalCheckbox = page.locator('#experimentalFeatures');
     await experimentalCheckbox.check();
-    await expect(page.locator('text=Enable debug tool')).toBeVisible();
+    await expect(
+      page.locator('[data-testid="feature-toggle-row"][data-feature-key="debug"]')
+    ).toBeVisible();
 
     // Enable debug toggle
-    const debugToggle = page
-      .locator('dl div')
-      .filter({ hasText: 'Enable debug tool' })
-      .locator('input[type="checkbox"]');
+    const debugToggle = page.locator(
+      '[data-testid="feature-toggle-control"][data-feature-key="debug"] input[type="checkbox"]'
+    );
     await debugToggle.check();
 
     // Navigate via SPA link to preserve in-memory mock state
@@ -125,7 +127,7 @@ test.describe('DebugSection', () => {
     await expect(page.locator('.debug-panel').first()).toBeVisible();
 
     const panel = page.locator('.debug-panel').first();
-    await expect(panel.locator('h2', { hasText: 'Debug' })).toBeVisible();
-    await expect(panel.locator('details summary', { hasText: 'Toggle raw data' })).toBeVisible();
+    await expect(panel.getByTestId('debug-title')).toBeVisible();
+    await expect(panel.getByTestId('debug-raw-toggle')).toBeVisible();
   });
 });

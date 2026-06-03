@@ -52,11 +52,9 @@ test.describe('CategoryList', () => {
   test('categories show translated labels', async ({ page }) => {
     await page.goto('/library');
     const list = page.locator('.component--category-list').first();
-    // Each category li should have text (translated label)
     const firstItem = list.locator('li').first();
     await expect(firstItem).toBeVisible();
-    const text = await firstItem.innerText();
-    expect(text.trim().length).toBeGreaterThan(0);
+    await expect(firstItem.locator('span').first()).toBeVisible();
   });
 
   test('interactive mode renders router-links to category pages', async ({ page }) => {
@@ -80,10 +78,8 @@ test.describe('CategoryList', () => {
 
   test('renders inline with hasItemsInline on applet detail page', async ({ page }) => {
     await page.goto('/applets');
-    await page
-      .locator('article.component--applet-card a', { hasText: 'Configure' })
-      .first()
-      .click();
+    await expect(page.locator('.component--playlist')).toBeVisible({ timeout: 15000 });
+    await page.getByTestId('applet-configure-link').first().click();
     await page.waitForURL(/\/applets\/.+/);
     // Detail page renders CategoryList with hasItemsInline — uses menu-horizontal class
     const inlineList = page.locator('.component--category-list.menu-horizontal');
@@ -112,9 +108,8 @@ test.describe('CallToAction', () => {
 
   test('AppletCard Configure CTA link present for each installed applet', async ({ page }) => {
     await page.goto('/applets');
-    const configureLinks = page.locator('article.component--applet-card a', {
-      hasText: 'Configure'
-    });
+    await expect(page.locator('.component--playlist')).toBeVisible({ timeout: 15000 });
+    const configureLinks = page.getByTestId('applet-configure-link');
     await expect(configureLinks.first()).toBeVisible();
     await expect(configureLinks).toHaveCount(5);
   });
