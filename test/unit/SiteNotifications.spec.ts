@@ -44,13 +44,14 @@ describe('SiteNotifications', () => {
       createNotification('Saved successfully', { type: 'success' }),
       createNotification('Controller unavailable', { type: 'error' })
     ]);
-    const alerts = wrapper.findAll('[data-testid="alert"]');
+    const alerts = wrapper.findAll('[data-testid="site-notification"]');
 
     expect(wrapper.get('.site-wrapper').classes()).toEqual(['site-wrapper', 'my-8']);
     expect(alerts).toHaveLength(2);
     expect(alerts[0]?.attributes()).toEqual(
       expect.objectContaining({
         'data-horizontal': 'true',
+        'data-notification-type': 'success',
         'data-type': 'success',
         role: 'alert'
       })
@@ -109,7 +110,10 @@ describe('SiteNotifications', () => {
       notifications: [createNotification('Replacement', { type: 'success' })]
     });
 
-    expect(wrapper.find('[data-testid="alert"]').attributes('data-type')).toBe('success');
+    const alert = wrapper.find('[data-testid="site-notification"]');
+
+    expect(alert.attributes('data-notification-type')).toBe('success');
+    expect(alert.attributes('data-type')).toBe('success');
     expect(wrapper.text()).toContain('Replacement');
   });
 });
