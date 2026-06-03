@@ -569,6 +569,8 @@ watchEffect(() => {
             v-for="network in uniqueWifiNetworks"
             :key="network.bssid"
             type="button"
+            data-testid="wifi-network-option"
+            :data-wifi-ssid="network.ssid"
             class="btn-xs items-center cursor-pointer flex justify-between w-full text-left"
             :class="{ 'btn-accent': network.ssid === ssid }"
             :title="

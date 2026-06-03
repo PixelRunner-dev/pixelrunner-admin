@@ -34,6 +34,9 @@ const appletImage = computed(() => {
 <template>
   <DFlex
     is="article"
+    data-testid="applet-card"
+    :data-applet-package-name="applet.packageName"
+    :data-applet-uuid="applet.installationDetails?.uuid"
     :class="[
       'component--applet-card',
       `applet-card--${view}`,
@@ -57,6 +60,7 @@ const appletImage = computed(() => {
             v-if="hasCallToAction && applet.isInstalled"
             :to="`/applets/${applet.installationDetails?.uuid}`"
             class="btn btn-secondary btn-sm"
+            data-testid="applet-configure-link"
           >
             <slot name="cta" />
           </router-link>

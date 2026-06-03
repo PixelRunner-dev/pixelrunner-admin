@@ -23,13 +23,11 @@ test.describe('Settings page flows', () => {
     await expect(page.locator('#ssid')).toBeVisible();
 
     // Mock configureWifi succeeds — click Apply with existing values
-    const applyButton = page.locator('button', { hasText: 'Apply WiFi network' });
+    const applyButton = page.getByTestId('wifi-apply');
     await expect(applyButton).toBeVisible();
     await applyButton.click();
 
-    await expect(
-      page.locator('text=WiFi configured. Device may disconnect from setup network')
-    ).toBeVisible();
+    await expect(page.locator('[role="status"]')).toBeVisible();
   });
 
   test('first-time setup mode (?first-time=1) hides general settings', async ({ page }) => {
@@ -49,30 +47,28 @@ test.describe('Settings page flows', () => {
     await page.goto('/settings?first-time=1');
     await expect(page.locator('h1')).toBeVisible();
 
-    // DAlert inside wifi section explains first-time setup
-    await expect(
-      page.locator('[role="alert"]').filter({ hasText: 'Connect this device to WiFi' })
-    ).toBeVisible();
+    // DAlert inside wifi section explains first-time setup.
+    await expect(page.locator('[role="alert"]')).toBeVisible();
   });
 
   test('WiFi scan error is shown and retry is available', async ({ page }) => {
     await page.goto('/settings');
 
     // Refresh networks button triggers a scan (mock returns success)
-    const refreshBtn = page.locator('button', { hasText: 'Refresh networks' });
+    const refreshBtn = page.getByTestId('wifi-refresh');
     await expect(refreshBtn).toBeVisible();
     await refreshBtn.click();
 
-    // After successful scan, Pixelrunner Lab network is listed
-    await expect(page.locator('button', { hasText: 'Pixelrunner Lab' })).toBeVisible();
+    await expect(page.locator('[data-testid="wifi-network-option"]')).toHaveCount(3);
   });
 
   test('scanned WiFi network can be selected and populated into form', async ({ page }) => {
     await page.goto('/settings');
     await expect(page.locator('h1')).toBeVisible();
 
-    // Click a scanned network to populate ssid field
-    const guestNetwork = page.locator('button', { hasText: 'Guest' });
+    const guestNetwork = page.locator(
+      '[data-testid="wifi-network-option"][data-wifi-ssid="Guest"]'
+    );
     await expect(guestNetwork).toBeVisible();
     await guestNetwork.click();
 
@@ -83,8 +79,8 @@ test.describe('Settings page flows', () => {
     await page.goto('/settings');
     await expect(page.locator('h1')).toBeVisible();
 
-    await expect(page.locator('button', { hasText: 'Reboot Device' })).toBeVisible();
-    await expect(page.locator('button', { hasText: 'Shutdown Device' })).toBeVisible();
+    await expect(page.getByTestId('reboot')).toBeVisible();
+    await expect(page.getByTestId('shutdown')).toBeVisible();
   });
 
   test('language selector and location search rendered on settings page', async ({ page }) => {

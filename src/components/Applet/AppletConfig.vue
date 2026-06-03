@@ -5,7 +5,6 @@ import { useRouter } from 'vue-router';
 import FormField from '../Form/FormField.vue';
 import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
 import FeatureToggle from '../FeatureToggle.vue';
-import IconImage from '../Icon/IconImage.vue';
 
 import { useClientApi } from '@/ws/index.ts';
 import { useNotifications } from '@/composables/useNotifications.ts';
@@ -134,6 +133,7 @@ const normalizeDefaultValue = (
 
 const normalizeSchemaItem = (item: RawAppletSchemaItem): AppletSchemaField => ({
   ...item,
+  palette: item.type === 'color' ? (item.palette ?? ['#000000']) : item.palette,
   name: item.name ?? item.id,
   icon: item.icon ?? '',
   desc: item.desc ?? item.description ?? '',
@@ -452,6 +452,7 @@ watch(
           <DToggle
             :model-value="isHidden"
             :disabled="!isConnected || isBusy"
+            data-testid="applet-hidden-toggle"
             :aria-label="$t('detailPage.appletConfig.hiddenToggle.ariaLabel')"
             @update:model-value="(value) => updateHiddenState(Boolean(value))"
           />
@@ -462,6 +463,7 @@ watch(
           <DToggle
             :model-value="isPinned"
             :disabled="!isConnected || isHidden || isBusy"
+            data-testid="applet-pin-toggle"
             :title="isHidden ? $t('detailPage.appletConfig.pinToggle.hiddenWarning') : ''"
             :aria-label="$t('detailPage.appletConfig.hiddenToggle.ariaLabel')"
             @update:model-value="(value) => updatePinnedState(Boolean(value))"
@@ -471,7 +473,13 @@ watch(
       </DFieldset>
 
       <DFlex class="gap-4">
-        <DButton type="submit" primary wide :disabled="!isConnected || isBusy">
+        <DButton
+          type="submit"
+          primary
+          wide
+          data-testid="applet-config-submit"
+          :disabled="!isConnected || isBusy"
+        >
           {{
             isSubmitting
               ? $t('generic.loading')
@@ -486,6 +494,7 @@ watch(
           dash
           error
           v-if="installedUuid"
+          data-testid="applet-remove"
           :disabled="!isConnected || isBusy"
           @click="handleRemove"
         >

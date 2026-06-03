@@ -25,7 +25,11 @@ const {
 </script>
 
 <template>
-  <DFormControl class="component--form-field my-4 gap-1">
+  <DFormControl
+    class="component--form-field my-4 gap-1"
+    data-testid="applet-config-field"
+    :data-field-id="id"
+  >
     <DLabel :for="id">
       <DText size="sm">{{ label || $t(`${context}.${toCamelCase(id)}.label`) }}</DText>
     </DLabel>
