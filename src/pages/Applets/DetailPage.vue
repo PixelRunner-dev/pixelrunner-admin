@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue';
+import { computed, onBeforeUnmount, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
+import { useNotifications } from '@/composables/useNotifications.ts';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
 
@@ -14,9 +15,12 @@ import DebugSection from '@/components/DebugSection.vue';
 import FeatureToggle from '@/components/FeatureToggle.vue';
 
 import type { IFullApplet, UUID } from 'pixelrunner-shared';
+import type { Notification } from '@/utils/notifications.ts';
 
 const route = useRoute();
 const { isConnected, state, lastError, applets } = useClientApi();
+const notificationState = useNotifications();
+const NOTIFICATION_DELAY_MS = 500;
 
 function getValueOfParam(param: string | string[] | undefined): string | undefined {
   return Array.isArray(param) ? param[0] : param;
@@ -76,6 +80,48 @@ watch([packageName, uuid], () => {
   }
 });
 
+const activeStatusNotification = computed<Notification | null>(() => {
+  if (isLoading.value) {
+    return { type: 'info', message: 'Loading applet...' };
+  }
+
+  if (isWaitingForPeer.value) {
+    return { type: 'info', message: 'Waiting for device connection...' };
+  }
+
+  if (loadError.value) {
+    return { type: 'error', message: loadError.value, hasCloseButton: true };
+  }
+
+  if (hasLoadAttempted.value && !applet.value) {
+    return { type: 'warning', message: 'Applet not found', hasCloseButton: true };
+  }
+
+  return null;
+});
+
+watch(
+  activeStatusNotification,
+  (notification, previousNotification) => {
+    if (previousNotification) {
+      notificationState?.setNotification(false, previousNotification);
+    }
+
+    if (!notification) return;
+
+    notificationState?.setNotification(true, notification, {
+      delay: NOTIFICATION_DELAY_MS
+    });
+  },
+  { immediate: true }
+);
+
+onBeforeUnmount(() => {
+  if (activeStatusNotification.value) {
+    notificationState?.setNotification(false, activeStatusNotification.value);
+  }
+});
+
 const debugState = computed(() => ({
   clientState: state.value,
   isConnected: isConnected.value,
@@ -83,6 +129,7 @@ const debugState = computed(() => ({
   hasLoadAttempted: hasLoadAttempted.value,
   loadError: loadError.value,
   lastClientError: lastError.value?.message ?? null,
+  isWaitingForPeer: isWaitingForPeer.value,
   packageName: packageName.value ?? null,
   uuid: uuid.value ?? null,
   loadedPackageName: applet.value?.packageName ?? null,
@@ -108,11 +155,6 @@ const debugState = computed(() => ({
         <AppletConfig :applet />
       </template>
     </AppletItem>
-
-    <p v-else-if="isLoading" class="m-4 text-center">Loading applet...</p>
-    <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>
-    <p v-else-if="loadError" class="m-4 text-center text-error">{{ loadError }}</p>
-    <h1 v-else class="m-4">Applet not found</h1>
 
     <FeatureToggle features="debug">
       <DebugSection :data="debugState" />

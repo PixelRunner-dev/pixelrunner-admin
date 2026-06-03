@@ -31,7 +31,7 @@ const {
       </component>
 
       <template v-if="view === 'full-detail' || view === 'preview'">
-        <p class="text-xs mt-2">[By]: {{ author }}</p>
+        <p class="text-xs mt-2">{{ $t('applet.details.createdBy', { author }) }}</p>
       </template>
     </hgroup>
 

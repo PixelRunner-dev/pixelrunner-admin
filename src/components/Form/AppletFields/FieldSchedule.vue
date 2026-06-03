@@ -20,11 +20,11 @@ const scheduleDays = ref([false, true, true, true, true, true, false]);
 </script>
 
 <template>
-  <DFieldset :legend="$t('schedule.legend')" class="component--field-schedule my-4 gap-4">
+  <DFieldset :legend="$t('fieldScheduleComponent.legend')" class="component--field-schedule my-4 gap-4">
     <DFormControl class="gap-1">
       <DLabel for="schedule">
         <DCheckbox id="schedule" name="schedule" v-model="schedule" />
-        <DText size="sm">{{ $t('schedule.label') }}</DText>
+        <DText size="sm">{{ $t('fieldScheduleComponent.schedule.label') }}</DText>
       </DLabel>
     </DFormControl>
 
@@ -46,7 +46,7 @@ const scheduleDays = ref([false, true, true, true, true, true, false]);
             "
           >
             <DFlex itemsCenter class="flex-col p-2 gap-2 w-full">
-              <DText>{{ d.charAt(0).toUpperCase() + d.slice(1) }}</DText>
+              <DText>{{ $t(`generic.daysOfWeek.${d}`) }}</DText>
               <DCheckbox
                 :id="`schedule-${d}`"
                 v-model="scheduleDays[daysOfWeek.indexOf(d)]"
@@ -61,14 +61,14 @@ const scheduleDays = ref([false, true, true, true, true, true, false]);
 
       <DFormControl class="gap-1">
         <DLabel input>
-          <DText label size="sm">{{ $t('schedule.start.label') }}</DText>
+          <DText label size="sm">{{ $t('fieldScheduleComponent.startTime.label') }}</DText>
           <DInput type="time" name="schedule-start" v-model="scheduleStart" />
         </DLabel>
       </DFormControl>
 
       <DFormControl class="gap-1">
         <DLabel input>
-          <DText label size="sm">{{ $t('schedule.end.label') }}</DText>
+          <DText label size="sm">{{ $t('fieldScheduleComponent.endTime.label') }}</DText>
           <DInput type="time" name="schedule-end" v-model="scheduleEnd" />
         </DLabel>
       </DFormControl>

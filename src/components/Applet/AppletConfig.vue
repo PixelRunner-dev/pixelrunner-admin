@@ -29,6 +29,7 @@ import {
   Text as DText
 } from '(vendor)/daisy-ui-kit/index.ts';
 import DToggle from '(vendor)/daisy-ui-kit/components/Toggle.vue';
+import { t } from 'i18next';
 
 export interface Props {
   applet: IFullApplet;
@@ -303,7 +304,7 @@ const handleSubmit = async () => {
       type: 'error',
       message: getErrorMessage(
         error,
-        isEditMode.value ? 'Failed to save applet configuration.' : 'Failed to install applet.'
+        isEditMode.value ? 'Failed to save applet configuration.' : t('applet.notification.playlist.install.error')
       ),
       hasCloseButton: true
     });
@@ -321,14 +322,14 @@ const handleRemove = async () => {
     await applets.remove(installedUuid.value);
     notify({
       type: 'success',
-      message: 'Applet removed from playlist.',
+      message: t('applet.notification.playlist.remove.success'),
       hasCloseButton: true
     });
     await redirectToApplets();
   } catch (error) {
     notify({
       type: 'error',
-      message: getErrorMessage(error, 'Failed to remove applet from playlist.'),
+      message: getErrorMessage(error, t('applet.notification.playlist.remove.error')),
       hasCloseButton: true
     });
   } finally {
@@ -350,7 +351,7 @@ const updateHiddenState = async (nextValue: boolean) => {
     isHidden.value = Boolean(updatedApplet?.installationDetails?.isHidden ?? nextValue);
     notify({
       type: 'success',
-      message: nextValue ? 'Applet hidden from playback.' : 'Applet visible in playback.',
+      message: t('applet.notification.playlist.hidden.success'),
       hasCloseButton: true
     });
   } catch (error) {
@@ -358,7 +359,7 @@ const updateHiddenState = async (nextValue: boolean) => {
     isPinned.value = previousPinned;
     notify({
       type: 'error',
-      message: getErrorMessage(error, 'Failed to update applet visibility.'),
+      message: getErrorMessage(error, t('applet.notification.playlist.hidden.error')),
       hasCloseButton: true
     });
   } finally {
@@ -378,14 +379,14 @@ const updatePinnedState = async (nextValue: boolean) => {
     isPinned.value = Boolean(updatedApplet?.installationDetails?.isPinned ?? nextValue);
     notify({
       type: 'success',
-      message: nextValue ? 'Applet pinned to the top of the playlist.' : 'Applet unpinned.',
+      message: t('applet.notification.playlist.pin.success'),
       hasCloseButton: true
     });
   } catch (error) {
     isPinned.value = previousValue;
     notify({
       type: 'error',
-      message: getErrorMessage(error, 'Failed to update applet pin state.'),
+      message: getErrorMessage(error, t('applet.notification.playlist.pin.error')),
       hasCloseButton: true
     });
   } finally {
@@ -449,21 +450,21 @@ watch(
           <DToggle
             :model-value="isHidden"
             :disabled="!isConnected || isBusy"
-            aria-label="Toggle applet visibility"
+            :aria-label="$t('detailPage.appletConfig.hiddenToggle.ariaLabel')"
             @update:model-value="(value) => updateHiddenState(Boolean(value))"
           />
-          <DText>[Hide applet in playlist]</DText>
+          <DText>{{ $t('detailPage.appletConfig.hiddenToggle.label') }}</DText>
         </DLabel>
 
         <DLabel label>
           <DToggle
             :model-value="isPinned"
             :disabled="!isConnected || isHidden || isBusy"
-            :title="isHidden ? 'Cannot pin applet when it is hidden' : ''"
-            aria-label="Toggle applet pin"
+            :title="isHidden ? $t('detailPage.appletConfig.pinToggle.hiddenWarning') : ''"
+            :aria-label="$t('detailPage.appletConfig.hiddenToggle.ariaLabel')"
             @update:model-value="(value) => updatePinnedState(Boolean(value))"
           />
-          <DText>[Pin applet in playlist]</DText>
+          <DText>{{ $t('detailPage.appletConfig.pinToggle.label') }}</DText>
         </DLabel>
       </DFieldset>
 

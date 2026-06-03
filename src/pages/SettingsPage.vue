@@ -273,7 +273,7 @@ const {
 
     return device.status({ full: true });
   },
-  defaultErrorMessage: 'Failed to load controller version',
+  defaultErrorMessage: 'TRANS: Failed to load controller version',
   onSuccess: (status) => {
     controllerVersion.value = extractControllerVersionFromStatus(status);
   }
@@ -357,7 +357,7 @@ async function loadWifiStatus() {
     wifiStatusError.value = '';
     applyWifiStatus(await settings.getWifiStatus());
   } catch (error) {
-    wifiStatusError.value = error instanceof Error ? error.message : 'Failed to load WiFi status';
+    wifiStatusError.value = error instanceof Error ? error.message : 'TRANS: Failed to load WiFi status';
   }
 }
 
@@ -388,7 +388,7 @@ async function loadWifiNetworks() {
   try {
     wifiNetworks.value = await settings.scanWifiNetworks();
   } catch (error) {
-    wifiStatusError.value = error instanceof Error ? error.message : 'Failed to scan WiFi networks';
+    wifiStatusError.value = error instanceof Error ? error.message : 'TRANS: Failed to scan WiFi networks';
   } finally {
     wifiIsScanning.value = false;
   }
@@ -541,7 +541,7 @@ watchEffect(() => {
     <DFieldset :legend="$t('settingsPage.wifiNetwork.legend')" class="my-4 gap-4">
       <DAlert v-if="isFirstTimeSetup" info role="alert" class="my-2">
         <DText>
-          [Connect this device to WiFi. Other settings unlock after the device joins the network.]
+          {{ $t('settingsPage.wifiNetwork.isFirstTimeSetupMessage') }}
         </DText>
       </DAlert>
 
@@ -555,7 +555,7 @@ watchEffect(() => {
 
       <DFormControl class="gap-1">
         <DLabel for="wifi-networks">
-          <DText size="sm">[Visible WiFi networks]</DText>
+          <DText size="sm">{{ $t('settingsPage.wifiNetwork.search.label') }}</DText>
         </DLabel>
 
         <div
@@ -570,7 +570,7 @@ watchEffect(() => {
             class="btn-xs items-center cursor-pointer flex justify-between w-full text-left"
             :class="{ 'btn-accent': network.ssid === ssid }"
             :title="
-              network.ssid === ssid ? 'Connected network' : `Connect to network '${network.ssid}'`
+              network.ssid === ssid ? t('settingsPage.wifiNetwork.search.connectedNetwork') : t('settingsPage.wifiNetwork.search.connectToNetwork', { ssid: network.ssid })
             "
             :disabled="network.ssid === ssid"
             @click="selectWifiNetwork(network)"
@@ -579,12 +579,12 @@ watchEffect(() => {
               network.ssid
             }}</span>
             <span class="font-normal text-base-content flex-[0_0_auto] text-xs pl-1">
-              {{ network.security || 'open' }} · {{ network.signal ?? '?' }}%
+              {{ network.security || '-' }} · {{ network.signal ?? '?' }}%
             </span>
           </DButton>
 
           <DText v-if="!wifiIsScanning && wifiNetworks.length === 0" is="p" size="sm">
-            [No visible WiFi networks found.]
+            {{ $t('settingsPage.wifiNetwork.search.noNetworksFound') }}
           </DText>
         </div>
 
@@ -598,7 +598,7 @@ watchEffect(() => {
           @touchstart="() => vibrateDevice(4)"
           @touchend="() => vibrateDevice(1)"
         >
-          {{ wifiIsScanning ? '[Scanning...]' : '[Refresh networks]' }}
+          {{ $t(`settingsPage.wifiNetwork.search.${wifiIsScanning ? 'scanning' : 'refresh'}`) }}
         </DButton>
       </DFormControl>
 
@@ -890,7 +890,7 @@ watchEffect(() => {
         @touchstart="() => vibrateDevice(4)"
         @touchend="() => vibrateDevice(1)"
       >
-        {{ wifiIsSaving ? 'Applying WiFi...' : 'Apply WiFi network' }}
+        {{ wifiIsSaving ? $t('generic.applying') : $t('generic.apply') }}
       </DButton>
     </DFieldset>
 
@@ -1090,7 +1090,7 @@ watchEffect(() => {
                   {{ feature.label }}
                   <DBadge v-if="feature.isPermanent" xs warning>PERMANENT</DBadge>
                 </DText>
-                <DText is="p" size="xs">Since controller {{ feature.sinceVersion }}</DText>
+                <DText is="p" size="xs">Since controller v{{ feature.sinceVersion }}</DText>
               </dt>
               <dd class="w-12">
                 <DToggle

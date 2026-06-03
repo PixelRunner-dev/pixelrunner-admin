@@ -68,13 +68,13 @@ defineExpose({ getCurrentLanguage });
 
 <template>
   <select :id="id" class="select" :name="name" :value="currentLanguage" @change="onLanguageChange">
-    <option v-if="requireSelection" value="" disabled>[Choose language]</option>
+    <option v-if="requireSelection" value="" disabled>{{ $t('setLanguageComponent.defaultLabel') }}</option>
     <option
       v-for="languageCode in languages"
       :key="'language-' + languageCode"
       :value="languageCode"
     >
-      {{ $t('language.' + languageCode) }}
+      {{ $t('setLanguageComponent.language.' + languageCode) }}
     </option>
   </select>
 </template>

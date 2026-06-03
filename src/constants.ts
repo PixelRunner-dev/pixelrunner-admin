@@ -156,108 +156,108 @@ export const FEATURE_TOGGLE_LIST = [
     key: 'networkProxy',
     label: 'Enable proxy for system network',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'dimAtSunset',
     label: 'Enable option "dim at sunset"',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'nightMode',
-    label: 'Enable "night mode" what reduce brightness between sunset and sunrise',
+    label: 'Enable "night mode" what reduce brightness between provided times',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'alarmClock',
     label: 'Enable functionality of an alarm clock (enabling nightMode is required)',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'updateDevice',
     label: 'Enable functionality to update the device via scripts instead of reinstalling the OS',
     isPermanent: true,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'factoryReset',
     label:
       'Enable functionality to do a factory reset of the device via the admin interface or via long pressing the button',
     isPermanent: true,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'appletScheduler',
     label:
       'Enable the possibility to schedule an applet to be enabled between certain time and date configurations',
     isPermanent: true,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'currentAppletInLogo',
     label:
       'Enable to show the current active applet on matrix screen in the logo in the admin interface',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'search',
     label:
       'Enable search of applets in the library by text search in name, author, summary, description and categories',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'topSearchQueries',
     label: 'Enable search tracking and show popular search queries (enabling search is required)',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'updateSystemClock',
     label: 'Enable functionality to set the system clock via the admin interface',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'enableOauthApplets',
     label: 'Enable OAuth2 enabled applets',
     isPermanent: true,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'fancyCarousel',
     label: 'Enable a fancy carousel instead of the current one',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'konami',
     label: 'Enable Konami',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'appletUserStats',
     label: 'Enable user statistics of an applets (favorite)',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'appletGlobalStats',
     label: 'Enable global statistics of an applets (total likes, total installations, etc)',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   },
   {
     key: 'appletZaps',
     label:
       'Enable functionality to zap the creator of the applet via NWC and shows total amount of zapped sats on AppletDetails',
     isPermanent: false,
-    sinceVersion: '0.0.1'
+    sinceVersion: '999'
   }
 ] as const satisfies readonly FeatureToggleItem[];
 

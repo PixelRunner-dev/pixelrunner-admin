@@ -51,36 +51,38 @@ watch(query, (newQuery) => {
 </script>
 
 <template>
-  <DJoin class="component--library-search">
-    <DFormControl>
-      <label class="input input-lg join-item">
-        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <g
-            stroke-linejoin="round"
-            stroke-linecap="round"
-            stroke-width="2.5"
-            fill="none"
-            stroke="currentColor"
-          >
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </g>
-        </svg>
-        <DInput
-          id="search"
-          type="search"
-          name="search"
-          placeholder="[Search]"
-          v-model="query"
-          size="lg"
-          class="grow pl-0 focus:outline-none"
-          autocomplete="false"
-        />
-      </label>
-    </DFormControl>
+  <form class="component--library-search">
+    <DJoin>
+      <DFormControl>
+        <label class="input input-lg join-item">
+          <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g
+              stroke-linejoin="round"
+              stroke-linecap="round"
+              stroke-width="2.5"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
+            </g>
+          </svg>
+          <DInput
+            id="search"
+            type="search"
+            name="search"
+            :placeholder="$t('librarySearchComponent.input.placeholder')"
+            v-model="query"
+            size="lg"
+            class="grow pl-0 focus:outline-none"
+            autocomplete="false"
+          />
+        </label>
+      </DFormControl>
 
-    <DButton color="primary" size="lg" join>[Search]</DButton>
-  </DJoin>
+      <DButton type="submit" color="primary" size="lg" join>{{ $t('librarySearchComponent.submitButton.label') }}</DButton>
+    </DJoin>
+  </form>
 </template>
 
 <style scoped></style>

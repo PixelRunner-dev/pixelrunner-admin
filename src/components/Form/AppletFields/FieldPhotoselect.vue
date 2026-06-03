@@ -71,7 +71,7 @@ function onChange(event: Event) {
         @change="onChange"
       />
       <figure class="w-80">
-        <AppletImage v-if="file" :src="file" alt="Example image" :dateCreated="new Date()" />
+        <AppletImage v-if="file" :src="file" alt="" :dateCreated="new Date()" />
       </figure>
     </DFlex>
   </div>

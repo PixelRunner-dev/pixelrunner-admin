@@ -1,30 +1,32 @@
 {
-  "language": {
-    "en": "English",
-    "nl": "Dutch (Nederlands)",
-    "de": "German (Deutsch)",
-    "fr": "French (Français)",
-    "es": "Spanish (Español)"
-  },
   "generic": {
     "prev": "Previous",
     "next": "Next",
     "loading": "Loading...",
     "configure": "Configure",
-    "accessWarning": {
-      "title": "Access Via Device IP",
-      "message": "You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device's local IP address.",
-      "instruction": "Find your device's IP address in your router's connected devices list, then access this admin interface via: http://[device-ip]"
-    },
-    "official": "official",
+    "official": "Official",
     "install": "Install",
     "save": "Save",
     "remove": "Remove",
     "edit": "Edit",
     "close": "Close",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "applying": "Applying...",
+    "daysOfWeek": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
   },
   "applet": {
+    "details": {
+      "createdBy": "By: {{author}}"
+    },
     "category": {
       "starter_pack": {
         "label": "Starter pack"
@@ -128,6 +130,25 @@
       "nostr": {
         "label": "Nostr"
       }
+    },
+    "notification": {
+      "playlist": {
+        "remove": {
+          "success": "Applet removed from playlist",
+          "error": "Failed to remove applet from playlist"
+        },
+        "install": {
+          "error": "Failed to install applet"
+        },
+        "hidden": {
+          "success": "Applet visibility has been updated",
+          "error": "Failed to toggle visibility of applet"
+        },
+        "pin": {
+          "success": "Applet pin has been updated",
+          "error": "Failed to toggle pin of applet"
+        }
+      }
     }
   },
   "settingsPage": {
@@ -161,6 +182,15 @@
     },
     "wifiNetwork": {
       "legend": "Wifi Network",
+      "isFirstTimeSetupMessage": "Connect this device to WiFi. Other settings unlock after the device joins the network.",
+      "search": {
+        "label": "Visible WiFi networks",
+        "scanning": "Scanning...",
+        "refresh": "Refresh WiFi networks",
+        "connectedNetwork": "Connected WiFi network",
+        "connectToNetwork": "Connect to {{ssid}}",
+        "noNetworksFound": "No visible WiFi networks found."
+      },
       "ssid": {
         "label": "SSID (Network Name)",
         "placeholder": "Enter SSID (Network Name)"
@@ -318,6 +348,27 @@
     },
     "cta": {
       "goToLibrary": "Applets Library"
+    },
+    "notification": {
+      "saveOrderError": "Failed to save order. The order has been reset to original order. Please refresh and try again.",
+      "saveOrderUuidError": "Failed to save order. One or more applets are missing an installation UUID.",
+      "loadError": "Failed to load active playlist"
+    }
+  },
+  "detailPage": {
+    "appletConfig": {
+      "playlistConfig": {
+        "legend": "Applet in playlist"
+      },
+      "hiddenToggle": {
+        "ariaLabel": "Toggle applet visibility",
+        "label": "Hide applet in playlist"
+      },
+      "pinToggle": {
+        "ariaLabel": "Toggle applet pin",
+        "label": "Pin applet in playlist",
+        "hiddenWarning": "Cannot pin applet when it is hidden"
+      }
     }
   },
   "libraryPage": {
@@ -339,5 +390,51 @@
   },
   "categoryPage": {
     "pageTitle": "{{category}} applets"
+  },
+  "fieldScheduleComponent": {
+    "legend": "Schedule",
+    "schedule": {
+      "label": "Enable schedule for applet"
+    },
+    "startTime": {
+      "label": "Start time"
+    },
+    "endTime": {
+      "label": "End time"
+    }
+  },
+  "librarySearchComponent": {
+    "input": {
+      "placeholder": "Search applet..."
+    },
+    "submitButton": {
+      "label": "Search"
+    }
+  },
+  "accessWarningComponent": {
+    "title": "Access Via Device IP",
+    "message": "You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device's local IP address.",
+    "instruction": "Find your device's IP address in your router's connected devices list, then access this admin interface via: http://[device-ip]"
+  },
+  "setLanguageComponent": {
+    "defaultLabel": "Choose language",
+    "language": {
+      "en": "English",
+      "nl": "Dutch (Nederlands)",
+      "de": "German (Deutsch)",
+      "fr": "French (Français)",
+      "es": "Spanish (Español)"
+    }
+  },
+  "siteHeaderComponent": {
+    "logo": {
+      "title": "Go to the playlist page"
+    },
+    "back": {
+      "title": "Go one page back"
+    },
+    "settings": {
+      "title": "Go to the settings page"
+    }
   }
 }

@@ -13,6 +13,7 @@ import type { Notification } from '@/utils/notifications.ts';
 import { Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 import type { IPlaylist, UUID } from 'pixelrunner-shared';
+import { t } from 'i18next';
 
 const { isConnected, state, lastError, playlists } = useClientApi();
 
@@ -41,7 +42,7 @@ const {
 
     return playlists.activePlaylist();
   },
-  defaultErrorMessage: 'Failed to load active playlist',
+  defaultErrorMessage: t('listPage.notification.loadError'),
   onSuccess: (playlist) => {
     console.log('[ListPage] Active playlist applet count:', playlist.applets.length);
 
@@ -61,7 +62,7 @@ function getAppletUuid(applet: IPlaylist['applets'][number]): UUID | null {
 }
 
 function getErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Failed to save playlist order';
+  return error instanceof Error ? error.message : t('listPage.notification.saveOrderError');
 }
 
 async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
@@ -72,8 +73,7 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
   const appletUuids = orderedApplets.map(getAppletUuid);
 
   if (appletUuids.some((uuid) => !uuid)) {
-    saveOrderError.value =
-      'Cannot save playlist order: one or more applets are missing an installation UUID.';
+    saveOrderError.value = t('listPage.notification.saveOrderUuidError');
     await reload();
     return;
   }
@@ -107,21 +107,21 @@ async function handlePlaylistReorder(orderedApplets: IPlaylist['applets']) {
 }
 
 const activeStatusNotification = computed<Notification | null>(() => {
-  if (isSavingOrder.value) {
-    return { type: 'info', message: 'Saving playlist order...' };
-  }
+  // if (isSavingOrder.value) {
+  //   return { type: 'info', message: 'Saving playlist order...' };
+  // }
 
   if (saveOrderError.value) {
     return { type: 'error', message: saveOrderError.value, hasCloseButton: true };
   }
 
-  if (isLoading.value) {
-    return { type: 'info', message: 'Loading active playlist...' };
-  }
+  // if (isLoading.value) {
+  //   return { type: 'info', message: 'Loading active playlist...' };
+  // }
 
-  if (isWaitingForPeer.value) {
-    return { type: 'info', message: 'Waiting for device connection...' };
-  }
+  // if (isWaitingForPeer.value) {
+  //   return { type: 'info', message: 'Waiting for device connection...' };
+  // }
 
   if (loadError.value) {
     return { type: 'error', message: loadError.value, hasCloseButton: true };
