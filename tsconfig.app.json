@@ -1,17 +1,6 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": [
-    "env.d.ts",
-    "src/**/*",
-    "src/**/*.vue",
-    "src/components/SiteNotifications.vue",
-    "src/components/SetLanguage.vue",
-    "src/composables/useNotifications.ts",
-    "vendor/**/*.ts",
-    "vendor/**/*.vue",
-    "translations/*.json",
-    "test/mocks/playlists.json"
-  ],
+  "include": ["env.d.ts", "src/**/*", "vendor/**/*.ts", "vendor/**/*.vue", "translations/*.json"],
   "exclude": [
     "test/**/*",
     "vendor/**/components/Calendar.vue",
