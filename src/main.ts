@@ -170,7 +170,6 @@ i18next
     wsClient.connect().catch((err) => {
       console.error('Failed to connect to WebSocket:', err);
     });
-
   });
 
 if (CookieStore.has('theme')) {
