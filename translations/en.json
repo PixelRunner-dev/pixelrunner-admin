@@ -154,6 +154,7 @@
     }
   },
   "settingsPage": {
+    "title": "Settings",
     "notification": {
       "saveInfo": "All changes are saved immediately"
     },
@@ -459,7 +460,9 @@
       "nl": "Dutch (Nederlands)",
       "de": "German (Deutsch)",
       "fr": "French (Français)",
-      "es": "Spanish (Español)"
+      "es": "Spanish (Español)",
+      "cn": "Chinese (现代标准汉语)",
+      "ar": "Arabic (العربية)"
     }
   },
   "siteHeaderComponent": {

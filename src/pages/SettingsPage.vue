@@ -452,7 +452,7 @@ watchEffect(() => {
 
 <template>
   <main class="site-wrapper">
-    <DText is="h1" size="5xl" class="my-4">{{ toCapitalizeWords(String($route.name)) }}</DText>
+    <DText is="h1" size="5xl" class="my-4">{{ $t('settingsPage.title') }}</DText>
 
     <template v-if="!isFirstTimeSetup">
       <DAlert info role="alert" class="my-4">

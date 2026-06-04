@@ -30,6 +30,11 @@ const fallbackLanguage = props.requireSelection ? '' : i18next.language || 'en';
 const currentLanguage = ref(props.modelValue ?? CookieStore.get('language') ?? fallbackLanguage);
 
 const languages = computed(() => {
+  const supportedLanguages = i18next.options.supportedLngs;
+  if (Array.isArray(supportedLanguages)) {
+    return supportedLanguages.filter((language) => language !== 'cimode');
+  }
+
   const resource = i18next.options.resources as Resource | undefined;
   return resource ? Object.keys(resource) : [];
 });
@@ -42,6 +47,12 @@ watch(
     }
   }
 );
+
+watch(currentLanguage, updateDocumentDirection, { immediate: true });
+
+function updateDocumentDirection(language: string) {
+  document.documentElement.setAttribute('dir', language.startsWith('ar') ? 'rtl' : 'ltr');
+}
 
 function applyLanguage(value: string) {
   currentLanguage.value = value;

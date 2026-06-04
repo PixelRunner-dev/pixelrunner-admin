@@ -154,6 +154,7 @@
     }
   },
   "settingsPage": {
+    "title": "Escenarios",
     "notification": {
       "saveInfo": "Todos los cambios se guardan inmediatamente"
     },
@@ -382,8 +383,8 @@
       "title": "Destacado"
     },
     "new": {
-      "title": "Añadidos recientemente",
-      "payoff": "Applets añadidos recientemente"
+      "title": "Añadido recientemente",
+      "payoff": "Applets añadido recientemente"
     },
     "starterPack": {
       "title": "Paquete inicial",
@@ -459,7 +460,9 @@
       "nl": "Dutch (Nederlands)",
       "de": "German (Deutsch)",
       "fr": "French (Français)",
-      "es": "Spanish (Español)"
+      "es": "Spanish (Español)",
+      "cn": "Chinese (现代标准汉语)",
+      "ar": "Arabic (العربية)"
     }
   },
   "siteHeaderComponent": {

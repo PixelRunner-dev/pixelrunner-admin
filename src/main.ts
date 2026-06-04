@@ -5,6 +5,7 @@ import './crypto-polyfill.ts';
 import { createApp } from 'vue';
 import i18next from 'i18next';
 import I18NextVue from 'i18next-vue';
+import type { BackendModule } from 'i18next';
 
 import App from './App.vue';
 import router from './router/index.ts';
@@ -22,27 +23,70 @@ import {
 } from '@/utils/access-detector.ts';
 
 import en from '../translations/en.json';
-import de from '../translations/de.json';
-import es from '../translations/es.json';
-import nl from '../translations/nl.json';
-import fr from '../translations/fr.json';
 
 const NAMESPACE = 'translation';
+const DEFAULT_LANGUAGE = 'en';
+const translationLoaders = {
+  ar: () => import('../translations/ar.json'),
+  cn: () => import('../translations/cn.json'),
+  de: () => import('../translations/de.json'),
+  es: () => import('../translations/es.json'),
+  fr: () => import('../translations/fr.json'),
+  nl: () => import('../translations/nl.json')
+} satisfies Record<string, () => Promise<{ default: typeof en }>>;
+const supportedLanguages = [DEFAULT_LANGUAGE, ...Object.keys(translationLoaders)];
+
+const lazyTranslationBackend: BackendModule = {
+  type: 'backend',
+  init() {},
+  read(language, namespace, callback) {
+    if (namespace !== NAMESPACE) {
+      callback(null, {});
+      return;
+    }
+
+    const languageCode = language.split('-')[0];
+
+    if (languageCode === DEFAULT_LANGUAGE) {
+      callback(null, en);
+      return;
+    }
+
+    const loadTranslation = translationLoaders[languageCode as keyof typeof translationLoaders];
+
+    if (!loadTranslation) {
+      callback(new Error(`Unsupported language: ${language}`), null);
+      return;
+    }
+
+    loadTranslation()
+      .then((translation) => callback(null, translation.default))
+      .catch((error: unknown) => callback(error instanceof Error ? error : String(error), null));
+  }
+};
 
 i18next
+  .use(lazyTranslationBackend)
   .init({
-    lng: 'en',
+    lng: DEFAULT_LANGUAGE,
+    fallbackLng: DEFAULT_LANGUAGE,
     fallbackNS: NAMESPACE,
+    defaultNS: NAMESPACE,
+    ns: [NAMESPACE],
+    nonExplicitSupportedLngs: true,
+    partialBundledLanguages: true,
+    supportedLngs: supportedLanguages,
 
     resources: {
-      en: { [NAMESPACE]: en },
-      de: { [NAMESPACE]: de },
-      es: { [NAMESPACE]: es },
-      nl: { [NAMESPACE]: nl },
-      fr: { [NAMESPACE]: fr }
+      [DEFAULT_LANGUAGE]: { [NAMESPACE]: en }
     }
   })
   .then(async () => {
+    const languageFromCookie = CookieStore.get('language');
+    if (languageFromCookie) {
+      await i18next.changeLanguage(languageFromCookie);
+    }
+
     const app = createApp(App);
 
     // Detect access mode
@@ -127,10 +171,6 @@ i18next
       console.error('Failed to connect to WebSocket:', err);
     });
 
-    const languageFromCookie = CookieStore.get('language');
-    if (languageFromCookie) {
-      i18next.changeLanguage(languageFromCookie);
-    }
   });
 
 if (CookieStore.has('theme')) {

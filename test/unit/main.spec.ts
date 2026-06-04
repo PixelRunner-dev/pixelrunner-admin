@@ -17,10 +17,16 @@ const mainMock = vi.hoisted(() => {
     provide: vi.fn(),
     use: vi.fn()
   };
+  const i18next = {
+    changeLanguage: vi.fn(),
+    init: vi.fn(),
+    use: vi.fn()
+  };
 
   app.provide.mockReturnValue(app);
   app.use.mockReturnValue(app);
   app.mount.mockReturnValue(app);
+  i18next.use.mockReturnValue(i18next);
 
   return {
     app,
@@ -33,10 +39,7 @@ const mainMock = vi.hoisted(() => {
     fetchProxyRoomConfig: vi.fn(),
     getFallbackRoomId: vi.fn(),
     i18NextVue: { name: 'I18NextVuePlugin' },
-    i18next: {
-      changeLanguage: vi.fn(),
-      init: vi.fn()
-    },
+    i18next,
     markAsViaProxy: vi.fn(),
     mockRpcClient: vi.fn(function MockRpcClient() {
       return createMockClient('mock');
@@ -156,15 +159,24 @@ describe('main bootstrap', () => {
 
     expect(i18nOptions).toEqual(
       expect.objectContaining({
+        defaultNS: 'translation',
+        fallbackLng: 'en',
         fallbackNS: 'translation',
         lng: 'en',
-        resources: expect.objectContaining({
-          de: expect.any(Object),
-          en: expect.any(Object),
-          es: expect.any(Object),
-          fr: expect.any(Object),
-          nl: expect.any(Object)
-        })
+        nonExplicitSupportedLngs: true,
+        partialBundledLanguages: true,
+        resources: {
+          en: {
+            translation: expect.any(Object)
+          }
+        },
+        supportedLngs: ['en', 'ar', 'cn', 'de', 'es', 'fr', 'nl']
+      })
+    );
+    expect(mainMock.i18next.use).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'backend',
+        read: expect.any(Function)
       })
     );
     expect(document.documentElement.dataset.theme).toBe('retro');
@@ -206,6 +218,27 @@ describe('main bootstrap', () => {
       }/ws/controller`
     });
     expect(mainMock.trysteroClient).not.toHaveBeenCalled();
+  });
+
+  it('loads non-English translation JSON through the lazy i18next backend', async () => {
+    await importMain();
+
+    const backend = mainMock.i18next.use.mock.calls[0]?.[0] as {
+      read: (
+        language: string,
+        namespace: string,
+        callback: (error: unknown, data: unknown) => void
+      ) => void;
+    };
+    const nlResource = await readBackendResource(backend, 'nl');
+
+    expect(nlResource).toEqual(
+      expect.objectContaining({
+        generic: expect.objectContaining({
+          next: 'Volgende'
+        })
+      })
+    );
   });
 
   it('uses a secure WebSocket bridge when proxy access is served over HTTPS', async () => {
@@ -332,6 +365,7 @@ function resetMainMocks(options: {
   mainMock.app.provide.mockReturnValue(mainMock.app);
   mainMock.app.use.mockReturnValue(mainMock.app);
   mainMock.app.mount.mockReturnValue(mainMock.app);
+  mainMock.i18next.use.mockReturnValue(mainMock.i18next);
   mainMock.i18next.init.mockResolvedValue(undefined);
   mainMock.detectAccessMode.mockReturnValue(options.accessMode ?? 'direct');
   mainMock.requiresProxyConnection.mockReturnValue(options.requiresProxy ?? false);
@@ -399,6 +433,28 @@ function latestClient(): MockClient {
   }
 
   return client;
+}
+
+function readBackendResource(
+  backend: {
+    read: (
+      language: string,
+      namespace: string,
+      callback: (error: unknown, data: unknown) => void
+    ) => void;
+  },
+  language: string
+): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    backend.read(language, 'translation', (error, data) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve(data);
+    });
+  });
 }
 
 function getMainModulePath(): string {

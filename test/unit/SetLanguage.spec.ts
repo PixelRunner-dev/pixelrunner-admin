@@ -13,8 +13,10 @@ const languageMock = vi.hoisted(() => ({
       resources: {
         en: {},
         nl: {},
-        de: {}
-      } as Record<string, unknown> | undefined
+        de: {},
+        ar: {}
+      } as Record<string, unknown> | undefined,
+      supportedLngs: undefined as string[] | undefined
     }
   }
 }));
@@ -41,11 +43,14 @@ describe('SetLanguage', () => {
     languageMock.i18next.options.resources = {
       en: {},
       nl: {},
-      de: {}
+      de: {},
+      ar: {}
     };
+    languageMock.i18next.options.supportedLngs = undefined;
   });
 
   afterEach(() => {
+    document.documentElement.removeAttribute('dir');
     vi.restoreAllMocks();
   });
 
@@ -57,8 +62,22 @@ describe('SetLanguage', () => {
     expect(select.attributes('id')).toBe('language');
     expect(select.attributes('name')).toBe('language');
     expect((select.element as HTMLSelectElement).value).toBe('en');
-    expect(options.map((option) => option.attributes('value'))).toEqual(['en', 'nl', 'de']);
-    expect(options).toHaveLength(3);
+    expect(options.map((option) => option.attributes('value'))).toEqual(['en', 'nl', 'de', 'ar']);
+    expect(options).toHaveLength(4);
+  });
+
+  it('renders language options from supported languages when resources are lazy loaded', () => {
+    languageMock.i18next.options.resources = { en: {} };
+    languageMock.i18next.options.supportedLngs = ['en', 'nl', 'de', 'ar'];
+
+    const wrapper = mountLanguage();
+
+    expect(wrapper.findAll('option').map((option) => option.attributes('value'))).toEqual([
+      'en',
+      'nl',
+      'de',
+      'ar'
+    ]);
   });
 
   it('prefers modelValue over cookie and i18next fallback values', () => {
@@ -145,6 +164,21 @@ describe('SetLanguage', () => {
     expect(wrapper.emitted('update:modelValue')).toEqual([['nl']]);
     expect(wrapper.emitted('change')).toEqual([['nl']]);
     expect(wrapper.vm.getCurrentLanguage().value).toBe('nl');
+  });
+
+  it('sets the document direction from the selected language', async () => {
+    const wrapper = mountLanguage({ modelValue: 'en' });
+    const select = wrapper.get('select');
+
+    expect(document.documentElement.getAttribute('dir')).toBe('ltr');
+
+    await select.setValue('ar');
+
+    expect(document.documentElement.getAttribute('dir')).toBe('rtl');
+
+    await select.setValue('nl');
+
+    expect(document.documentElement.getAttribute('dir')).toBe('ltr');
   });
 
   it('ignores empty changes and supports missing resource maps', async () => {
