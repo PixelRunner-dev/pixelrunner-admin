@@ -51,10 +51,26 @@ test.describe('AppletCarousel', () => {
   test('renders carousel wrapper with track and nav buttons', async ({ page }) => {
     await goToLibrary(page);
     const carousel = page.locator('.component--carousel').first();
+    const prevButton = carousel.locator('button[data-action="prev"]');
+    const nextButton = carousel.locator('button[data-action="next"]');
+    const isCoarsePointer = await page.evaluate(
+      () => window.matchMedia('(pointer: coarse)').matches
+    );
+
     await expect(carousel).toBeVisible();
     await expect(carousel.locator('.carousel__track')).toBeVisible();
-    await expect(carousel.locator('button[data-action="prev"]')).toBeVisible();
-    await expect(carousel.locator('button[data-action="next"]')).toBeVisible();
+    await expect(prevButton).toHaveCount(1);
+    await expect(nextButton).toHaveCount(1);
+    await expect(prevButton).toHaveClass(/pointer-coarse:hidden/);
+    await expect(nextButton).toHaveClass(/pointer-coarse:hidden/);
+
+    if (isCoarsePointer) {
+      await expect(prevButton).toBeHidden();
+      await expect(nextButton).toBeHidden();
+    } else {
+      await expect(prevButton).toBeVisible();
+      await expect(nextButton).toBeVisible();
+    }
   });
 
   test('carousel contains applet cards', async ({ page }) => {
@@ -83,9 +99,10 @@ test.describe('AppletDetails', () => {
     const details = page.getByTestId('applet-details').first();
     await expect(details).toBeVisible();
     await expect(details).toHaveAttribute('data-view', 'horizontal');
-    await expect(details.getByTestId('applet-details-title')).toBeVisible();
-    // Author not shown in horizontal view
-    await expect(details.getByTestId('applet-details-author')).toHaveCount(0);
+    await expect(details.locator('h2[data-testid="applet-details-title"]')).toBeVisible();
+    await expect(details.locator('h1[data-testid="applet-details-title"]')).toHaveCount(0);
+    await expect(details.locator('h3[data-testid="applet-details-title"]')).toHaveCount(0);
+    await expect(details.getByTestId('applet-details-author')).toHaveCount(1);
   });
 
   test('renders h1 with author and description in full-detail view', async ({ page }) => {
@@ -95,16 +112,25 @@ test.describe('AppletDetails', () => {
 
     const details = page.locator('[data-testid="applet-details"][data-view="full-detail"]');
     await expect(details).toHaveAttribute('data-view', 'full-detail');
-    await expect(details.getByTestId('applet-details-title')).toBeVisible();
+    await expect(details.locator('h1[data-testid="applet-details-title"]')).toBeVisible();
+    await expect(details.locator('h2[data-testid="applet-details-title"]')).toHaveCount(0);
+    await expect(details.locator('h3[data-testid="applet-details-title"]')).toHaveCount(0);
     await expect(details.getByTestId('applet-details-author')).toBeVisible();
     await expect(details.getByTestId('applet-details-summary')).toBeVisible();
     await expect(details.getByTestId('applet-details-description')).toBeVisible();
   });
 
-  test('shows official badge for official applets', async ({ page }) => {
+  test('renders h3 titles for preview and vertical applet cards', async ({ page }) => {
     await goToLibrary(page);
-    // Not guaranteed to be present (random), just assert the element type is correct if present
-    await expect(page.getByTestId('applet-details-title').first()).toBeVisible();
+    const previewDetails = page
+      .locator('[data-testid="applet-details"][data-view="preview"]')
+      .first();
+    const verticalDetails = page
+      .locator('[data-testid="applet-details"][data-view="vertical"]')
+      .first();
+
+    await expect(previewDetails.locator('h3[data-testid="applet-details-title"]')).toBeVisible();
+    await expect(verticalDetails.locator('h3[data-testid="applet-details-title"]')).toBeVisible();
   });
 });
 
