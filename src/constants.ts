@@ -242,13 +242,14 @@ export const FEATURE_TOGGLE_LIST = [
   },
   {
     key: 'appletUserStats',
-    label: 'Enable user statistics of an applets (favorite)',
+    label: 'Enable user statistics of applets (favorite)',
     isPermanent: false,
     sinceVersion: '999'
   },
   {
     key: 'appletGlobalStats',
-    label: 'Enable global statistics of an applets (total likes, total installations, etc)',
+    label:
+      'Enable global statistics of applets (total likes, total installations, etc) and enables "most downloaded applets" category in the applets library',
     isPermanent: false,
     sinceVersion: '999'
   },

@@ -36,7 +36,7 @@ describe('PlayList', () => {
     expect(wrapper.findAll('[data-testid="applet-card"]')).toHaveLength(2);
     expect(wrapper.text()).toContain('card:clock:call-to-action:true');
     expect(wrapper.text()).toContain('card:weather:call-to-action:true');
-    expect(wrapper.text()).toContain('t:generic.configure');
+    expect(wrapper.text()).toContain('t:applet.cta.configure');
   });
 
   it('emits installed playlist applets when AppletList reports a reordered full applet list', async () => {

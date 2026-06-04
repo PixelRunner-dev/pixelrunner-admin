@@ -37,10 +37,10 @@ const {
       <component
         :is="isInteractive ? 'router-link' : 'span'"
         :to="isInteractive ? `/library/categories/${category.key}` : undefined"
-        :class="isInteractive ? 'rounded-field hover:bg-base-200 px-4 py-2' : undefined"
+        :class="isInteractive ? 'rounded-field hover:bg-base-200 px-4 py-2 gap-2' : undefined"
         class="flex"
       >
-        <IconImage v-bind="category.icon" className="mr-2" />
+        <IconImage v-bind="category.icon" className="shrink-0" />
         <span class="text-balance">{{ $t(`applet.category.${category.key}.label`) }}</span>
       </component>
     </li>

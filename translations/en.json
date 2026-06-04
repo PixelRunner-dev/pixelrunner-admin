@@ -3,7 +3,6 @@
     "prev": "Previous",
     "next": "Next",
     "loading": "Loading...",
-    "configure": "Configure",
     "official": "Official",
     "install": "Install",
     "save": "Save",
@@ -24,6 +23,9 @@
     }
   },
   "applet": {
+    "cta": {
+      "configure": "Configure applet"
+    },
     "details": {
       "createdBy": "By: {{author}}"
     },
@@ -360,14 +362,17 @@
       "playlistConfig": {
         "legend": "Applet in playlist"
       },
-      "hiddenToggle": {
-        "ariaLabel": "Toggle applet visibility",
-        "label": "Hide applet in playlist"
-      },
-      "pinToggle": {
-        "ariaLabel": "Toggle applet pin",
-        "label": "Pin applet in playlist",
-        "hiddenWarning": "Cannot pin applet when it is hidden"
+      "appletPlaylist": {
+        "legend": "Playlist behavior",
+        "hiddenToggle": {
+          "ariaLabel": "Toggle applet visibility",
+          "label": "Hide applet in playlist"
+        },
+        "pinToggle": {
+          "ariaLabel": "Toggle applet pin",
+          "label": "Pin applet in playlist",
+          "hiddenWarning": "Cannot pin applet when it is hidden"
+        }
       }
     }
   },
@@ -386,6 +391,37 @@
     },
     "categories": {
       "title": "All Categroies"
+    },
+    "clock": {
+      "title": "Clocks",
+      "payoff": "Tick, tock, tick, tock..."
+    },
+    "news": {
+      "title": "News"
+    },
+    "bitcoin": {
+      "title": "Bitcoin",
+      "payoff": "Only bitcoin, so no crypto here"
+    },
+    "weather": {
+      "title": "Weather",
+      "payoff": "Local weather reports"
+    },
+    "finance": {
+      "title": "Finance",
+      "payoff": "Money, finance and economics"
+    },
+    "now_playing": {
+      "title": "Now Playing",
+      "payoff": "Live on air"
+    },
+    "gaming": {
+      "title": "Gaming",
+      "payoff": "All gaming related"
+    },
+    "smart_home": {
+      "title": "Home Automation / Smart Home",
+      "payoff": "Be smart at home and automate everything!"
     }
   },
   "categoryPage": {

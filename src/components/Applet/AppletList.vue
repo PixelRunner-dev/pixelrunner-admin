@@ -97,6 +97,7 @@ if (isDragable) {
   useDraggable(listElement, draggableApplets, {
     animation: 150,
     draggable: '.draggable-applet',
+    delay: 210,
     onStart() {
       drag.value = true;
       dragStartOrder = draggableApplets.value.map(getAppletKey);

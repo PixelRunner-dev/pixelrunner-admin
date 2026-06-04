@@ -38,11 +38,17 @@ onBeforeUnmount(() => {
       </template>
     </AppletList>
 
-    <button class="btn btn-xs _prev mr-2 mt-1" data-action="prev">
-      {{ $t('generic.prev') }}
-    </button>
-    <button class="btn btn-xs next mt-1" data-action="next">
+    <button
+      class="btn btn-xs btn-ghost _next mt-1 pointer-coarse:hidden float-right lowercase"
+      data-action="next"
+    >
       {{ $t('generic.next') }}
+    </button>
+    <button
+      class="btn btn-xs btn-ghost _prev mr-2 mt-1 pointer-coarse:hidden lowercase"
+      data-action="prev"
+    >
+      {{ $t('generic.prev') }}
     </button>
   </div>
 </template>

@@ -104,29 +104,33 @@ const mockDate = new Date('2026-01-01T00:00:00.000Z');
 
 const allApplets = {
   key: 'tracking',
-  icon: { iconId: 'icon--star' as const, alt: 'All' }
+  icon: { iconId: 'barcode' as const, alt: 'All' }
 } satisfies ICategory;
 
 const categories = {
   spotlight: {
     key: 'spotlight',
-    icon: { iconId: 'icon--star' as const, alt: 'Spotlight' }
+    icon: { iconId: 'ranking-star' as const, alt: 'Spotlight' }
   },
   starterPack: {
     key: 'starter_pack',
-    icon: { iconId: 'icon--rocket' as const, alt: 'Starter pack' }
+    icon: { iconId: 'wand-magic-sparkles' as const, alt: 'Starter pack' }
   },
   fireworks: {
     key: 'fireworks',
-    icon: { iconId: 'icon--bomb' as const, alt: 'Fireworks' }
+    icon: { iconId: 'burst' as const, alt: 'Fireworks' }
   },
   weather: {
     key: 'weather',
-    icon: { iconId: 'icon--cloud' as const, alt: 'Weather' }
+    icon: { iconId: 'cloud-sun-rain' as const, alt: 'Weather' }
+  },
+  clock: {
+    key: 'clock',
+    icon: { iconId: 'clock' as const, alt: 'Clock' }
   },
   alert: {
     key: 'alert',
-    icon: { iconId: 'icon--triangle-alert' as const, alt: 'Alert' }
+    icon: { iconId: 'triangle-exclamation' as const, alt: 'Alert' }
   }
 } satisfies Record<string, ICategory>;
 
@@ -242,7 +246,7 @@ const mockApplets: IFullApplet[] = [
     'Clock By Henry',
     'Shows current time on the Pixelrunner display.',
     true,
-    [categories.spotlight, categories.starterPack]
+    [categories.spotlight, categories.starterPack, categories.clock]
   ),
   makeApplet('buienradar', 'Buienradar', 'Shows local conditions and forecast.', true, [
     categories.starterPack
@@ -257,7 +261,8 @@ const mockApplets: IFullApplet[] = [
   makeZeroByteAlertApplet(),
   makeApplet('usdebtclock', 'US Debt Clock', 'Shows how much debt the United States has.', false, [
     categories.fireworks,
-    categories.spotlight
+    categories.spotlight,
+    categories.clock
   ])
 ];
 

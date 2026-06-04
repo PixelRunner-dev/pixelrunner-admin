@@ -80,8 +80,10 @@ describe('AppletCarousel', () => {
 describe('AppletDetails', () => {
   it('renders compact horizontal details without author or long description', () => {
     const wrapper = mountDetails({ view: 'horizontal' });
+    const title = wrapper.get('[data-testid="applet-details-title"]');
 
-    expect(wrapper.get('h2').text()).toBe('Weather');
+    expect(title.element.tagName).toBe('H2');
+    expect(title.text()).toBe('Weather');
     expect(wrapper.find('h1').exists()).toBe(false);
     expect(wrapper.text()).not.toContain('[By]');
     expect(wrapper.text()).not.toContain('Detailed forecast');
@@ -89,8 +91,10 @@ describe('AppletDetails', () => {
 
   it('renders preview author and official badge', () => {
     const wrapper = mountDetails({ isOfficialApplet: true, view: 'preview' });
+    const title = wrapper.get('[data-testid="applet-details-title"]');
 
-    expect(wrapper.get('h2').text()).toContain('Weather');
+    expect(title.element.tagName).toBe('H3');
+    expect(title.text()).toContain('Weather');
     expect(wrapper.find('.badge').exists()).toBe(true);
     expect(wrapper.find('p.text-xs').exists()).toBe(true);
     expect(wrapper.text()).not.toContain('Detailed forecast');
@@ -98,8 +102,10 @@ describe('AppletDetails', () => {
 
   it('renders full detail with h1, summary, description, and spacing class', () => {
     const wrapper = mountDetails({ view: 'full-detail' });
+    const title = wrapper.get('[data-testid="applet-details-title"]');
 
-    expect(wrapper.get('h1').text()).toBe('Weather');
+    expect(title.element.tagName).toBe('H1');
+    expect(title.text()).toBe('Weather');
     expect(wrapper.text()).toContain('Forecast summary');
     expect(wrapper.text()).toContain('Detailed forecast');
     expect(wrapper.find('.component--applet-details').classes()).toContain('my-4');

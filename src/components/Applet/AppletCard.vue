@@ -50,16 +50,16 @@ const appletImage = computed(() => {
       :is="hasCallToAction ? 'div' : 'router-link'"
       :to="hasCallToAction ? undefined : `/library/applets/${applet.packageName}`"
     >
-      <figure class="w-full">
+      <figure class="w-full" :class="view === 'horizontal' ? 'flex-col md:flex-row' : 'flex-row'">
         <AppletImage v-bind="appletImage" />
 
         <figcaption>
-          <AppletDetails v-bind="details" :view="view" />
+          <AppletDetails v-bind="details" :view />
 
           <router-link
             v-if="hasCallToAction && applet.isInstalled"
             :to="`/applets/${applet.installationDetails?.uuid}`"
-            class="btn btn-secondary btn-sm"
+            class="btn btn-secondary btn-sm mt-2"
             data-testid="applet-configure-link"
           >
             <slot name="cta" />
@@ -77,7 +77,6 @@ const appletImage = computed(() => {
 
 .applet-card--horizontal figure {
   display: flex;
-  flex-direction: row;
   gap: 1rem;
   width: 100%;
 }
@@ -85,7 +84,10 @@ const appletImage = computed(() => {
 .applet-card--vertical figure {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+}
+
+.applet-card--vertical figcaption {
+  padding: 0.5rem 1rem;
 }
 
 .applet-card--preview figure {

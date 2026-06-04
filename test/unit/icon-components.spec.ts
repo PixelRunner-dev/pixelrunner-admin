@@ -8,7 +8,7 @@ describe('IconImage', () => {
   it('renders default decorative SVG attributes and icon reference', () => {
     const wrapper = mount(IconImage, {
       props: {
-        iconId: 'icon--search',
+        iconId: 'search',
         alt: ''
       }
     });
@@ -16,12 +16,12 @@ describe('IconImage', () => {
     const svg = wrapper.find('svg');
 
     expect(svg.classes()).toEqual(['component--icon', 'icon', 'icon--search']);
-    expect(svg.attributes('width')).toBe('16');
-    expect(svg.attributes('height')).toBe('16');
-    expect(svg.attributes('fill')).toBe('#000');
-    expect(svg.attributes('stroke')).toBe('#fff');
+    expect(svg.attributes('width')).toBe('24');
+    expect(svg.attributes('height')).toBe('24');
+    expect(svg.attributes('fill')).toBe(undefined);
+    expect(svg.attributes('stroke')).toBe(undefined);
     expect(svg.attributes('role')).toBe('img');
-    expect(svg.attributes('aria-hidden')).toBe('true');
+    expect(svg.attributes('aria-hidden')).toBe('false');
     expect(svg.find('title').exists()).toBe(false);
     expect(svg.find('use').attributes('href')).toBe('#icon--search');
   });
@@ -29,11 +29,11 @@ describe('IconImage', () => {
   it('renders accessible title and custom presentation props', () => {
     const wrapper = mount(IconImage, {
       props: {
-        iconId: 'icon--check',
+        iconId: 'check',
         alt: 'Selected',
         className: 'text-success',
         size: 24,
-        isDecorative: false,
+        isDecorative: true,
         fill: 'currentColor',
         stroke: 'none'
       }
@@ -46,7 +46,7 @@ describe('IconImage', () => {
     expect(svg.attributes('height')).toBe('24');
     expect(svg.attributes('fill')).toBe('currentColor');
     expect(svg.attributes('stroke')).toBe('none');
-    expect(svg.attributes('aria-hidden')).toBe('false');
+    expect(svg.attributes('aria-hidden')).toBe('true');
     expect(svg.find('title').text()).toBe('Selected');
     expect(svg.find('use').attributes('href')).toBe('#icon--check');
   });

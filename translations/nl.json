@@ -1,19 +1,37 @@
 {
-  "language": {
-    "en": "English",
-    "nl": "Dutch (Nederlands)",
-    "de": "German (Deutsch)",
-    "fr": "French (Français)",
-    "es": "Spanish (Español)"
-  },
   "generic": {
     "prev": "Vorige",
-    "next": "Volgende"
+    "next": "Volgende",
+    "loading": "Laden...",
+    "official": "Officieel",
+    "install": "Installeren",
+    "save": "Opslaan",
+    "remove": "Verwijderen",
+    "edit": "Bewerken",
+    "close": "Sluiten",
+    "cancel": "Annuleren",
+    "apply": "Toepassen",
+    "applying": "Toepassen...",
+    "daysOfWeek": {
+      "monday": "Maandag",
+      "tuesday": "Dinsdag",
+      "wednesday": "Woensdag",
+      "thursday": "Donderdag",
+      "friday": "Vrijdag",
+      "saturday": "Zaterdag",
+      "sunday": "Zondag"
+    }
   },
   "applet": {
+    "cta": {
+      "configure": "Applet configureren"
+    },
+    "details": {
+      "createdBy": "Door: {{author}}"
+    },
     "category": {
       "starter_pack": {
-        "label": "Startpakket"
+        "label": "Starterpakket"
       },
       "spotlight": {
         "label": "Uitgelicht"
@@ -31,7 +49,7 @@
         "label": "Nieuws"
       },
       "weather": {
-        "label": "Weerbericht"
+        "label": "Weer"
       },
       "art": {
         "label": "Kunst"
@@ -49,13 +67,13 @@
         "label": "Productiviteit"
       },
       "smart_home": {
-        "label": "Thuisautomatisering (slimme huis)"
+        "label": "Domotica (smart home)"
       },
       "now_playing": {
         "label": "Speelt nu af"
       },
       "devs": {
-        "label": "Voor ontwikkelaars"
+        "label": "Gemaakt voor ontwikkelaars"
       },
       "gaming": {
         "label": "Games"
@@ -67,7 +85,7 @@
         "label": "Religie"
       },
       "alert": {
-        "label": "Waarschuwing"
+        "label": "Meldingen"
       },
       "food": {
         "label": "Eten, drinken & koken"
@@ -76,7 +94,7 @@
         "label": "Vervoer"
       },
       "education": {
-        "label": "Educatie"
+        "label": "Onderwijs"
       },
       "entertainment": {
         "label": "Entertainment"
@@ -85,7 +103,7 @@
         "label": "Financiën"
       },
       "calendar": {
-        "label": "Kalender"
+        "label": "Agenda / planning"
       },
       "animals": {
         "label": "Dieren"
@@ -106,7 +124,7 @@
         "label": "Reizen"
       },
       "fireworks": {
-        "label": "Oud & nieuw met vuurwerk"
+        "label": "Oud en nieuw met vuurwerk"
       },
       "tracking": {
         "label": "Tracking"
@@ -114,19 +132,345 @@
       "nostr": {
         "label": "Nostr"
       }
+    },
+    "notification": {
+      "playlist": {
+        "remove": {
+          "success": "Applet uit playlist verwijderd",
+          "error": "Applet verwijderen uit playlist mislukt"
+        },
+        "install": {
+          "error": "Applet installeren mislukt"
+        },
+        "hidden": {
+          "success": "Zichtbaarheid van applet is bijgewerkt",
+          "error": "Zichtbaarheid van applet wijzigen mislukt"
+        },
+        "pin": {
+          "success": "Vastzetten van applet is bijgewerkt",
+          "error": "Vastzetten van applet wijzigen mislukt"
+        }
+      }
     }
   },
   "settingsPage": {
+    "notification": {
+      "saveInfo": "Alle wijzigingen worden direct opgeslagen"
+    },
     "deviceName": {
-      "label": "Naam van het apparaat",
-      "placeholder": "Voer de naam van het apparaat in"
+      "label": "Apparaatnaam",
+      "placeholder": "Voer apparaatnaam in",
+      "description": "Gebruik alleen letters, cijfers, '_' en '-'."
+    },
+    "dateAndTime": {
+      "legend": "Datum en tijd",
+      "date": {
+        "label": "Huidige datum"
+      },
+      "time": {
+        "label": "Huidige tijd"
+      }
     },
     "localization": {
+      "legend": "Lokalisatie",
+      "language": {
+        "label": "Taal"
+      },
       "location": {
         "label": "Locatie",
-        "placeholder": "Locatie invoeren",
+        "placeholder": "Voer locatie in",
         "error": "Selecteer een locatie uit de lijst"
       }
+    },
+    "wifiNetwork": {
+      "legend": "Wifi-netwerk",
+      "isFirstTimeSetupMessage": "Verbind dit apparaat met wifi. Andere instellingen worden beschikbaar nadat het apparaat met het netwerk is verbonden.",
+      "search": {
+        "label": "Zichtbare wifi-netwerken",
+        "scanning": "Scannen...",
+        "refresh": "Wifi-netwerken vernieuwen",
+        "connectedNetwork": "Verbonden wifi-netwerk",
+        "connectToNetwork": "Verbinden met {{ssid}}",
+        "noNetworksFound": "Geen zichtbare wifi-netwerken gevonden."
+      },
+      "ssid": {
+        "label": "SSID (netwerknaam)",
+        "placeholder": "Voer SSID (netwerknaam) in"
+      },
+      "password": {
+        "label": "Wachtwoord",
+        "placeholder": "Voer wachtwoord in"
+      },
+      "security": {
+        "label": "Beveiliging",
+        "options": {
+          "none": "Geen",
+          "wep": "WEP",
+          "wpa": "WPA",
+          "wpa23": "WPA2 / WPA3",
+          "wpa3": "WPA3",
+          "wpae": "WPA Enterprise",
+          "wpa2e": "WPA 2 Enterprise",
+          "wpa3e": "WPA 3 Enterprise"
+        }
+      },
+      "advancedOptions": "Geavanceerde opties",
+      "hiddenNetwork": {
+        "label": "Netwerk is een verborgen netwerk"
+      },
+      "ipConfiguration": {
+        "legend": "IP",
+        "dhcp": {
+          "label": "IP-configuratie",
+          "options": {
+            "dhcp": "DHCP",
+            "static": "Statisch"
+          }
+        },
+        "ip": {
+          "label": "IP-adres",
+          "placeholder": "Voer IP-adres in"
+        },
+        "subnet": {
+          "label": "Subnetmasker",
+          "placeholder": "Voer subnetmasker in"
+        },
+        "gateway": {
+          "label": "Gateway",
+          "placeholder": "Voer gateway in"
+        }
+      },
+      "dnsConfiguration": {
+        "legend": "DNS",
+        "dns": {
+          "label": "DNS-configuratie",
+          "options": {
+            "auto": "Automatisch",
+            "manual": "Handmatig"
+          }
+        },
+        "primaryDns": {
+          "label": "Primaire DNS",
+          "placeholder": "Voer primair DNS-adres in"
+        },
+        "secondaryDns": {
+          "label": "Secundaire DNS",
+          "placeholder": "Voer secundair DNS-adres in"
+        }
+      },
+      "proxyConfiguration": {
+        "legend": "Proxy",
+        "proxy": {
+          "label": "Proxyconfiguratie",
+          "options": {
+            "none": "Geen",
+            "manual": "Handmatig",
+            "autoConfig": "Automatische configuratie (via URL)"
+          }
+        },
+        "proxyServer": {
+          "label": "Server (domein)",
+          "placeholder": "proxy.example.com"
+        },
+        "proxyPort": {
+          "label": "Poort",
+          "placeholder": "8080"
+        },
+        "proxyAutoConfig": {
+          "label": "URL voor automatische configuratie",
+          "placeholder": "https://proxy.example.com/proxy.pac"
+        }
+      }
+    },
+    "brightness": {
+      "label": "Schermhelderheid"
+    },
+    "dimAtSunset": {
+      "label": "Scherm automatisch dimmen bij zonsondergang"
+    },
+    "nightMode": {
+      "legend": "Nachtmodus",
+      "label": "'Nachtmodus' inschakelen",
+      "description": "Als 'nachtmodus' is ingeschakeld, wordt het scherm gedimd naar de laagste helderheid en wordt een klok met donkere kleuren weergegeven.",
+      "nightModeStart": {
+        "label": "Starttijd"
+      },
+      "nightModeEnd": {
+        "label": "Eindtijd"
+      },
+      "alarmClock": {
+        "legend": "Wekker",
+        "label": "'Wekker' inschakelen",
+        "description": "Als 'wekker' is ingeschakeld, licht het scherm langzaam, maar binnen 5 minuten, op tot maximale helderheid om je wakker te maken. Je kunt sluimeren via de admin-interface.",
+        "alarmTime": {
+          "label": "Wektijd"
+        }
+      }
+    },
+    "theme": {
+      "label": "Thema (admin-interface)"
+    },
+    "experimentalFeatures": {
+      "label": "Experimentele functies inschakelen",
+      "list": {
+        "legend": "Experimentele functies",
+        "warning": {
+          "title": "WAARSCHUWING:",
+          "body": "ALLE FUNCTIES ZIJN NOG IN ONTWIKKELING OF IN TESTFASE. HET INSCHAKELEN VAN EEN FUNCTIE KAN JE APPARAAT ONBRUIKBAAR MAKEN! Sommige functies zijn permanent en kunnen niet worden uitgeschakeld, andere functies kunnen helemaal geen kwaad. Schakel een functie alleen in als je weet wat je doet. Er is GEEN SUPPORT voor experimentele functies in deze lijst."
+        }
+      }
+    },
+    "actions": {
+      "legend": "Acties",
+      "update": {
+        "button": "Apparaat bijwerken"
+      },
+      "shutdown": {
+        "button": "Apparaat uitschakelen",
+        "inProgress": "Apparaat wordt uitgeschakeld...",
+        "success": "Apparaat wordt uitgeschakeld",
+        "failure": "Apparaat uitschakelen mislukt"
+      },
+      "reboot": {
+        "button": "Apparaat herstarten",
+        "inProgress": "Apparaat wordt herstart...",
+        "success": "Apparaat wordt herstart",
+        "failure": "Apparaat herstarten mislukt"
+      },
+      "factoryReset": {
+        "button": "Fabrieksinstellingen herstellen",
+        "confirm": "Dit wist alle gegevens op het apparaat. Weet je zeker dat je dit apparaat wilt terugzetten naar de fabrieksinstellingen?"
+      }
+    }
+  },
+  "listPage": {
+    "pageTitle": "Pixel Runner",
+    "playlist": {
+      "noAppletsInPlaylist": "Er zijn nog geen applets toegevoegd aan de playlist. Voeg er een toe via de appletbibliotheek."
+    },
+    "cta": {
+      "goToLibrary": "Appletbibliotheek"
+    },
+    "notification": {
+      "saveOrderError": "Volgorde opslaan mislukt. De volgorde is teruggezet naar de oorspronkelijke volgorde. Vernieuw de pagina en probeer het opnieuw.",
+      "saveOrderUuidError": "Volgorde opslaan mislukt. Een of meer applets missen een installatie-UUID.",
+      "loadError": "Actieve playlist laden mislukt"
+    }
+  },
+  "detailPage": {
+    "appletConfig": {
+      "playlistConfig": {
+        "legend": "Applet in playlist"
+      },
+      "appletPlaylist": {
+        "legend": "Playlistgedrag",
+        "hiddenToggle": {
+          "ariaLabel": "Zichtbaarheid van applet schakelen",
+          "label": "Applet verbergen in playlist"
+        },
+        "pinToggle": {
+          "ariaLabel": "Applet vastzetten schakelen",
+          "label": "Applet vastzetten in playlist",
+          "hiddenWarning": "Kan applet niet vastzetten wanneer deze verborgen is"
+        }
+      }
+    }
+  },
+  "libraryPage": {
+    "pageTitle": "Appletbibliotheek",
+    "spotlight": {
+      "title": "Uitgelicht"
+    },
+    "new": {
+      "title": "Nieuw toegevoegd",
+      "payoff": "Recent toegevoegde applets"
+    },
+    "starterPack": {
+      "title": "Starterpakket",
+      "payoff": "Begin met deze applets"
+    },
+    "categories": {
+      "title": "Alle categorieën"
+    },
+    "clock": {
+      "title": "Klokken",
+      "payoff": "Tik, tak, tik, tak..."
+    },
+    "news": {
+      "title": "Nieuws"
+    },
+    "bitcoin": {
+      "title": "Bitcoin",
+      "payoff": "Alleen bitcoin, dus geen crypto hier"
+    },
+    "weather": {
+      "title": "Weer",
+      "payoff": "Lokale weerberichten"
+    },
+    "finance": {
+      "title": "Financiën",
+      "payoff": "Geld, financiën en economie"
+    },
+    "now_playing": {
+      "title": "Speelt nu af",
+      "payoff": "Live in de lucht"
+    },
+    "gaming": {
+      "title": "Gaming",
+      "payoff": "Alles rond gaming"
+    },
+    "smart_home": {
+      "title": "Domotica / smart home",
+      "payoff": "Maak je huis slim en automatiseer alles!"
+    }
+  },
+  "categoryPage": {
+    "pageTitle": "{{category}}-applets"
+  },
+  "fieldScheduleComponent": {
+    "legend": "Schema",
+    "schedule": {
+      "label": "Schema inschakelen voor applet"
+    },
+    "startTime": {
+      "label": "Starttijd"
+    },
+    "endTime": {
+      "label": "Eindtijd"
+    }
+  },
+  "librarySearchComponent": {
+    "input": {
+      "placeholder": "Applet zoeken..."
+    },
+    "submitButton": {
+      "label": "Zoeken"
+    }
+  },
+  "accessWarningComponent": {
+    "title": "Toegang via apparaat-IP",
+    "message": "Je opent deze admin-interface rechtstreeks. Gebruik voor volledige functionaliteit deze site via het lokale IP-adres van je Pixelrunner-apparaat.",
+    "instruction": "Vind het IP-adres van je apparaat in de lijst met verbonden apparaten van je router en open deze admin-interface via: http://[device-ip]"
+  },
+  "setLanguageComponent": {
+    "defaultLabel": "Kies taal",
+    "language": {
+      "en": "English",
+      "nl": "Dutch (Nederlands)",
+      "de": "German (Deutsch)",
+      "fr": "French (Français)",
+      "es": "Spanish (Español)"
+    }
+  },
+  "siteHeaderComponent": {
+    "logo": {
+      "title": "Ga naar de playlistpagina"
+    },
+    "back": {
+      "title": "Ga een pagina terug"
+    },
+    "settings": {
+      "title": "Ga naar de instellingenpagina"
     }
   }
 }

@@ -26,22 +26,35 @@ const {
   >
     <hgroup>
       <component
-        :is="view === 'full-detail' ? 'h1' : 'h2'"
+        :is="view === 'full-detail' ? 'h1' : view === 'horizontal' ? 'h2' : 'h3'"
         data-testid="applet-details-title"
-        :class="view === 'full-detail' ? 'text-5xl my-4' : 'text-lg'"
+        :class="
+          view === 'full-detail'
+            ? 'text-5xl my-4 gap-x-4'
+            : view === 'horizontal'
+              ? 'text-2xl gap-x-4'
+              : view === 'preview'
+                ? 'text-lg gap-x-2'
+                : 'text-md gap-x-2'
+        "
+        class="flex flex-wrap"
       >
         {{ name }}
         <span
           v-if="isOfficialApplet"
-          class="badge badge-primary badge-sm ml-2"
+          class="badge badge-primary badge-sm lowercase self-center"
           data-testid="applet-official-badge"
         >
           {{ $t('generic.official') }}
         </span>
       </component>
 
-      <template v-if="view === 'full-detail' || view === 'preview'">
-        <p class="text-xs mt-2" data-testid="applet-details-author">
+      <template v-if="view === 'full-detail' || view === 'horizontal' || view === 'preview'">
+        <p
+          class="text-xs"
+          :class="{ 'my-1 hidden md:block': view === 'horizontal' }"
+          data-testid="applet-details-author"
+        >
           {{ $t('applet.details.createdBy', { author }) }}
         </p>
       </template>

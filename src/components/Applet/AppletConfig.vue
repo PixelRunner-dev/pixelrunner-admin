@@ -447,16 +447,20 @@ watch(
         <FieldSchedule />
       </FeatureToggle>
 
-      <DFieldset v-if="installedUuid" legend="fdsfs" class="w-80 my-4 gap-4">
+      <DFieldset
+        v-if="installedUuid"
+        :legend="$t('detailPage.appletConfig.appletPlaylist.legend')"
+        class="w-80 my-4 gap-4"
+      >
         <DLabel label>
           <DToggle
             :model-value="isHidden"
             :disabled="!isConnected || isBusy"
             data-testid="applet-hidden-toggle"
-            :aria-label="$t('detailPage.appletConfig.hiddenToggle.ariaLabel')"
+            :aria-label="$t('detailPage.appletConfig.appletPlaylist.hiddenToggle.ariaLabel')"
             @update:model-value="(value) => updateHiddenState(Boolean(value))"
           />
-          <DText>{{ $t('detailPage.appletConfig.hiddenToggle.label') }}</DText>
+          <DText>{{ $t('detailPage.appletConfig.appletPlaylist.hiddenToggle.label') }}</DText>
         </DLabel>
 
         <DLabel label>
@@ -464,11 +468,13 @@ watch(
             :model-value="isPinned"
             :disabled="!isConnected || isHidden || isBusy"
             data-testid="applet-pin-toggle"
-            :title="isHidden ? $t('detailPage.appletConfig.pinToggle.hiddenWarning') : ''"
-            :aria-label="$t('detailPage.appletConfig.hiddenToggle.ariaLabel')"
+            :title="
+              isHidden ? $t('detailPage.appletConfig.appletPlaylist.pinToggle.hiddenWarning') : ''
+            "
+            :aria-label="$t('detailPage.appletConfig.appletPlaylist.hiddenToggle.ariaLabel')"
             @update:model-value="(value) => updatePinnedState(Boolean(value))"
           />
-          <DText>{{ $t('detailPage.appletConfig.pinToggle.label') }}</DText>
+          <DText>{{ $t('detailPage.appletConfig.appletPlaylist.pinToggle.label') }}</DText>
         </DLabel>
       </DFieldset>
 

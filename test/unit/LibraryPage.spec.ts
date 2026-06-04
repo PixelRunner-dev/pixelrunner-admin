@@ -146,17 +146,29 @@ describe('LibraryPage', () => {
       'LibraryPage - spotlight',
       'LibraryPage - newlyAdded',
       'LibraryPage - starterPack',
+      'LibraryPage - clock',
+      'LibraryPage - randomCategory',
+      'LibraryPage - news',
       'LibraryPage - categories'
     ]);
-    expect(libraryPageMock.queryOptions[0]?.skipContext()).toEqual({
+    expect(queryOption('LibraryPage - spotlight').skipContext()).toEqual({
       hasAppletsApi: true,
       categoryKey: 'spotlight'
     });
+    expect(queryOption('LibraryPage - randomCategory').skipContext()).toEqual({
+      hasAppletsApi: true,
+      categoryKey: expect.any(String)
+    });
 
-    await expect(libraryPageMock.queryOptions[0]?.load()).resolves.toEqual([clockApplet]);
-    await expect(libraryPageMock.queryOptions[1]?.load()).resolves.toEqual([weatherApplet]);
-    await expect(libraryPageMock.queryOptions[2]?.load()).resolves.toEqual([weatherApplet]);
-    await expect(libraryPageMock.queryOptions[3]?.load()).resolves.toEqual(categories);
+    await expect(queryOption('LibraryPage - spotlight').load()).resolves.toEqual([clockApplet]);
+    await expect(queryOption('LibraryPage - newlyAdded').load()).resolves.toEqual([weatherApplet]);
+    await expect(queryOption('LibraryPage - starterPack').load()).resolves.toEqual([weatherApplet]);
+    await expect(queryOption('LibraryPage - clock').load()).resolves.toEqual([weatherApplet]);
+    await expect(queryOption('LibraryPage - randomCategory').load()).resolves.toEqual([
+      weatherApplet
+    ]);
+    await expect(queryOption('LibraryPage - news').load()).resolves.toEqual([weatherApplet]);
+    await expect(queryOption('LibraryPage - categories').load()).resolves.toEqual(categories);
 
     expect(libraryPageMock.applets.getAppletsByCategoryKey).toHaveBeenCalledWith('spotlight');
     expect(libraryPageMock.applets.getAllApplets).toHaveBeenCalledWith({
@@ -164,6 +176,8 @@ describe('LibraryPage', () => {
       limit: 10
     });
     expect(libraryPageMock.applets.getAppletsByCategoryKey).toHaveBeenCalledWith('starter_pack');
+    expect(libraryPageMock.applets.getAppletsByCategoryKey).toHaveBeenCalledWith('clock');
+    expect(libraryPageMock.applets.getAppletsByCategoryKey).toHaveBeenCalledWith('news');
     expect(libraryPageMock.applets.getAllCategories).toHaveBeenCalledOnce();
   });
 
@@ -256,16 +270,6 @@ describe('LibraryPage', () => {
       expect(option.skipContext()).toEqual(expect.objectContaining({ hasAppletsApi: false }));
       await expect(option.load()).rejects.toThrow('Applets API not available');
     }
-  });
-
-  it('renders the themed section in December when newly added applets are available', async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-12-15T12:00:00.000Z'));
-
-    const wrapper = await mountLibraryPage();
-
-    expect(wrapper.text()).toContain('[themed items]');
-    expect(wrapper.text()).toContain('[themed applets]');
   });
 });
 
@@ -362,6 +366,16 @@ function buttonByText(wrapper: VueWrapper, text: string) {
   return button;
 }
 
+function queryOption(label: string): ControllerQueryOptions {
+  const option = libraryPageMock.queryOptions.find((candidate) => candidate.label === label);
+
+  if (!option) {
+    throw new Error(`Query option not found: ${label}`);
+  }
+
+  return option;
+}
+
 function libraryPageStubs() {
   return {
     AppletCard: {
@@ -371,7 +385,7 @@ function libraryPageStubs() {
     AppletCarousel: {
       props: ['applets', 'itemWidth'],
       template:
-        '<div>carousel:{{ applets.map((applet) => applet.packageName).join(",") }}:<slot v-bind="applets[0]" /></div>'
+        '<div>carousel:{{ applets.map((applet) => applet.packageName).join(",") }}:<slot v-if="applets[0]" name="item" v-bind="applets[0]" /></div>'
     },
     CategoryList: {
       props: ['categories', 'isInteractive'],

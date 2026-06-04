@@ -126,6 +126,122 @@ const {
   }
 });
 
+const clockCategoryKey = 'clock';
+const {
+  data: clockItems,
+  isLoading: isClockLoading,
+  error: clockError,
+  isWaitingForPeer: isWaitingForClockPeer,
+  reload: reloadClock
+} = useControllerQuery<IFullApplet[]>({
+  label: 'LibraryPage - clock',
+  enabled: isConnected,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets),
+    categoryKey: clockCategoryKey
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
+
+    const categoryApplets = await applets.getAppletsByCategoryKey(clockCategoryKey);
+
+    return (categoryApplets ?? []) as IFullApplet[];
+  },
+  defaultErrorMessage: 'Failed to load clock applets',
+  onSuccess: (loadedApplets) => {
+    console.log('[LibraryPage] Clock applets loaded:', {
+      categoryKey: clockCategoryKey,
+      count: loadedApplets.length
+    });
+  }
+});
+
+const randomCategoryCandidates = [
+  'bitcoin',
+  'weather',
+  'finance',
+  'now_playing',
+  'tracking',
+  'smart_home',
+  'gaming'
+];
+const randomIndex = Math.floor(Math.random() * randomCategoryCandidates.length);
+const randomCategory = randomCategoryCandidates[randomIndex];
+
+const {
+  data: randomCategoryItems,
+  isLoading: isRandomCategoryLoading,
+  error: randomCategoryError,
+  isWaitingForPeer: isWaitingForRandomCategoryPeer,
+  reload: reloadRandomCategory
+} = useControllerQuery<IFullApplet[]>({
+  label: 'LibraryPage - randomCategory',
+  enabled: isConnected,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets),
+    categoryKey: randomCategory
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
+
+    const categoryApplets = await applets.getAppletsByCategoryKey(randomCategory);
+
+    return (categoryApplets ?? []) as IFullApplet[];
+  },
+  defaultErrorMessage: 'Failed to load randomCategory applets',
+  onSuccess: (loadedApplets) => {
+    console.log('[LibraryPage] randomCategory applets loaded:', {
+      categoryKey: randomCategory,
+      count: loadedApplets.length
+    });
+  }
+});
+
+const newsCategoryKey = 'news';
+const {
+  data: newsItems,
+  isLoading: isNewsLoading,
+  error: newsError,
+  isWaitingForPeer: isWaitingForNewsPeer,
+  reload: reloadNews
+} = useControllerQuery<IFullApplet[]>({
+  label: 'LibraryPage - news',
+  enabled: isConnected,
+  state,
+  lastError,
+  canLoad: () => Boolean(applets),
+  skipContext: () => ({
+    hasAppletsApi: Boolean(applets),
+    categoryKey: newsCategoryKey
+  }),
+  load: async () => {
+    if (!applets) {
+      throw new Error('Applets API not available');
+    }
+
+    const categoryApplets = await applets.getAppletsByCategoryKey(newsCategoryKey);
+
+    return (categoryApplets ?? []) as IFullApplet[];
+  },
+  defaultErrorMessage: 'Failed to load news applets',
+  onSuccess: (loadedApplets) => {
+    console.log('[LibraryPage] news applets loaded:', {
+      categoryKey: newsCategoryKey,
+      count: loadedApplets.length
+    });
+  }
+});
+
 const {
   data: categories,
   isLoading: isCategoriesLoading,
@@ -185,22 +301,10 @@ const themedItems = newlyAddedItems;
       </FeatureToggle>
     </section>
 
-    <!-- (spotlight)<br />
-    Kleine tiles met plaatje links en op max 2 lijnen titel rechts.<br />
-    Tiles in grid van max 2 tiles hoog.
-
-    <section>
-      subtitel TITEL (categorie) (rechts uitgelijnd: show all knop)
-      <div>
-        tiles met grote plaat, onder titel op max 2 regels. na laatste zichtbare tile is de volgende
-        voor 10% zichtbaar
-      </div>
-    </section> -->
-
     <LibrarySection v-if="spotlightItems" :title="$t('libraryPage.spotlight.title')">
-      <AppletCarousel :applets="spotlightItems">
+      <AppletCarousel :applets="spotlightItems" itemWidth="wide">
         <template #item="applet">
-          <AppletCard view="vertical" :applet hasCategories />
+          <AppletCard view="preview" :applet hasCategories />
         </template>
       </AppletCarousel>
     </LibrarySection>
@@ -214,26 +318,26 @@ const themedItems = newlyAddedItems;
       <DButton size="xs" color="neutral" @click="reloadSpotlight">Retry</DButton>
     </div>
 
-    <LibrarySection
+    <!-- <LibrarySection
       v-if="isTimeOfTheYear && themedItems"
       title="[themed items]"
       payoff="[themed applets]"
     >
       <AppletCarousel :applets="themedItems">
         <template #item="applet">
-          <AppletCard view="preview" :applet />
+          <AppletCard view="vertical" :applet />
         </template>
       </AppletCarousel>
-    </LibrarySection>
+    </LibrarySection> -->
 
     <LibrarySection
       v-if="newlyAddedItems"
       :title="$t('libraryPage.new.title')"
       :payoff="$t('libraryPage.new.payoff')"
     >
-      <AppletCarousel itemWidth="wide" :applets="newlyAddedItems">
+      <AppletCarousel :applets="newlyAddedItems">
         <template #item="applet">
-          <AppletCard view="preview" :applet />
+          <AppletCard view="vertical" :applet />
         </template>
       </AppletCarousel>
     </LibrarySection>
@@ -246,34 +350,6 @@ const themedItems = newlyAddedItems;
       <p class="text-error">{{ newlyAddedError }}</p>
       <DButton size="xs" color="neutral" @click="reloadNewlyAdded">Retry</DButton>
     </div>
-
-    <LibrarySection v-if="categories" :title="$t('libraryPage.categories.title')">
-      <CategoryList :categories isInteractive />
-    </LibrarySection>
-
-    <p v-else-if="isCategoriesLoading" class="m-4 text-center">Loading categories...</p>
-    <p v-else-if="isWaitingForCategoriesPeer" class="m-4 text-center">
-      Waiting for device connection...
-    </p>
-    <div v-else-if="categoriesError" class="m-4 text-center">
-      <p class="text-error">{{ categoriesError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadCategories">Retry</DButton>
-    </div>
-
-    <!-- mostInstalledItems komt later -->
-    <!-- <LibrarySection
-      v-if="mostInstalledItems"
-      title="[Most Installed]"
-      payoff="[Most installed applets]"
-    >
-      <AppletCarousel :applets="mostInstalledItems">
-        <template #item="applet">
-          <AppletCard view="preview" :applet>
-            <template #cta>[test]</template>
-          </AppletCard>
-        </template>
-      </AppletCarousel>
-    </LibrarySection> -->
 
     <LibrarySection
       v-if="starterPackItems"
@@ -296,7 +372,79 @@ const themedItems = newlyAddedItems;
       <DButton size="xs" color="neutral" @click="reloadStarterPack">Retry</DButton>
     </div>
 
-    <section>[Build your own applet! Submit it via Github]</section>
+    <LibrarySection v-if="categories" :title="$t('libraryPage.categories.title')">
+      <CategoryList :categories isInteractive />
+    </LibrarySection>
+
+    <p v-else-if="isCategoriesLoading" class="m-4 text-center">Loading categories...</p>
+    <p v-else-if="isWaitingForCategoriesPeer" class="m-4 text-center">
+      Waiting for device connection...
+    </p>
+    <div v-else-if="categoriesError" class="m-4 text-center">
+      <p class="text-error">{{ categoriesError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadCategories">Retry</DButton>
+    </div>
+
+    <LibrarySection
+      v-if="clockItems"
+      :title="$t('libraryPage.clock.title')"
+      :payoff="$t('libraryPage.clock.payoff')"
+    >
+      <AppletCarousel :applets="clockItems">
+        <template #item="applet">
+          <AppletCard view="vertical" :applet />
+        </template>
+      </AppletCarousel>
+    </LibrarySection>
+
+    <p v-else-if="isClockLoading" class="m-4 text-center">Loading clock applets...</p>
+    <p v-else-if="isWaitingForClockPeer" class="m-4 text-center">
+      [Waiting for device connection...]
+    </p>
+    <div v-else-if="clockError" class="m-4 text-center">
+      <p class="text-error">{{ clockError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadClock">Retry</DButton>
+    </div>
+
+    <LibrarySection
+      v-if="randomCategoryItems"
+      :title="$t(`libraryPage.${randomCategory}.title`)"
+      :payoff="$t(`libraryPage.${randomCategory}.payoff`)"
+    >
+      <AppletCarousel :applets="randomCategoryItems">
+        <template #item="applet">
+          <AppletCard view="vertical" :applet />
+        </template>
+      </AppletCarousel>
+    </LibrarySection>
+
+    <p v-else-if="isRandomCategoryLoading" class="m-4 text-center">
+      Loading random category applets...
+    </p>
+    <p v-else-if="isWaitingForRandomCategoryPeer" class="m-4 text-center">
+      [Waiting for device connection...]
+    </p>
+    <div v-else-if="randomCategoryError" class="m-4 text-center">
+      <p class="text-error">{{ randomCategoryError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadRandomCategory">Retry</DButton>
+    </div>
+
+    <LibrarySection v-if="newsItems" :title="$t('libraryPage.news.title')">
+      <AppletCarousel :applets="newsItems">
+        <template #item="applet">
+          <AppletCard view="vertical" :applet />
+        </template>
+      </AppletCarousel>
+    </LibrarySection>
+
+    <p v-else-if="isNewsLoading" class="m-4 text-center">Loading news applets...</p>
+    <p v-else-if="isWaitingForNewsPeer" class="m-4 text-center">
+      [Waiting for device connection...]
+    </p>
+    <div v-else-if="newsError" class="m-4 text-center">
+      <p class="text-error">{{ newsError }}</p>
+      <DButton size="xs" color="neutral" @click="reloadNews">Retry</DButton>
+    </div>
 
     <FeatureToggle features="debug">
       <DebugSection
