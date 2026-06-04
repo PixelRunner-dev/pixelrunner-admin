@@ -3,7 +3,7 @@ import { basename, join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-const SUPPORTED_LOCALES = ['de', 'en', 'es', 'fr', 'nl'] as const;
+const SUPPORTED_LOCALES = ['de', 'en', 'es', 'fr', 'nl', 'cn', 'ar'] as const;
 
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
