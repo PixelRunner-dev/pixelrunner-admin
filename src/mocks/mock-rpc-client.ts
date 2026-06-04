@@ -102,6 +102,11 @@ const MOCK_LATENCY_MS = 80;
 
 const mockDate = new Date('2026-01-01T00:00:00.000Z');
 
+const allApplets = {
+  key: 'tracking',
+  icon: { iconId: 'icon--star' as const, alt: 'All' }
+} satisfies ICategory;
+
 const categories = {
   spotlight: {
     key: 'spotlight',
@@ -125,10 +130,15 @@ const categories = {
   }
 } satisfies Record<string, ICategory>;
 
-const categoryList = Object.values(categories);
+const appletCategoryList = Object.values(categories);
+const categoryList = [allApplets, ...appletCategoryList];
+
+function withAllApplets(appletCategories: ICategory[]): ICategory[] {
+  return [allApplets, ...appletCategories.filter((category) => category.key !== allApplets.key)];
+}
 
 export function getRandomCategories(random = Math.random): ICategory[] {
-  const shuffledCategories = [...categoryList];
+  const shuffledCategories = [...appletCategoryList];
 
   for (let index = shuffledCategories.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(random() * (index + 1));
@@ -175,7 +185,7 @@ function makeApplet(
       alt: `${name} preview`,
       dateCreated: mockDate
     },
-    categories: appletCategories,
+    categories: withAllApplets(appletCategories),
     isInstalled: installed,
     ...(installed && {
       installationDetails: {

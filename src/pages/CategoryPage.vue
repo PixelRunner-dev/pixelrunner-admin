@@ -3,10 +3,9 @@ import { computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { IFullApplet } from 'pixelrunner-shared';
 
-import AppletCard from '@/components/Applet/AppletCard.vue';
-import AppletList from '@/components/Applet/AppletList.vue';
 import DebugSection from '@/components/DebugSection.vue';
 import FeatureToggle from '@/components/FeatureToggle.vue';
+import AppletGrid from '@/components/Applet/AppletGrid.vue';
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
 
@@ -75,11 +74,7 @@ watch(categoryKey, () => {
       }}
     </DText>
 
-    <AppletList v-if="categoryApplets" :applets="categoryApplets" :limit="categoryApplets.length">
-      <template #item="applet">
-        <AppletCard view="vertical" :applet />
-      </template>
-    </AppletList>
+    <AppletGrid v-if="categoryApplets" :applets="categoryApplets" />
 
     <p v-else-if="isLoading" class="m-4 text-center">Loading category applets...</p>
     <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>

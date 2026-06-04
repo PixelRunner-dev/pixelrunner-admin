@@ -26,7 +26,7 @@ function handleReordered(orderedApplets: IFullApplet[]) {
       :limit="99"
       :isDragable="true"
       :isReorderPending="isSavingOrder"
-      :classes="{ list: 'playlist list', item: 'playlist__item list-row' }"
+      :classes="{ list: 'playlist list', item: 'playlist__item list-row my-2' }"
       @reordered="handleReordered"
     >
       <template #item="applet">

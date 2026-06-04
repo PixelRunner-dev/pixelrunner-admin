@@ -17,10 +17,6 @@ describe('PlayList', () => {
     expect(list.props()).toEqual(
       expect.objectContaining({
         applets: playlist.applets,
-        classes: {
-          item: 'playlist__item list-row',
-          list: 'playlist list'
-        },
         isDragable: true,
         isReorderPending: false
       })

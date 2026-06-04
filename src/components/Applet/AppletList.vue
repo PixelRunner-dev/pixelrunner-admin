@@ -134,7 +134,7 @@ list item actief class toevoegen
       <li
         v-for="applet in visibleApplets"
         :key="applet.installationDetails?.uuid || applet.packageName"
-        :class="['bg-base-200 rounded-box my-2 shadow-sm', classes?.item]"
+        :class="['bg-base-200 rounded-box shadow-sm', classes?.item]"
       >
         <AppletItem :applet>
           <template #item="applet">
