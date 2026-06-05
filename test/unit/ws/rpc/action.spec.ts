@@ -26,25 +26,25 @@ describe('action.ts', () => {
 
     it('uses default NOSTR_RELAYS when not provided', () => {
       const config = createTrysteroRoomConfig({});
-      expect(config.relayUrls).toEqual(NOSTR_RELAYS);
+      expect(config.relayConfig?.urls).toEqual(NOSTR_RELAYS);
     });
 
     it('uses custom relayUrls when provided', () => {
       const customRelays = ['wss://relay1.example.com', 'wss://relay2.example.com'];
       const config = createTrysteroRoomConfig({ relayUrls: customRelays });
-      expect(config.relayUrls).toEqual(customRelays);
+      expect(config.relayConfig?.urls).toEqual(customRelays);
     });
 
     it('creates new array from custom relays (does not mutate)', () => {
       const customRelays = ['wss://relay1.example.com'];
       const config = createTrysteroRoomConfig({ relayUrls: customRelays });
-      config.relayUrls?.push('wss://relay2.example.com');
+      config.relayConfig?.urls?.push('wss://relay2.example.com');
       expect(customRelays).toHaveLength(1);
     });
 
     it('handles empty relayUrls array', () => {
       const config = createTrysteroRoomConfig({ relayUrls: [] });
-      expect(config.relayUrls).toEqual([]);
+      expect(config.relayConfig?.urls).toEqual([]);
     });
   });
 

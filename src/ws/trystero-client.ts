@@ -1,4 +1,4 @@
-import type { BaseRoomConfig, RelayConfig } from 'trystero';
+import type { JoinRoomConfig, JsonValue } from 'trystero';
 import {
   ACTION_NAME,
   DEFAULT_WEBSOCKET_CONFIG,
@@ -49,11 +49,11 @@ let webRtcDebugInstalled = false;
 interface TrysteroRoomLike {
   leave?: () => void;
   getPeers?: () => string[] | Record<string, unknown>;
-  onPeerJoin?: (handler: (peerId: string) => void) => void;
-  onPeerLeave?: (handler: (peerId: string) => void) => void;
+  onPeerJoin?: ((peerId: string) => void) | null;
+  onPeerLeave?: ((peerId: string) => void) | null;
   onError?: (handler: (error: Error) => void) => void;
   onStream?: (handler: (stream: MediaStream, peerId: string) => void) => void;
-  onPeerStream?: (handler: (stream: MediaStream, peerId: string) => void) => void;
+  onPeerStream?: ((stream: MediaStream, peerId: string, metadata?: JsonValue) => void) | null;
   onSignalingReady?: (handler: () => void) => void;
   makeAction: (actionName: string) => unknown;
 }
@@ -221,7 +221,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     console.log('[trystero-client] APP_ID:', APP_ID);
     await this.logDerivedTopics(roomId);
 
-    const trysteroConfig: BaseRoomConfig & RelayConfig = {
+    const trysteroConfig: JoinRoomConfig = {
       appId: APP_ID,
       password: roomPassword,
       // Add STUN servers for NAT traversal
@@ -232,7 +232,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     // Configure Nostr relays if provided
     if (this.config.relayUrls && this.config.relayUrls.length > 0) {
-      trysteroConfig.relayUrls = this.config.relayUrls;
+      trysteroConfig.relayConfig = { urls: this.config.relayUrls };
       console.log('[trystero-client] Relay URLs configured:', this.config.relayUrls);
       console.log('[trystero-client] Checking relay health...');
       const relayHealth = await this.checkRelayHealth();
@@ -274,21 +274,17 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   private setupRoomHandlers(): void {
     if (!this.room) throw new Error('no room found');
-    if (this.room.onPeerJoin) {
-      this.room.onPeerJoin((peerId: string) => {
-        console.log('[trystero-client] Peer joined:', peerId);
-        this.handlePeersAvailable('peer joined');
-      });
-    } else console.log('[trystero-client] No onPeerJoin event found');
-    if (this.room.onPeerLeave) {
-      this.room.onPeerLeave((peerId: string) => {
-        console.log('[trystero-client] Peer left:', peerId);
-        if (this.getPeerCount() > 0) {
-          return;
-        }
-        this.handleNoPeersDetected('Peer left');
-      });
-    } else console.log('[trystero-client] No onPeerLeave event found');
+    this.room.onPeerJoin = (peerId: string) => {
+      console.log('[trystero-client] Peer joined:', peerId);
+      this.handlePeersAvailable('peer joined');
+    };
+    this.room.onPeerLeave = (peerId: string) => {
+      console.log('[trystero-client] Peer left:', peerId);
+      if (this.getPeerCount() > 0) {
+        return;
+      }
+      this.handleNoPeersDetected('Peer left');
+    };
     if (this.room.getPeers) {
       const existingPeerCount = this.getPeerCount();
       console.log('[trystero-client] Existing peers:', this.room.getPeers());
@@ -296,15 +292,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         this.handlePeersAvailable('existing peers');
       }
     } else console.log('[trystero-client] No getPeers event found');
-    if (this.room.onStream) {
-      this.room.onStream((stream: MediaStream, peerId: string) => {
-        console.log('[trystero-client] Peer stream:', peerId, stream);
-      });
-    } else if ('onPeerStream' in this.room && typeof this.room.onPeerStream === 'function') {
-      this.room.onPeerStream((stream: MediaStream, peerId: string) => {
-        console.log('[trystero-client] Peer stream:', peerId, stream);
-      });
-    } else console.log('[trystero-client] No peer stream event found');
+    this.room.onPeerStream = (stream: MediaStream, peerId: string) => {
+      console.log('[trystero-client] Peer stream:', peerId, stream);
+    };
     if (this.room.onSignalingReady) {
       this.room.onSignalingReady(() => {
         console.log('[trystero-client] Signaling ready');

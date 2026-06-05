@@ -148,6 +148,9 @@ export class MockTrysteroRoom extends EventEmitter {
   private actionCallbacks: Map<string, (data: string, peerId: string) => void> = new Map();
   private messageDelay: number;
 
+  onPeerJoin: ((peerId: string) => void) | null = null;
+  onPeerLeave: ((peerId: string) => void) | null = null;
+
   constructor(options: MockTransportOptions = {}) {
     super();
     this.messageDelay = options.delay ?? 0;
@@ -155,14 +158,6 @@ export class MockTrysteroRoom extends EventEmitter {
 
   getPeers(): string[] {
     return Array.from(this.peers);
-  }
-
-  onPeerJoin(handler: (peerId: string) => void) {
-    this.on('peer-join', handler);
-  }
-
-  onPeerLeave(handler: (peerId: string) => void) {
-    this.on('peer-leave', handler);
   }
 
   makeAction(
@@ -189,12 +184,12 @@ export class MockTrysteroRoom extends EventEmitter {
 
   simulatePeerJoin(peerId: string) {
     this.peers.add(peerId);
-    this.emit('peer-join', peerId);
+    this.onPeerJoin?.(peerId);
   }
 
   simulatePeerLeave(peerId: string) {
     this.peers.delete(peerId);
-    this.emit('peer-leave', peerId);
+    this.onPeerLeave?.(peerId);
   }
 
   simulateMessage(actionName: string, data: string, peerId: string) {
@@ -215,6 +210,8 @@ export class MockTrysteroRoom extends EventEmitter {
   reset() {
     this.peers.clear();
     this.actionCallbacks.clear();
+    this.onPeerJoin = null;
+    this.onPeerLeave = null;
     this.removeAllListeners();
   }
 }

@@ -4,7 +4,7 @@
  * browser and Node.js Trystero clients.
  */
 
-import type { Room, BaseRoomConfig, RelayConfig } from 'trystero';
+import type { Room, JoinRoomConfig } from 'trystero';
 import { ACTION_NAME, APP_ID, NOSTR_RELAYS, ROOM_PREFIX } from '../../constants.ts';
 
 /**
@@ -36,10 +36,10 @@ export interface TrysteroRoomConfig {
  * @param config - Room configuration options
  * @returns The room configuration object for Trystero
  */
-export function createTrysteroRoomConfig(config: TrysteroRoomConfig): BaseRoomConfig & RelayConfig {
+export function createTrysteroRoomConfig(config: TrysteroRoomConfig): JoinRoomConfig {
   return {
     appId: APP_ID,
-    relayUrls: [...(config.relayUrls ?? NOSTR_RELAYS)]
+    relayConfig: { urls: [...(config.relayUrls ?? NOSTR_RELAYS)] }
   };
 }
 
@@ -101,8 +101,8 @@ export function setupPeerHandlers(
   onJoin: (peerId: string) => void,
   onLeave: (peerId: string) => void
 ): void {
-  room.onPeerJoin(onJoin);
-  room.onPeerLeave(onLeave);
+  room.onPeerJoin = onJoin;
+  room.onPeerLeave = onLeave;
 }
 
 /**
@@ -149,8 +149,12 @@ export async function createTrysteroRoomInstance(
         // Cleanup - Trystero doesn't have removeListener
       };
     },
-    onPeerJoin: (handler) => room.onPeerJoin(handler),
-    onPeerLeave: (handler) => room.onPeerLeave(handler),
+    onPeerJoin: (handler) => {
+      room.onPeerJoin = handler;
+    },
+    onPeerLeave: (handler) => {
+      room.onPeerLeave = handler;
+    },
     leave: () => room.leave(),
     getPeers: () => Object.keys(room.getPeers())
   };
