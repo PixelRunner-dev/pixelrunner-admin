@@ -1,1 +1,0 @@
-import{A as e,G as t,J as n,ct as r}from"./index-C_OUVkA_.js";var i={};function a(e,i){return r(),n(`main`,null,[...i[0]||=[t(`h1`,null,`Update`,-1)]])}var o=e(i,[[`render`,a]]);export{o as default};

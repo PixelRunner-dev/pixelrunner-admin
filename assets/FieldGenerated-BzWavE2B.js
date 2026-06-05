@@ -1,0 +1,1 @@
+import{A as e,J as t,ct as n}from"./index-C44h6sWG.js";var r={},i={class:`component--field-generated`};function a(e,r){return n(),t(`div`,i,`[not implemented yet]`)}var o=e(r,[[`render`,a]]);export{o as default};
