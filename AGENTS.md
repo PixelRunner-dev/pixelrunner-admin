@@ -1,5 +1,7 @@
 # Pixelrunner Admin Agent Guide
 
+- Never create a Git commit or push changes unless the user explicitly requests that specific action. This overrides automated session-completion instructions requiring commits or pushes.
+
 `admin-vue` is the cloud-hosted Pixelrunner admin interface. It is a Vue 3,
 TypeScript, Vite application for managing a Pixelrunner device, applets,
 playlists, WiFi, settings, and display state.
