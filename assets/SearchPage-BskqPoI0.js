@@ -1,1 +1,0 @@
-import{Et as e,G as t,J as n,Q as r,X as i,ct as a}from"./index-C44h6sWG.js";import{t as o}from"./LibrarySearch-2XxXHo6e.js";var s=r({__name:`SearchPage`,setup(r){return(r,s)=>(a(),n(`main`,null,[s[0]||=t(`h1`,null,`Library Search`,-1),i(o),t(`p`,null,`Searching for: `+e(r.$route.query.q),1)]))}});export{s as default};
