@@ -5,7 +5,7 @@ import {
   NavigationFailureType
 } from 'vue-router';
 
-import { isSetupRequired } from '@/services/setup-status.ts';
+import { getSetupRedirect } from '@/services/setup-status.ts';
 
 const APP_TITLE = document.title;
 
@@ -73,14 +73,10 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  const setupRequired = await isSetupRequired().catch(() => null);
+  const redirect = await getSetupRedirect(to).catch(() => null);
 
-  if (to.name !== 'setup' && setupRequired) {
-    return { name: 'setup' };
-  }
-
-  if (to.name === 'setup' && setupRequired === false) {
-    return { name: 'applet-list' };
+  if (redirect) {
+    return redirect;
   }
 
   if (to.meta.title) {
