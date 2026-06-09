@@ -4,5 +4,6 @@ export interface Notification {
   actionLabel?: string;
   onAction?: () => void;
   timeoutToClose?: number;
+  persistent?: boolean;
   hasCloseButton?: boolean;
 }

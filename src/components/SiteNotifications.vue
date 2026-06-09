@@ -10,7 +10,11 @@ defineProps<{
 
 <template>
   <div v-if="notifications.length" class="site-wrapper my-8">
-    <div v-for="notification in notifications" :key="notification.message" class="my-4">
+    <div
+      v-for="notification in notifications"
+      :key="`${notification.type}:${notification.message}`"
+      class="my-4"
+    >
       <DAlert
         :type="notification.type"
         role="alert"
