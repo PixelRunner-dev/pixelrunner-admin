@@ -259,6 +259,13 @@ export const FEATURE_TOGGLE_LIST = [
       'Enable functionality to zap the creator of the applet via NWC and shows total amount of zapped sats on AppletDetails',
     isPermanent: false,
     sinceVersion: '999'
+  },
+  {
+    key: 'shareSessionViaQrCode',
+    label:
+      'Enable functionality to allow a phone to connect by scanning a QR-code from the matrix. It opens the admin url and connects to the device\'s proxy automatically',
+    isPermanent: false,
+    sinceVersion: '999'
   }
 ] as const satisfies readonly FeatureToggleItem[];
 
