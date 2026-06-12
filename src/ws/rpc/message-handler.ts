@@ -17,7 +17,7 @@ export function parseJsonRpcMessage(data: string): IJsonRpcMessage | null {
     if (
       message &&
       typeof message === 'object' &&
-      (message.jsonrpc === '2.0' || message.jsonrpc === '2.0')
+      message.jsonrpc === '2.0'
     ) {
       return message as IJsonRpcMessage;
     }
