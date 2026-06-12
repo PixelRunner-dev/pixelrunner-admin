@@ -263,7 +263,7 @@ export const FEATURE_TOGGLE_LIST = [
   {
     key: 'shareSessionViaQrCode',
     label:
-      'Enable functionality to allow a phone to connect by scanning a QR-code from the matrix. It opens the admin url and connects to the device\'s proxy automatically',
+      "Enable functionality to allow a phone to connect by scanning a QR-code from the matrix. It opens the admin url and connects to the device's proxy automatically",
     isPermanent: false,
     sinceVersion: '999'
   }
