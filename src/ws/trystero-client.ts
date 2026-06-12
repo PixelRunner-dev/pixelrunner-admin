@@ -191,7 +191,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   protected async connectTransport(): Promise<void> {
     console.log('[trystero-client] connectTransport() called');
-    this.installRelaySocketDebugging();
+    if (this.config.debug) {
+      this.installRelaySocketDebugging();
+    }
     // this.installWebRtcDebugging();
 
     if (!trystero) {
