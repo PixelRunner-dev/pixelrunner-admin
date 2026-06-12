@@ -261,6 +261,13 @@ describe('main bootstrap', () => {
       fallbackRoomId: 'fallback-from-device',
       proxyRoomConfig: {
         fallbackRoomId: 'fallback-from-proxy',
+        iceServers: [
+          {
+            urls: 'turn:relay.example.com:3478',
+            username: 'runtime-user',
+            credential: 'runtime-secret'
+          }
+        ],
         roomId: 'proxy-room',
         roomPassword: 'room-password'
       },
@@ -270,6 +277,13 @@ describe('main bootstrap', () => {
     expect(mainMock.trysteroClient).toHaveBeenCalledWith({
       debug: expect.any(Boolean),
       fallbackRoomId: 'fallback-from-proxy',
+      iceServers: [
+        {
+          urls: 'turn:relay.example.com:3478',
+          username: 'runtime-user',
+          credential: 'runtime-secret'
+        }
+      ],
       reconnect: true,
       relayUrls: expect.any(Array),
       roomId: 'proxy-room',
@@ -333,7 +347,7 @@ async function importMain(
     fallbackRoomId?: string;
     hasCookies?: Record<string, boolean>;
     mockController?: boolean;
-    proxyRoomConfig?: Record<string, string> | null;
+    proxyRoomConfig?: Record<string, unknown> | null;
     requiresProxy?: boolean;
     search?: string;
   } = {}
@@ -355,7 +369,7 @@ function resetMainMocks(options: {
   cookieValues?: Record<string, string | null>;
   fallbackRoomId?: string;
   hasCookies?: Record<string, boolean>;
-  proxyRoomConfig?: Record<string, string> | null;
+  proxyRoomConfig?: Record<string, unknown> | null;
   requiresProxy?: boolean;
 }): void {
   vi.clearAllMocks();

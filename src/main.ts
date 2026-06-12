@@ -124,6 +124,7 @@ i18next
           roomId: proxyRoomConfig?.roomId,
           fallbackRoomId: proxyRoomConfig?.fallbackRoomId ?? getFallbackRoomId(),
           roomPassword: proxyRoomConfig?.roomPassword,
+          iceServers: proxyRoomConfig?.iceServers,
           relayUrls: [...NOSTR_RELAYS],
           debug: import.meta.env.DEV,
           reconnect: true

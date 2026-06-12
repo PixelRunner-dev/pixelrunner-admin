@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { TrysteroConfig } from '@/ws/trystero-client';
-import { TrysteroWebRTCClient } from '@/ws/trystero-client';
+import { DEFAULT_ICE_SERVERS, TrysteroWebRTCClient } from '@/ws/trystero-client';
 import { MockTrysteroRoom, createMockTransport } from '@/../test/mocks/transport';
 
 describe('TrysteroWebRTCClient', () => {
@@ -235,7 +235,7 @@ describe('TrysteroWebRTCClient', () => {
     it('continues operating after transient errors', () => {
       try {
         mockRoom.simulateError(new Error('Temporary error'));
-      } catch (e) {
+      } catch {
         // Error simulation may throw, which is ok
       }
 
@@ -273,6 +273,16 @@ describe('TrysteroWebRTCClient', () => {
   });
 
   describe('configuration', () => {
+    it('does not embed TURN credentials in default ICE servers', () => {
+      expect(DEFAULT_ICE_SERVERS.length).toBeGreaterThan(0);
+      expect(DEFAULT_ICE_SERVERS.every((server) => !server.credential)).toBe(true);
+      expect(
+        DEFAULT_ICE_SERVERS.flatMap((server) =>
+          typeof server.urls === 'string' ? [server.urls] : server.urls
+        ).every((url) => !url.startsWith('turn:') && !url.startsWith('turns:'))
+      ).toBe(true);
+    });
+
     it('uses custom roomId', () => {
       const customClient = new TrysteroWebRTCClient({
         roomId: 'my-custom-room'

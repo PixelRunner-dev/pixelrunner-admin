@@ -75,7 +75,17 @@ describe('trystero room id', () => {
           deviceId: 'pxlr_f91a',
           roomId: 'pixelrunner-pxlr_f91a',
           fallbackRoomId: 'pixelrunner-pxlr_f91a',
-          controllerWebSocketPath: '/.pixelrunner/controller'
+          controllerWebSocketPath: '/.pixelrunner/controller',
+          iceServers: [
+            { urls: 'stun:stun.example.com:3478' },
+            {
+              urls: ['turn:turn.example.com:3478', 'turns:turn.example.com:5349'],
+              username: 'runtime-user',
+              credential: 'runtime-secret'
+            },
+            { urls: 'https://invalid.example.com' },
+            { urls: 'turn:missing-credentials.example.com' }
+          ]
         }),
         { status: 200 }
       )
@@ -87,7 +97,15 @@ describe('trystero room id', () => {
       deviceId: 'pxlr_f91a',
       roomId: 'pixelrunner-pxlr_f91a',
       fallbackRoomId: 'pixelrunner-pxlr_f91a',
-      controllerWebSocketPath: '/.pixelrunner/controller'
+      controllerWebSocketPath: '/.pixelrunner/controller',
+      iceServers: [
+        { urls: 'stun:stun.example.com:3478' },
+        {
+          urls: ['turn:turn.example.com:3478', 'turns:turn.example.com:5349'],
+          username: 'runtime-user',
+          credential: 'runtime-secret'
+        }
+      ]
     });
     expect(fetcher).toHaveBeenCalledWith('/.pixelrunner/proxy-config', { cache: 'no-store' });
 

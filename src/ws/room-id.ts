@@ -26,6 +26,7 @@ export interface ProxyRoomConfig {
   roomPassword?: string;
   fallbackRoomId?: string;
   controllerWebSocketPath?: string;
+  iceServers?: RTCIceServer[];
 }
 
 function createRoomIdentity(password = DEFAULT_ROOM_PASSWORD) {
@@ -87,6 +88,55 @@ function readStringProperty(value: unknown, key: keyof ProxyRoomConfig): string 
   return typeof property === 'string' && property.trim() ? property : undefined;
 }
 
+function readIceServer(value: unknown): RTCIceServer | null {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const server = value as Record<string, unknown>;
+  const rawUrls = typeof server.urls === 'string' ? [server.urls] : server.urls;
+  if (!Array.isArray(rawUrls)) {
+    return null;
+  }
+
+  const urls = rawUrls
+    .filter((url): url is string => typeof url === 'string')
+    .map((url) => url.trim())
+    .filter((url) => /^(?:stun|stuns|turn|turns):/i.test(url));
+  if (urls.length === 0 || urls.length !== rawUrls.length) {
+    return null;
+  }
+
+  const username = typeof server.username === 'string' ? server.username.trim() : '';
+  const credential = typeof server.credential === 'string' ? server.credential.trim() : '';
+  const requiresCredentials = urls.some((url) => /^turns?:/i.test(url));
+  if (requiresCredentials && (!username || !credential)) {
+    return null;
+  }
+
+  return {
+    urls: typeof server.urls === 'string' ? urls[0] : urls,
+    ...(username ? { username } : {}),
+    ...(credential ? { credential } : {})
+  };
+}
+
+function readIceServersProperty(value: unknown): RTCIceServer[] | undefined {
+  if (!value || typeof value !== 'object') {
+    return undefined;
+  }
+
+  const property = (value as Record<string, unknown>).iceServers;
+  if (!Array.isArray(property)) {
+    return undefined;
+  }
+
+  const iceServers = property
+    .map((server) => readIceServer(server))
+    .filter((server): server is RTCIceServer => server !== null);
+  return iceServers.length > 0 ? iceServers : undefined;
+}
+
 export async function fetchProxyRoomConfig(): Promise<ProxyRoomConfig | null> {
   try {
     const response = await fetch(PROXY_CONFIG_PATH, { cache: 'no-store' });
@@ -101,7 +151,8 @@ export async function fetchProxyRoomConfig(): Promise<ProxyRoomConfig | null> {
       roomId: readStringProperty(body, 'roomId'),
       roomPassword: readStringProperty(body, 'roomPassword'),
       fallbackRoomId: readStringProperty(body, 'fallbackRoomId'),
-      controllerWebSocketPath: readStringProperty(body, 'controllerWebSocketPath')
+      controllerWebSocketPath: readStringProperty(body, 'controllerWebSocketPath'),
+      iceServers: readIceServersProperty(body)
     };
   } catch (error) {
     console.warn('[trystero-client] Failed to read proxy room config:', error);

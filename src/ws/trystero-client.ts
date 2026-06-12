@@ -4,7 +4,6 @@ import {
   DEFAULT_WEBSOCKET_CONFIG,
   APP_ID,
   DEFAULT_TIMEOUT,
-  ROOM_PREFIX,
   ROOM_PASSWORD as DEFAULT_ROOM_PASSWORD
 } from '../constants.ts';
 import { BaseWebSocketClient } from './base-client.ts';
@@ -19,7 +18,7 @@ import type {
 import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
 import { resolveTrysteroRoomId } from '@/ws/room-id.ts';
 
-const ICE_SERVERS = [
+export const DEFAULT_ICE_SERVERS: RTCIceServer[] = [
   { urls: 'stun:stun.cloudflare.com:3478' },
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
@@ -27,17 +26,7 @@ const ICE_SERVERS = [
   { urls: 'stun:stun3.l.google.com:19302' },
   { urls: 'stun:stun4.l.google.com:19302' },
   { urls: 'stun:stun.xs4all.nl:3478' },
-  { urls: 'stun:stun.relay.metered.ca:80' },
-  {
-    urls: [
-      'turn:europe.relay.metered.ca:80',
-      'turn:europe.relay.metered.ca:80?transport=tcp',
-      'turn:europe.relay.metered.ca:443',
-      'turns:europe.relay.metered.ca:443?transport=tcp'
-    ],
-    username: '73e194280dcd4bcaa50e24d0',
-    credential: 'ILDh2OILkNzXQxFP'
-  }
+  { urls: 'stun:stun.relay.metered.ca:80' }
 ];
 const CONTROLLER_CONNECTION_LOST_DELAY_MS = 10_000;
 
@@ -67,6 +56,7 @@ export interface TrysteroConfig extends IWebSocketConfig {
   roomPassword?: string;
   relayUrls?: string[];
   joinSecret?: string;
+  iceServers?: RTCIceServer[];
 }
 
 /**
@@ -226,7 +216,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       password: roomPassword,
       // Add STUN servers for NAT traversal
       rtcConfig: {
-        iceServers: ICE_SERVERS
+        iceServers: this.config.iceServers ?? DEFAULT_ICE_SERVERS
       }
     };
 
@@ -248,12 +238,12 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     // }
 
     // Create the room (acts as host/join peer)
-    console.log(
-      '[trystero-client] About to join room with config:',
-      trysteroConfig,
-      'roomId:',
-      roomId
-    );
+    console.log('[trystero-client] About to join room:', {
+      roomId,
+      appId: trysteroConfig.appId,
+      relayUrls: this.config.relayUrls,
+      iceServerCount: trysteroConfig.rtcConfig?.iceServers?.length ?? 0
+    });
     this.room = trystero.joinRoom(trysteroConfig, roomId, {
       onJoinError: (details) => {
         const error = new Error(details.error);
@@ -711,7 +701,14 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     class DebugPeerConnection extends NativePeerConnection {
       constructor(configuration?: RTCConfiguration) {
-        console.log('[trystero-client] RTCPeerConnection created:', configuration);
+        console.log('[trystero-client] RTCPeerConnection created:', {
+          ...configuration,
+          iceServers: configuration?.iceServers?.map((server) => ({
+            urls: server.urls,
+            username: server.username ? '[set]' : undefined,
+            credential: server.credential ? '[set]' : undefined
+          }))
+        });
         super(configuration);
 
         this.addEventListener('connectionstatechange', () => {
