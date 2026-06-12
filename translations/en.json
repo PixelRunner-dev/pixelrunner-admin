@@ -12,6 +12,8 @@
     "cancel": "Cancel",
     "apply": "Apply",
     "applying": "Applying...",
+    "continue": "Continue",
+    "wait": "Please wait...",
     "daysOfWeek": {
       "monday": "Monday",
       "tuesday": "Tuesday",
@@ -475,5 +477,9 @@
     "settings": {
       "title": "Go to the settings page"
     }
+  },
+  "setupPage": {
+    "title": "Start here",
+    "intro": "Welcome! Thank you for buying this Pixel Runner. You're now about to setup this device. Please make sure not to poweroff or interrupt this device while setting everything up."
   }
 }

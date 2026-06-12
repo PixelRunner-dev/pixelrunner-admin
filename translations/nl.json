@@ -12,6 +12,8 @@
     "cancel": "Annuleren",
     "apply": "Toepassen",
     "applying": "Toepassen...",
+    "continue": "Doorgaan",
+    "wait": "Even wachten...",
     "daysOfWeek": {
       "monday": "Maandag",
       "tuesday": "Dinsdag",
@@ -475,5 +477,9 @@
     "settings": {
       "title": "Ga naar de instellingenpagina"
     }
+  },
+  "setupPage": {
+    "title": "Begin hier",
+    "intro": "Welkom! Bedankt voor het aanschaffen van deze Pixel Runner. Je begint nu met het instellen van dit apparaat. Zorg ervoor dat je het apparaat niet uitschakelt of onderbreekt tijdens het instellen."
   }
 }

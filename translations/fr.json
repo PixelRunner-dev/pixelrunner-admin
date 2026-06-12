@@ -12,6 +12,8 @@
     "cancel": "Annuler",
     "apply": "Appliquer",
     "applying": "Application...",
+    "continue": "Continuer",
+    "wait": "Veuillez patienter...",
     "daysOfWeek": {
       "monday": "Lundi",
       "tuesday": "Mardi",
@@ -475,5 +477,9 @@
     "settings": {
       "title": "Aller à la page des paramètres"
     }
+  },
+  "setupPage": {
+    "title": "Commencez ici",
+    "intro": "Bienvenue ! Merci d'avoir acheté ce Pixel Runner. Vous êtes sur le point de configurer cet appareil. Veuillez vous assurer de ne pas l'éteindre ni l'interrompre pendant la configuration."
   }
 }

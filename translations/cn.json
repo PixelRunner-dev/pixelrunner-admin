@@ -12,6 +12,8 @@
     "cancel": "取消",
     "apply": "应用",
     "applying": "正在应用...",
+    "continue": "继续",
+    "wait": "请稍候...",
     "daysOfWeek": {
       "monday": "星期一",
       "tuesday": "星期二",
@@ -475,5 +477,9 @@
     "settings": {
       "title": "转到设置页面"
     }
+  },
+  "setupPage": {
+    "title": "从这里开始",
+    "intro": "欢迎！感谢您购买 Pixel Runner。您即将开始设置此设备。请确保在设置过程中不要关闭电源或中断该设备。"
   }
 }
