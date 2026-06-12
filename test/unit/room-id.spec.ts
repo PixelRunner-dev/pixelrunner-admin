@@ -22,10 +22,10 @@ function expectedRoomId(publicIp: string) {
 }
 
 describe('trystero room id', () => {
-  it('uses the proxy-compatible default fallback room id', () => {
+  it('returns undefined when no device id is available', () => {
     CookieStore.delete('deviceId');
 
-    expect(getFallbackRoomId()).toBe('pixelrunner-pxlr_f91a');
+    expect(getFallbackRoomId()).toBeUndefined();
   });
 
   it('uses the stored device id for the fallback room id when available', () => {
@@ -34,6 +34,33 @@ describe('trystero room id', () => {
     expect(getFallbackRoomId()).toBe('pixelrunner-pxlr_custom');
 
     CookieStore.delete('deviceId');
+  });
+
+  it('uses the fallbackRoomId URL param when present', () => {
+    CookieStore.delete('deviceId');
+    window.history.replaceState({}, '', '?fallbackRoomId=pixelrunner-from-url');
+
+    expect(getFallbackRoomId()).toBe('pixelrunner-from-url');
+
+    window.history.replaceState({}, '', '/');
+  });
+
+  it('uses the deviceId URL param to construct fallback room id', () => {
+    CookieStore.delete('deviceId');
+    window.history.replaceState({}, '', '?deviceId=pxlr_url_device');
+
+    expect(getFallbackRoomId()).toBe('pixelrunner-pxlr_url_device');
+
+    window.history.replaceState({}, '', '/');
+  });
+
+  it('fallbackRoomId URL param takes priority over deviceId URL param', () => {
+    CookieStore.delete('deviceId');
+    window.history.replaceState({}, '', '?fallbackRoomId=explicit-room&deviceId=pxlr_device');
+
+    expect(getFallbackRoomId()).toBe('explicit-room');
+
+    window.history.replaceState({}, '', '/');
   });
 
   it('creates a deterministic room id from a public IP hash', async () => {

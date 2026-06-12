@@ -11,7 +11,6 @@ import {
 
 import {
   APP_ID,
-  DEFAULT_DEVICE_ID,
   ROOM_PASSWORD as DEFAULT_ROOM_PASSWORD,
   ROOM_PREFIX
 } from '@/constants.ts';
@@ -68,14 +67,14 @@ function createFallbackRoomIdFromDeviceId(deviceId: string | null): string | nul
   return value ? `${ROOM_PREFIX}-${value}` : null;
 }
 
-export function getFallbackRoomId(): string {
+export function getFallbackRoomId(): string | undefined {
   return (
     normalizeFallbackRoomId(getUrlParam('fallbackRoomId')) ??
     createFallbackRoomIdFromDeviceId(getUrlParam('deviceId')) ??
     normalizeFallbackRoomId(import.meta.env.VITE_FALLBACK_ROOM_ID) ??
     createFallbackRoomIdFromDeviceId(CookieStore.get('deviceId')) ??
     createFallbackRoomIdFromDeviceId(import.meta.env.VITE_DEVICE_ID) ??
-    `${ROOM_PREFIX}-${DEFAULT_DEVICE_ID}`
+    undefined
   );
 }
 

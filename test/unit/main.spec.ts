@@ -310,6 +310,20 @@ describe('main bootstrap', () => {
     expect(mainMock.getFallbackRoomId).toHaveBeenCalledOnce();
   });
 
+  it('passes undefined fallbackRoomId to trystero when getFallbackRoomId has no device id', async () => {
+    await importMain({
+      proxyRoomConfig: null,
+      requiresProxy: true
+    });
+
+    expect(mainMock.trysteroClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fallbackRoomId: undefined
+      })
+    );
+    expect(mainMock.getFallbackRoomId).toHaveBeenCalledOnce();
+  });
+
   it('uses the development WebSocket URL and reports connect failures', async () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     await importMain({
@@ -384,7 +398,7 @@ function resetMainMocks(options: {
   mainMock.detectAccessMode.mockReturnValue(options.accessMode ?? 'direct');
   mainMock.requiresProxyConnection.mockReturnValue(options.requiresProxy ?? false);
   mainMock.fetchProxyRoomConfig.mockResolvedValue(options.proxyRoomConfig ?? null);
-  mainMock.getFallbackRoomId.mockReturnValue(options.fallbackRoomId ?? 'fallback-room');
+  mainMock.getFallbackRoomId.mockReturnValue(options.fallbackRoomId);
   mainMock.cookieHas.mockImplementation((name: string) => options.hasCookies?.[name] ?? false);
   mainMock.cookieGet.mockImplementation((name: string) => options.cookieValues?.[name] ?? null);
 

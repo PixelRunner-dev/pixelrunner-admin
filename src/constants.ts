@@ -41,12 +41,6 @@ export const ACTION_NAME = 'rpc';
 export const ROOM_PREFIX = 'pixelrunner';
 
 /**
- * Default device identifier used when no per-device identifier is available.
- * Must match the device proxy fallback default.
- */
-export const DEFAULT_DEVICE_ID = import.meta.env.VITE_DEVICE_ID || 'pxlr_f91a';
-
-/**
  * Development fallback. Production devices return a per-device room password
  * from /.pixelrunner/proxy-config when the admin UI is served through the proxy.
  */
