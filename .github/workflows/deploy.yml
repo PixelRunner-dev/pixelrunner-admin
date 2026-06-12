@@ -38,13 +38,6 @@ jobs:
           HOME: /root
         run: npm run ci
 
-      - uses: actions/upload-artifact@v7
-        if: ${{ !cancelled() && hashFiles('playwright-report/**') != '' }}
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 14
-
   deploy:
     runs-on: ubuntu-latest
     needs: test

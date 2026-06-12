@@ -9,6 +9,7 @@ export default mergeConfig(
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'test/e2e/**', 'vendor/**'],
       root: fileURLToPath(new URL('./', import.meta.url)),
+      reporters: process.env.GITHUB_ACTIONS ? ['dot', 'github-actions'] : ['default'],
       coverage: {
         exclude: ['vendor/**', 'translations/*.json']
       }
