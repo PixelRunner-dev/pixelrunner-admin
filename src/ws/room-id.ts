@@ -160,7 +160,11 @@ export async function fetchProxyRoomConfig(): Promise<ProxyRoomConfig | null> {
 }
 
 export async function createRoomIdFromPublicIp(publicIp: string): Promise<string> {
-  return createTrysteroRoomIdFromPublicIp(publicIp, createRoomIdentity());
+  const identity = createRoomIdentity();
+  if (!identity.password) {
+    throw new Error('Room password required to derive room ID from public IP');
+  }
+  return createTrysteroRoomIdFromPublicIp(publicIp, identity as Parameters<typeof createTrysteroRoomIdFromPublicIp>[1]);
 }
 
 export async function fetchPublicIp(options: ResolveTrysteroRoomIdOptions = {}): Promise<string> {

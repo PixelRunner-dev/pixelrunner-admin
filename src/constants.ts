@@ -41,10 +41,11 @@ export const ACTION_NAME = 'rpc';
 export const ROOM_PREFIX = 'pixelrunner';
 
 /**
- * Development fallback. Production devices return a per-device room password
- * from /.pixelrunner/proxy-config when the admin UI is served through the proxy.
+ * Development-only room password override. Production devices supply the password
+ * through /.pixelrunner/proxy-config. When absent the Trystero client requires the
+ * proxy config to provide a password before connecting.
  */
-export const ROOM_PASSWORD = import.meta.env.ROOM_PASSWORD || 'your-secure-password-change-me';
+export const ROOM_PASSWORD: string | undefined = import.meta.env.VITE_ROOM_PASSWORD;
 
 // ============================================================================
 // WebSocket Configuration Constants
