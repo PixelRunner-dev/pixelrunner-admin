@@ -5,7 +5,11 @@ import {
   isJsonRpcResponse,
   isJsonRpcNotification
 } from '@/ws/rpc/message-handler';
-import type { IJsonRpcMessage } from 'pixelrunner-shared';
+import type {
+  IJsonRpcMessage,
+  IJsonRpcNotification,
+  IJsonRpcResponse
+} from 'pixelrunner-shared';
 
 describe('message-handler.ts', () => {
   describe('parseJsonRpcMessage', () => {
@@ -21,7 +25,7 @@ describe('message-handler.ts', () => {
 
       expect(result).not.toBeNull();
       expect(result?.jsonrpc).toBe('2.0');
-      expect(result?.method).toBe('test.method');
+      expect((result as IJsonRpcNotification)?.method).toBe('test.method');
     });
 
     it('parses valid JSON-RPC response', () => {
@@ -35,7 +39,7 @@ describe('message-handler.ts', () => {
 
       expect(result).not.toBeNull();
       expect(result?.jsonrpc).toBe('2.0');
-      expect(result?.result).toEqual({ success: true });
+      expect((result as IJsonRpcResponse)?.result).toEqual({ success: true });
     });
 
     it('parses valid JSON-RPC error response', () => {
@@ -63,7 +67,7 @@ describe('message-handler.ts', () => {
 
       expect(result).not.toBeNull();
       expect(result?.jsonrpc).toBe('2.0');
-      expect(result?.method).toBe('notify');
+      expect((result as IJsonRpcNotification)?.method).toBe('notify');
     });
 
     it('returns null for invalid JSON', () => {
