@@ -14,11 +14,7 @@ export function parseJsonRpcMessage(data: string): IJsonRpcMessage | null {
   try {
     const message = JSON.parse(data);
     // Validate basic JSON-RPC structure
-    if (
-      message &&
-      typeof message === 'object' &&
-      message.jsonrpc === '2.0'
-    ) {
+    if (message && typeof message === 'object' && message.jsonrpc === '2.0') {
       return message as IJsonRpcMessage;
     }
     return null;

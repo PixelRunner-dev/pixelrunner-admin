@@ -9,11 +9,7 @@ import {
   type ResolveTrysteroRoomIdOptions
 } from 'pixelrunner-shared';
 
-import {
-  APP_ID,
-  ROOM_PASSWORD as DEFAULT_ROOM_PASSWORD,
-  ROOM_PREFIX
-} from '@/constants.ts';
+import { APP_ID, ROOM_PASSWORD as DEFAULT_ROOM_PASSWORD, ROOM_PREFIX } from '@/constants.ts';
 import { CookieStore } from '@/utils/CookieStore.ts';
 
 const PROXY_CONFIG_PATH = '/.pixelrunner/proxy-config';
@@ -164,7 +160,10 @@ export async function createRoomIdFromPublicIp(publicIp: string): Promise<string
   if (!identity.password) {
     throw new Error('Room password required to derive room ID from public IP');
   }
-  return createTrysteroRoomIdFromPublicIp(publicIp, identity as Parameters<typeof createTrysteroRoomIdFromPublicIp>[1]);
+  return createTrysteroRoomIdFromPublicIp(
+    publicIp,
+    identity as Parameters<typeof createTrysteroRoomIdFromPublicIp>[1]
+  );
 }
 
 export async function fetchPublicIp(options: ResolveTrysteroRoomIdOptions = {}): Promise<string> {
