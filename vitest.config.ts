@@ -2,6 +2,8 @@ import { fileURLToPath } from 'node:url';
 import { mergeConfig, defineConfig, configDefaults } from 'vitest/config';
 import viteConfig from './vite.config';
 
+process.env.VITE_ROOM_PASSWORD ??= 'test-room-password';
+
 export default mergeConfig(
   viteConfig,
   defineConfig({

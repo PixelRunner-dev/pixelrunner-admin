@@ -5,7 +5,12 @@ import {
   isJsonRpcResponse,
   isJsonRpcNotification
 } from '@/ws/rpc/message-handler';
-import type { IJsonRpcMessage, IJsonRpcNotification, IJsonRpcResponse } from 'pixelrunner-shared';
+import type {
+  IJsonRpcMessage,
+  IJsonRpcNotification,
+  IJsonRpcRequest,
+  IJsonRpcResponse
+} from 'pixelrunner-shared';
 
 describe('message-handler.ts', () => {
   describe('parseJsonRpcMessage', () => {
@@ -49,7 +54,10 @@ describe('message-handler.ts', () => {
 
       expect(result).not.toBeNull();
       expect(result?.jsonrpc).toBe('2.0');
-      expect((result as any)?.error).toEqual({ code: -32000, message: 'Server error' });
+      expect((result as IJsonRpcResponse)?.error).toEqual({
+        code: -32000,
+        message: 'Server error'
+      });
     });
 
     it('parses valid JSON-RPC notification (no id)', () => {
@@ -132,7 +140,9 @@ describe('message-handler.ts', () => {
       const result = parseJsonRpcMessage(data);
 
       expect(result).not.toBeNull();
-      expect((result as any)?.params?.data).toBe(largeParam);
+      expect(((result as IJsonRpcRequest)?.params as Record<string, unknown>)?.data).toBe(
+        largeParam
+      );
     });
 
     it('handles unicode in message', () => {
@@ -146,7 +156,9 @@ describe('message-handler.ts', () => {
       const result = parseJsonRpcMessage(data);
 
       expect(result).not.toBeNull();
-      expect((result as any)?.params?.message).toBe('你好 مرحبا 🚀');
+      expect(((result as IJsonRpcRequest)?.params as Record<string, unknown>)?.message).toBe(
+        '你好 مرحبا 🚀'
+      );
     });
   });
 
@@ -370,7 +382,11 @@ describe('message-handler.ts', () => {
       const result = parseJsonRpcMessage(data);
 
       expect(result).not.toBeNull();
-      expect((result as any)?.params?.level1?.level2?.level3?.level4).toBe('deep');
+      const params = (result as IJsonRpcRequest)?.params as Record<string, unknown>;
+      const level1 = params?.level1 as Record<string, unknown>;
+      const level2 = level1?.level2 as Record<string, unknown>;
+      const level3 = level2?.level3 as Record<string, unknown>;
+      expect(level3?.level4).toBe('deep');
     });
 
     it('handles zero as id', () => {
