@@ -152,17 +152,36 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
         ...(params !== undefined && { params })
       };
 
+      // Handle AbortSignal if provided — define handler before timer/pending so it can be captured
+      let abortHandler: (() => void) | null = null;
+      const removeAbortHandler = (): void => {
+        if (abortHandler && options?.signal) {
+          options.signal.removeEventListener('abort', abortHandler);
+          abortHandler = null;
+        }
+      };
+
+      // Wrap resolve/reject so the abort listener is always cleaned up on settlement
+      const wrappedResolve = (value: unknown): void => {
+        removeAbortHandler();
+        (resolve as (value: unknown) => void)(value);
+      };
+      const wrappedReject = (reason: unknown): void => {
+        removeAbortHandler();
+        reject(reason as Error);
+      };
+
       // Setup timeout
       const timeout = options?.timeout ?? this.getConfigNumber('timeout', DEFAULT_TIMEOUT);
       const timer = setTimeout(() => {
         this.pendingRequests.delete(id);
-        reject(new WebSocketTimeoutError(method, timeout));
+        wrappedReject(new WebSocketTimeoutError(method, timeout));
       }, timeout);
 
       // Store pending request
       this.pendingRequests.set(id, {
-        resolve: resolve as (value: unknown) => void,
-        reject,
+        resolve: wrappedResolve,
+        reject: wrappedReject,
         timer,
         method,
         timestamp: Date.now()
@@ -170,14 +189,15 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
 
       // Handle AbortSignal if provided
       if (options?.signal) {
-        options.signal.addEventListener('abort', () => {
+        abortHandler = () => {
           const pending = this.pendingRequests.get(id);
           if (pending) {
             clearTimeout(pending.timer);
             this.pendingRequests.delete(id);
-            reject(new Error('Request aborted'));
+            wrappedReject(new Error('Request aborted'));
           }
-        });
+        };
+        options.signal.addEventListener('abort', abortHandler);
       }
 
       try {
