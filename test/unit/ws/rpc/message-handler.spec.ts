@@ -5,11 +5,7 @@ import {
   isJsonRpcResponse,
   isJsonRpcNotification
 } from '@/ws/rpc/message-handler';
-import type {
-  IJsonRpcMessage,
-  IJsonRpcNotification,
-  IJsonRpcResponse
-} from 'pixelrunner-shared';
+import type { IJsonRpcMessage, IJsonRpcNotification, IJsonRpcResponse } from 'pixelrunner-shared';
 
 describe('message-handler.ts', () => {
   describe('parseJsonRpcMessage', () => {
