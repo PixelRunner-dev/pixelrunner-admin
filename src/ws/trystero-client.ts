@@ -71,7 +71,6 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   private receiveAction: ((data: string, peerId: string) => void) | null = null;
   private peerConnected: boolean = false;
   private hasConnectedPeer: boolean = false;
-  private connectionCheckInterval: ReturnType<typeof setInterval> | null = null;
   private controllerConnectionLostTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(config?: TrysteroConfig) {
@@ -295,26 +294,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   }
 
   private startPeerMonitoring(): void {
-    this.connectionCheckInterval = setInterval(() => {
-      if (this.room && this.room?.getPeers) {
-        const peerCount = this.getPeerCount();
-        console.log('[trystero-client] Peer check', peerCount, 'peers', this.room.getPeers());
-        if (peerCount > 0 && !this.peerConnected) {
-          console.log('[trystero-client] First peer detected');
-          this.handlePeersAvailable('peer monitoring');
-        } else if (peerCount === 0 && this.peerConnected) {
-          console.log('[trystero-client] No peers detected');
-          this.handleNoPeersDetected('Peer disconnected');
-        }
-      }
-    }, 2000);
+    // Peer lifecycle is tracked via onPeerJoin and onPeerLeave callbacks in setupRoomHandlers.
   }
 
   private stopPeerMonitoring(): void {
-    if (this.connectionCheckInterval) {
-      clearInterval(this.connectionCheckInterval);
-      this.connectionCheckInterval = null;
-    }
+    // Nothing to tear down — no polling interval.
   }
 
   private handlePeersAvailable(reason: string): void {

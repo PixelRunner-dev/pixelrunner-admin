@@ -443,7 +443,6 @@ onMounted(() => {
 watch(isConnected, (connected) => {
   if (connected) {
     void loadWifiStatus();
-    void loadWifiNetworks();
   }
 });
 
