@@ -519,6 +519,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.state.value = 'connected';
     this.lastError.value = null;
     const wasReconnect = this.reconnectAttempts > 0;
+    const prevReconnectAttempts = this.reconnectAttempts;
     this.reconnectAttempts = 0;
 
     console.log('[trystero] connected');
@@ -526,7 +527,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     // Emit connected event
     const event: IConnectedEvent = {
       timestamp: Date.now(),
-      reconnectAttempt: wasReconnect ? this.reconnectAttempts : 0
+      reconnectAttempt: wasReconnect ? prevReconnectAttempts : 0
     };
 
     this.emit('connected', event);
@@ -542,10 +543,20 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     for (const relayUrl of this.config.relayUrls || []) {
       try {
         const ws = new WebSocket(relayUrl);
-        await new Promise((resolve, reject) => {
-          ws.onopen = resolve;
-          ws.onerror = reject;
-          setTimeout(resolve, 3000); // Timeout
+        await new Promise<void>((resolve, reject) => {
+          let timeoutId: ReturnType<typeof setTimeout>;
+          ws.onopen = () => {
+            clearTimeout(timeoutId);
+            resolve();
+          };
+          ws.onerror = () => {
+            clearTimeout(timeoutId);
+            ws.close();
+            reject(new Error('relay error'));
+          };
+          timeoutId = setTimeout(() => {
+            resolve();
+          }, 3000);
         });
         ws.close();
         relayStatus[relayUrl] = true;

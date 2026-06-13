@@ -1,9 +1,7 @@
 import type { UUID } from 'pixelrunner-shared';
+import { isUuid } from 'pixelrunner-shared';
 
-export function isValidUUID(uuid: string): uuid is UUID {
-  const regex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return regex.test(uuid);
-}
+export { isUuid as isValidUUID };
 
 export function generateRandomUUID(): UUID {
   if (typeof globalThis.crypto?.randomUUID === 'function') {

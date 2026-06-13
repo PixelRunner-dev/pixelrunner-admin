@@ -230,7 +230,7 @@ describe('SettingsPage', () => {
     const validBeforeInput = new InputEvent('beforeinput', {
       bubbles: true,
       cancelable: true,
-      data: '_'
+      data: '-'
     });
 
     deviceName.element.dispatchEvent(invalidBeforeInput);
@@ -245,7 +245,7 @@ describe('SettingsPage', () => {
       }
     });
 
-    expect((deviceName.element as HTMLInputElement).value).toBe('badname!');
+    expect((deviceName.element as HTMLInputElement).value).toBe('badname');
   });
 
   it('persists the selected theme and vibrates for brightness/touch feedback', async () => {

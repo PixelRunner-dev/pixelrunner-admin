@@ -82,11 +82,9 @@ watchEffect(() => {
     <SiteNotifications :notifications />
 
     <router-view v-slot="{ Component }">
-      <keep-alive>
-        <transition name="page" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </keep-alive>
+      <transition name="page" mode="out-in">
+        <component :is="Component" />
+      </transition>
     </router-view>
   </template>
 

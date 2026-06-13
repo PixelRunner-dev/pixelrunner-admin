@@ -242,6 +242,7 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
     this.state.value = 'connected';
     this.lastError.value = null;
     const wasReconnect = this.reconnectAttempts > 0;
+    const prevReconnectAttempts = this.reconnectAttempts;
     this.reconnectAttempts = 0;
 
     if (this.config.debug) {
@@ -251,7 +252,7 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
     // Emit connected event
     const event: IConnectedEvent = {
       timestamp: Date.now(),
-      reconnectAttempt: wasReconnect ? this.reconnectAttempts : 0
+      reconnectAttempt: wasReconnect ? prevReconnectAttempts : 0
     };
 
     this.emit('connected', event);

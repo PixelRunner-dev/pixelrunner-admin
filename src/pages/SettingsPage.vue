@@ -146,13 +146,13 @@ async function doShutdown() {
 }
 
 function deviceNameOnBeforeInput(e: InputEvent) {
-  if (e.data && !/^[A-Za-z0-9_\-]+$/.test(e.data)) e.preventDefault();
+  if (e.data && !/^[A-Za-z0-9-]+$/.test(e.data)) e.preventDefault();
 }
 
 function deviceNameOnPaste(e: ClipboardEvent) {
   const clipboardData = e?.clipboardData?.getData('text');
   const inputField = e?.target as HTMLInputElement;
-  if (clipboardData) inputField.value = clipboardData.replace(/[^A-Za-z0-9_-]/, '');
+  if (clipboardData) inputField.value = clipboardData.replace(/[^A-Za-z0-9-]/g, '');
 }
 
 const themesDark = computed<string[]>(() => THEMES_DARK);
@@ -172,7 +172,7 @@ const securityOptions = computed<string[]>(() => [
 
 const proxyOptions = computed<string[]>(() => ['none', 'manual', 'auto-config']);
 
-const deviceName = ref(`pxlr_${'f91a'}`);
+const deviceName = ref(`pxlr-${'f91a'}`);
 const date = ref(new Date().toISOString().slice(0, 10));
 const time = ref(new Date().toTimeString().slice(0, 5));
 const location = ref();
@@ -279,11 +279,9 @@ const {
   }
 });
 
-async function confirmPermanentFeature(feature: FeatureToggleItem): Promise<boolean> {
-  const ask = window.ask ?? window.confirm;
+function confirmPermanentFeature(feature: FeatureToggleItem): boolean {
   const message = `Feature: '${feature.key}' - ${feature.label}\n\nThis experimental feature is marked PERMANENT. Enable it only if you understand it. This feature can change device behavior in a way that cannot be undone from this screen.`;
-
-  return Boolean(await ask(message));
+  return window.confirm(message);
 }
 
 function resetFeatureToggleInput(featureKey: FeatureToggleKey): void {
@@ -325,7 +323,7 @@ async function setFeatureToggle(feature: FeatureToggleItem, enabled: boolean): P
   if (feature.isPermanent) {
     resetFeatureToggleInput(featureKey);
 
-    if (!(await confirmPermanentFeature(feature))) {
+    if (!confirmPermanentFeature(feature)) {
       model.value = false;
       resetFeatureToggleInput(featureKey);
       return;
@@ -429,7 +427,12 @@ async function saveWifiNetwork() {
 }
 
 const uniqueWifiNetworks = computed(() => {
-  return [...new Set(wifiNetworks.value)];
+  const seen = new Map<string, WifiScanNetwork>();
+  for (const network of wifiNetworks.value) {
+    const key = network.bssid || network.ssid;
+    if (!seen.has(key)) seen.set(key, network);
+  }
+  return [...seen.values()];
 });
 
 onMounted(() => {
