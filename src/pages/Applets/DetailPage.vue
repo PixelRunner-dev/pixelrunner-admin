@@ -17,6 +17,8 @@ import FeatureToggle from '@/components/FeatureToggle.vue';
 import type { IFullApplet, UUID } from 'pixelrunner-shared';
 import type { Notification } from '@/utils/notifications.ts';
 
+import { t } from 'i18next';
+
 const route = useRoute();
 const { isConnected, state, lastError, applets } = useClientApi();
 const notificationState = useNotifications();
@@ -51,16 +53,16 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     if (!hasAppletIdentifier.value) {
-      throw new Error('Missing applet identifier');
+      throw new Error(t('appletDetailPage.error.missingIdentifier'));
     }
 
     return applets.get(packageName.value, uuid.value);
   },
-  defaultErrorMessage: 'Failed to load applet',
+  defaultErrorMessage: t('appletDetailPage.error.loadFailed'),
   onSuccess: (loadedApplet) => {
     if (!loadedApplet) {
       return;
@@ -82,11 +84,11 @@ watch([packageName, uuid], () => {
 
 const activeStatusNotification = computed<Notification | null>(() => {
   if (isLoading.value) {
-    return { type: 'info', message: 'Loading applet...' };
+    return { type: 'info', message: t('appletDetailPage.loading') };
   }
 
   if (isWaitingForPeer.value) {
-    return { type: 'info', message: 'Waiting for device connection...' };
+    return { type: 'info', message: t('generic.waitingForDevice') };
   }
 
   if (loadError.value) {
@@ -94,7 +96,7 @@ const activeStatusNotification = computed<Notification | null>(() => {
   }
 
   if (hasLoadAttempted.value && !applet.value) {
-    return { type: 'warning', message: 'Applet not found', hasCloseButton: true };
+    return { type: 'warning', message: t('appletDetailPage.notFound'), hasCloseButton: true };
   }
 
   return null;

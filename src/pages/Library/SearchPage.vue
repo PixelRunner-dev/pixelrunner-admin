@@ -4,9 +4,9 @@ import LibrarySearch from '@/components/Library/LibrarySearch.vue';
 
 <template>
   <main>
-    <h1>Library Search</h1>
+    <h1>{{ $t('searchPage.title') }}</h1>
     <LibrarySearch />
-    <p>Searching for: {{ $route.query.q }}</p>
+    <p>{{ $t('searchPage.searchingFor', { query: $route.query.q }) }}</p>
   </main>
 </template>
 

@@ -12,6 +12,7 @@ import {
   parseBooleanSetting
 } from '@/utils/feature-toggles.ts';
 import { useClientApi } from '@/ws/index.ts';
+import { t } from 'i18next';
 
 interface Props {
   features: FeatureToggleKey | FeatureToggleKey[];
@@ -68,7 +69,7 @@ const { data: featureToggleState } = useControllerQuery({
       controllerVersion: extractControllerVersionFromStatus(status)
     };
   },
-  defaultErrorMessage: 'Failed to load feature toggle settings'
+  defaultErrorMessage: t('featureToggleComponent.error.loadFailed')
 });
 
 const canRenderSlot = computed(() => {

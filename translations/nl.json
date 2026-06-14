@@ -22,7 +22,10 @@
       "friday": "Vrijdag",
       "saturday": "Zaterdag",
       "sunday": "Zondag"
-    }
+    },
+    "retry": "Opnieuw proberen",
+    "waitingForDevice": "Wachten op apparaatverbinding...",
+    "appletsApiUnavailable": "Applets-API niet beschikbaar"
   },
   "applet": {
     "cta": {
@@ -152,6 +155,12 @@
           "success": "Vastzetten van applet is bijgewerkt",
           "error": "Vastzetten van applet wijzigen mislukt"
         }
+      }
+    },
+    "config": {
+      "error": {
+        "schemaUnavailable": "Configuratieschema niet beschikbaar.",
+        "saveFailed": "Kon appletconfiguratie niet opslaan."
       }
     }
   },
@@ -344,6 +353,9 @@
         "button": "Fabrieksinstellingen herstellen",
         "confirm": "Dit wist alle gegevens op het apparaat. Weet je zeker dat je dit apparaat wilt terugzetten naar de fabrieksinstellingen?"
       }
+    },
+    "error": {
+      "loadFailed": "Kon apparaatinstellingen niet laden"
     }
   },
   "listPage": {
@@ -425,10 +437,37 @@
     "smart_home": {
       "title": "Domotica / smart home",
       "payoff": "Maak je huis slim en automatiseer alles!"
+    },
+    "loading": {
+      "spotlight": "Spotlight-applets laden...",
+      "new": "Nieuw toegevoegde applets laden...",
+      "starterPack": "Starterpakket-applets laden...",
+      "categories": "Categorieën laden...",
+      "clock": "Klok-applets laden...",
+      "randomCategory": "Willekeurige categorie-applets laden...",
+      "news": "Nieuws-applets laden..."
+    },
+    "error": {
+      "spotlight": "Kon spotlight-applets niet laden",
+      "new": "Kon nieuw toegevoegde applets niet laden",
+      "starterPack": "Kon starterpakket-applets niet laden",
+      "categories": "Kon categorieën niet laden",
+      "clock": "Kon klok-applets niet laden",
+      "randomCategory": "Kon willekeurige categorie-applets niet laden",
+      "news": "Kon nieuws-applets niet laden"
+    },
+    "themed": {
+      "title": "Thema-items",
+      "payoff": "Thema-applets"
     }
   },
   "categoryPage": {
-    "pageTitle": "{{category}}-applets"
+    "pageTitle": "{{category}}-applets",
+    "loading": "Categorie-applets laden...",
+    "error": {
+      "loadFailed": "Kon categorie-applets niet laden",
+      "missingKey": "Categoriesleutel ontbreekt"
+    }
   },
   "fieldScheduleComponent": {
     "legend": "Schema",
@@ -481,5 +520,22 @@
   "setupPage": {
     "title": "Begin hier",
     "intro": "Welkom! Bedankt voor het aanschaffen van deze Pixel Runner. Je begint nu met het instellen van dit apparaat. Zorg ervoor dat je het apparaat niet uitschakelt of onderbreekt tijdens het instellen."
+  },
+  "appletDetailPage": {
+    "loading": "Applet laden...",
+    "notFound": "Applet niet gevonden",
+    "error": {
+      "loadFailed": "Kon applet niet laden",
+      "missingIdentifier": "Applet-identificatie ontbreekt"
+    }
+  },
+  "searchPage": {
+    "title": "Bibliotheek zoeken",
+    "searchingFor": "Zoeken naar: {{query}}"
+  },
+  "featureToggleComponent": {
+    "error": {
+      "loadFailed": "Kon functieschakelaarinstellingen niet laden"
+    }
   }
 }

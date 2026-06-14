@@ -22,7 +22,10 @@
       "friday": "Freitag",
       "saturday": "Samstag",
       "sunday": "Sonntag"
-    }
+    },
+    "retry": "Erneut versuchen",
+    "waitingForDevice": "Warten auf Geräteverbindung...",
+    "appletsApiUnavailable": "Applet-API nicht verfügbar"
   },
   "applet": {
     "cta": {
@@ -152,6 +155,12 @@
           "success": "Applet-Anheftung wurde aktualisiert",
           "error": "Applet-Anheftung konnte nicht geändert werden"
         }
+      }
+    },
+    "config": {
+      "error": {
+        "schemaUnavailable": "Konfigurationsschema nicht verfügbar.",
+        "saveFailed": "Applet-Konfiguration konnte nicht gespeichert werden."
       }
     }
   },
@@ -344,6 +353,9 @@
         "button": "Werkseinstellungen wiederherstellen",
         "confirm": "Dadurch werden alle Daten auf dem Gerät gelöscht. Möchtest du dieses Gerät wirklich auf die Werkseinstellungen zurücksetzen?"
       }
+    },
+    "error": {
+      "loadFailed": "Geräteeinstellungen konnten nicht geladen werden"
     }
   },
   "listPage": {
@@ -425,10 +437,37 @@
     "smart_home": {
       "title": "Hausautomation / Smart Home",
       "payoff": "Mach dein Zuhause smart und automatisiere alles!"
+    },
+    "loading": {
+      "spotlight": "Spotlight-Applets werden geladen...",
+      "new": "Neu hinzugefügte Applets werden geladen...",
+      "starterPack": "Starterpaket-Applets werden geladen...",
+      "categories": "Kategorien werden geladen...",
+      "clock": "Uhr-Applets werden geladen...",
+      "randomCategory": "Applets einer zufälligen Kategorie werden geladen...",
+      "news": "Nachrichten-Applets werden geladen..."
+    },
+    "error": {
+      "spotlight": "Spotlight-Applets konnten nicht geladen werden",
+      "new": "Neu hinzugefügte Applets konnten nicht geladen werden",
+      "starterPack": "Starterpaket-Applets konnten nicht geladen werden",
+      "categories": "Kategorien konnten nicht geladen werden",
+      "clock": "Uhr-Applets konnten nicht geladen werden",
+      "randomCategory": "Applets einer zufälligen Kategorie konnten nicht geladen werden",
+      "news": "Nachrichten-Applets konnten nicht geladen werden"
+    },
+    "themed": {
+      "title": "Themen-Elemente",
+      "payoff": "Themen-Applets"
     }
   },
   "categoryPage": {
-    "pageTitle": "{{category}}-Applets"
+    "pageTitle": "{{category}}-Applets",
+    "loading": "Kategorie-Applets werden geladen...",
+    "error": {
+      "loadFailed": "Kategorie-Applets konnten nicht geladen werden",
+      "missingKey": "Kategorieschlüssel fehlt"
+    }
   },
   "fieldScheduleComponent": {
     "legend": "Zeitplan",
@@ -481,5 +520,22 @@
   "setupPage": {
     "title": "Hier starten",
     "intro": "Willkommen! Vielen Dank für den Kauf dieses Pixel Runner. Du wirst dieses Gerät nun einrichten. Bitte achte darauf, das Gerät während der Einrichtung nicht auszuschalten oder zu unterbrechen."
+  },
+  "appletDetailPage": {
+    "loading": "Applet wird geladen...",
+    "notFound": "Applet nicht gefunden",
+    "error": {
+      "loadFailed": "Applet konnte nicht geladen werden",
+      "missingIdentifier": "Applet-Kennung fehlt"
+    }
+  },
+  "searchPage": {
+    "title": "Bibliothekssuche",
+    "searchingFor": "Suche nach: {{query}}"
+  },
+  "featureToggleComponent": {
+    "error": {
+      "loadFailed": "Feature-Toggle-Einstellungen konnten nicht geladen werden"
+    }
   }
 }

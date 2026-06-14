@@ -14,6 +14,9 @@
     "applying": "Applying...",
     "continue": "Continue",
     "wait": "Please wait...",
+    "retry": "Retry",
+    "waitingForDevice": "Waiting for device connection...",
+    "appletsApiUnavailable": "Applets API not available",
     "daysOfWeek": {
       "monday": "Monday",
       "tuesday": "Tuesday",
@@ -153,10 +156,19 @@
           "error": "Failed to toggle pin of applet"
         }
       }
+    },
+    "config": {
+      "error": {
+        "schemaUnavailable": "Configuration schema unavailable.",
+        "saveFailed": "Failed to save applet configuration."
+      }
     }
   },
   "settingsPage": {
     "title": "Settings",
+    "error": {
+      "loadFailed": "Failed to load device settings"
+    },
     "notification": {
       "saveInfo": "All changes are saved immediately"
     },
@@ -381,6 +393,28 @@
   },
   "libraryPage": {
     "pageTitle": "Applets Library",
+    "loading": {
+      "spotlight": "Loading spotlight applets...",
+      "new": "Loading newly added applets...",
+      "starterPack": "Loading starter pack applets...",
+      "categories": "Loading categories...",
+      "clock": "Loading clock applets...",
+      "randomCategory": "Loading random category applets...",
+      "news": "Loading news applets..."
+    },
+    "error": {
+      "spotlight": "Failed to load spotlight applets",
+      "new": "Failed to load newly added applets",
+      "starterPack": "Failed to load starter pack applets",
+      "categories": "Failed to load categories",
+      "clock": "Failed to load clock applets",
+      "randomCategory": "Failed to load randomCategory applets",
+      "news": "Failed to load news applets"
+    },
+    "themed": {
+      "title": "Themed Items",
+      "payoff": "Themed applets"
+    },
     "spotlight": {
       "title": "Spotlight"
     },
@@ -428,7 +462,29 @@
     }
   },
   "categoryPage": {
-    "pageTitle": "{{category}} applets"
+    "pageTitle": "{{category}} applets",
+    "loading": "Loading category applets...",
+    "error": {
+      "loadFailed": "Failed to load category applets",
+      "missingKey": "Missing category key"
+    }
+  },
+  "appletDetailPage": {
+    "loading": "Loading applet...",
+    "notFound": "Applet not found",
+    "error": {
+      "loadFailed": "Failed to load applet",
+      "missingIdentifier": "Missing applet identifier"
+    }
+  },
+  "searchPage": {
+    "title": "Library Search",
+    "searchingFor": "Searching for: {{query}}"
+  },
+  "featureToggleComponent": {
+    "error": {
+      "loadFailed": "Failed to load feature toggle settings"
+    }
   },
   "fieldScheduleComponent": {
     "legend": "Schedule",

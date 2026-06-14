@@ -22,7 +22,10 @@
       "friday": "Vendredi",
       "saturday": "Samedi",
       "sunday": "Dimanche"
-    }
+    },
+    "retry": "Réessayer",
+    "waitingForDevice": "En attente de la connexion de l'appareil...",
+    "appletsApiUnavailable": "API des applets indisponible"
   },
   "applet": {
     "cta": {
@@ -152,6 +155,12 @@
           "success": "L'épinglage de l'applet a été mis à jour",
           "error": "Impossible de modifier l'épinglage de l'applet"
         }
+      }
+    },
+    "config": {
+      "error": {
+        "schemaUnavailable": "Schéma de configuration indisponible.",
+        "saveFailed": "Échec de l'enregistrement de la configuration de l'applet."
       }
     }
   },
@@ -344,6 +353,9 @@
         "button": "Réinitialisation d'usine",
         "confirm": "Cela effacera toutes les données de l'appareil. Voulez-vous vraiment réinitialiser cet appareil aux paramètres d'usine ?"
       }
+    },
+    "error": {
+      "loadFailed": "Échec du chargement des paramètres de l'appareil"
     }
   },
   "listPage": {
@@ -425,10 +437,37 @@
     "smart_home": {
       "title": "Domotique / smart home",
       "payoff": "Rendez votre maison intelligente et automatisez tout !"
+    },
+    "loading": {
+      "spotlight": "Chargement des applets en vedette...",
+      "new": "Chargement des applets récemment ajoutés...",
+      "starterPack": "Chargement des applets du pack de démarrage...",
+      "categories": "Chargement des catégories...",
+      "clock": "Chargement des applets d'horloge...",
+      "randomCategory": "Chargement des applets d'une catégorie aléatoire...",
+      "news": "Chargement des applets d'actualités..."
+    },
+    "error": {
+      "spotlight": "Échec du chargement des applets en vedette",
+      "new": "Échec du chargement des applets récemment ajoutés",
+      "starterPack": "Échec du chargement des applets du pack de démarrage",
+      "categories": "Échec du chargement des catégories",
+      "clock": "Échec du chargement des applets d'horloge",
+      "randomCategory": "Échec du chargement des applets d'une catégorie aléatoire",
+      "news": "Échec du chargement des applets d'actualités"
+    },
+    "themed": {
+      "title": "Éléments thématiques",
+      "payoff": "Applets thématiques"
     }
   },
   "categoryPage": {
-    "pageTitle": "Applets {{category}}"
+    "pageTitle": "Applets {{category}}",
+    "loading": "Chargement des applets de la catégorie...",
+    "error": {
+      "loadFailed": "Échec du chargement des applets de la catégorie",
+      "missingKey": "Clé de catégorie manquante"
+    }
   },
   "fieldScheduleComponent": {
     "legend": "Planification",
@@ -481,5 +520,22 @@
   "setupPage": {
     "title": "Commencez ici",
     "intro": "Bienvenue ! Merci d'avoir acheté ce Pixel Runner. Vous êtes sur le point de configurer cet appareil. Veuillez vous assurer de ne pas l'éteindre ni l'interrompre pendant la configuration."
+  },
+  "appletDetailPage": {
+    "loading": "Chargement de l'applet...",
+    "notFound": "Applet introuvable",
+    "error": {
+      "loadFailed": "Échec du chargement de l'applet",
+      "missingIdentifier": "Identifiant d'applet manquant"
+    }
+  },
+  "searchPage": {
+    "title": "Recherche dans la bibliothèque",
+    "searchingFor": "Recherche de : {{query}}"
+  },
+  "featureToggleComponent": {
+    "error": {
+      "loadFailed": "Échec du chargement des paramètres des fonctionnalités"
+    }
   }
 }

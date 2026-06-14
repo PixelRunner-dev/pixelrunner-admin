@@ -3,6 +3,7 @@
   "include": [
     "test/unit/**/*",
     "test/mocks/**/*",
+    "translations/*.json",
     "env.d.ts",
     "src/adapters/CarouselAdapter.ts",
     "src/App.vue",

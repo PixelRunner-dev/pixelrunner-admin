@@ -22,7 +22,10 @@
       "friday": "星期五",
       "saturday": "星期六",
       "sunday": "星期日"
-    }
+    },
+    "retry": "重试",
+    "waitingForDevice": "正在等待设备连接...",
+    "appletsApiUnavailable": "Applet API 不可用"
   },
   "applet": {
     "cta": {
@@ -152,6 +155,12 @@
           "success": "小程序置顶状态已更新",
           "error": "无法切换小程序置顶状态"
         }
+      }
+    },
+    "config": {
+      "error": {
+        "schemaUnavailable": "配置架构不可用。",
+        "saveFailed": "无法保存 applet 配置。"
       }
     }
   },
@@ -344,6 +353,9 @@
         "button": "恢复出厂设置",
         "confirm": "这将清除设备上的所有数据。确定要将此设备恢复出厂设置吗？"
       }
+    },
+    "error": {
+      "loadFailed": "无法加载设备设置"
     }
   },
   "listPage": {
@@ -425,10 +437,37 @@
     "smart_home": {
       "title": "家庭自动化 / 智能家居",
       "payoff": "让家更智能，把一切自动化！"
+    },
+    "loading": {
+      "spotlight": "正在加载聚焦 applet...",
+      "new": "正在加载新增 applet...",
+      "starterPack": "正在加载入门包 applet...",
+      "categories": "正在加载分类...",
+      "clock": "正在加载时钟 applet...",
+      "randomCategory": "正在加载随机分类 applet...",
+      "news": "正在加载新闻 applet..."
+    },
+    "error": {
+      "spotlight": "无法加载聚焦 applet",
+      "new": "无法加载新增 applet",
+      "starterPack": "无法加载入门包 applet",
+      "categories": "无法加载分类",
+      "clock": "无法加载时钟 applet",
+      "randomCategory": "无法加载随机分类 applet",
+      "news": "无法加载新闻 applet"
+    },
+    "themed": {
+      "title": "主题项目",
+      "payoff": "主题 applet"
     }
   },
   "categoryPage": {
-    "pageTitle": "{{category}} 小程序"
+    "pageTitle": "{{category}} 小程序",
+    "loading": "正在加载分类 applet...",
+    "error": {
+      "loadFailed": "无法加载分类 applet",
+      "missingKey": "缺少分类键"
+    }
   },
   "fieldScheduleComponent": {
     "legend": "计划",
@@ -481,5 +520,22 @@
   "setupPage": {
     "title": "从这里开始",
     "intro": "欢迎！感谢您购买 Pixel Runner。您即将开始设置此设备。请确保在设置过程中不要关闭电源或中断该设备。"
+  },
+  "appletDetailPage": {
+    "loading": "正在加载 applet...",
+    "notFound": "未找到 applet",
+    "error": {
+      "loadFailed": "无法加载 applet",
+      "missingIdentifier": "缺少 applet 标识符"
+    }
+  },
+  "searchPage": {
+    "title": "库搜索",
+    "searchingFor": "正在搜索：{{query}}"
+  },
+  "featureToggleComponent": {
+    "error": {
+      "loadFailed": "无法加载功能开关设置"
+    }
   }
 }

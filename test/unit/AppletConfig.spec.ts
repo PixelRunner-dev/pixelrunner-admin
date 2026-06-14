@@ -203,7 +203,7 @@ describe('AppletConfig', () => {
     const wrapper = mountConfig(makeApplet({ installed: false }));
     await flushPromises();
 
-    expect(wrapper.text()).toContain('Configuration schema unavailable.');
+    expect(wrapper.text()).toContain('applet.config.error.schemaUnavailable');
     expect(appletApiMock.notifications.addNotification).toHaveBeenCalledWith({
       type: 'error',
       message: 'schema unavailable',

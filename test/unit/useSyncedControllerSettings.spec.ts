@@ -1,6 +1,7 @@
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
 import { computed, defineComponent, ref, type Ref } from 'vue';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import i18next from 'i18next';
 
 import {
   serializeSettingValue,
@@ -8,6 +9,12 @@ import {
 } from '@/composables/useSyncedControllerSettings.ts';
 
 import type { SettingsAPIInstance } from '@/ws/composables/use-client.ts';
+
+import en from '../../translations/en.json';
+
+beforeAll(async () => {
+  await i18next.init({ lng: 'en', resources: { en: { translation: en } } });
+});
 
 type SettingRecord = {
   key: string;

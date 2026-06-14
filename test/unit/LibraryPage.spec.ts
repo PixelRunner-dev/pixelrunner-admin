@@ -1,8 +1,15 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import i18next from 'i18next';
 
 import type { ICategory, IFullApplet } from 'pixelrunner-shared';
+
+import en from '../../translations/en.json';
+
+beforeAll(async () => {
+  await i18next.init({ lng: 'en', resources: { en: { translation: en } } });
+});
 
 type QueryState<T = unknown> = {
   data?: T;
@@ -209,10 +216,9 @@ describe('LibraryPage', () => {
       }
     });
 
-    expect(wrapper.text()).toContain('Loading spotlight applets...');
-    expect(wrapper.text()).toContain('Waiting for device connection...');
-    expect(wrapper.text()).toContain('Loading categories...');
-    expect(wrapper.text()).toContain('[Waiting for device connection...]');
+    expect(wrapper.text()).toContain('t:libraryPage.loading.spotlight');
+    expect(wrapper.text()).toContain('t:generic.waitingForDevice');
+    expect(wrapper.text()).toContain('t:libraryPage.loading.categories');
   });
 
   it('renders error states and calls the matching retry handlers', async () => {
@@ -252,7 +258,7 @@ describe('LibraryPage', () => {
 
     for (const retryButton of wrapper
       .findAll('button')
-      .filter((button) => button.text() === 'Retry')) {
+      .filter((button) => button.text() === 't:generic.retry')) {
       await retryButton.trigger('click');
     }
 

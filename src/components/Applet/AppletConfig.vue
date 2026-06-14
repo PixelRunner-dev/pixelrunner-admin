@@ -269,7 +269,7 @@ const loadAppletSchema = async () => {
     appletSchema.value = null;
     configurationValues.value = {};
     console.error('Failed to load applet schema', error);
-    schemaError.value = 'Configuration schema unavailable.';
+    schemaError.value = t('applet.config.error.schemaUnavailable');
     notify({
       type: 'error',
       message: getErrorMessage(error, schemaError.value),
@@ -305,7 +305,7 @@ const handleSubmit = async () => {
       message: getErrorMessage(
         error,
         isEditMode.value
-          ? 'Failed to save applet configuration.'
+          ? t('applet.config.error.saveFailed')
           : t('applet.notification.playlist.install.error')
       ),
       hasCloseButton: true

@@ -1,8 +1,15 @@
 import { mount, type VueWrapper } from '@vue/test-utils';
 import { nextTick } from 'vue';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import i18next from 'i18next';
 
 import type { IFullApplet, UUID } from 'pixelrunner-shared';
+
+import en from '../../translations/en.json';
+
+beforeAll(async () => {
+  await i18next.init({ lng: 'en', resources: { en: { translation: en } } });
+});
 
 type RouteParams = Record<string, string | string[] | undefined>;
 

@@ -1,4 +1,5 @@
 import { nextTick, onBeforeUnmount, ref, watch, type ComputedRef, type Ref } from 'vue';
+import { t } from 'i18next';
 
 import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 
@@ -130,7 +131,7 @@ export function useSyncedControllerSettings(options: SyncedControllerSettingsOpt
 
       return options.settings.getAll();
     },
-    defaultErrorMessage: 'Failed to load device settings',
+    defaultErrorMessage: t('settingsPage.error.loadFailed'),
     onSuccess: applySettings
   });
 

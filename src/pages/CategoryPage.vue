@@ -10,6 +10,7 @@ import { useControllerQuery } from '@/composables/useControllerQuery.ts';
 import { useClientApi } from '@/ws/index.ts';
 
 import { Button as DButton, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
+import { t } from 'i18next';
 
 const route = useRoute();
 const { isConnected, applets, state, lastError } = useClientApi();
@@ -38,18 +39,18 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     if (!categoryKey.value) {
-      throw new Error('Missing category key');
+      throw new Error(t('categoryPage.error.missingKey'));
     }
 
     const loadedApplets = await applets.getAppletsByCategoryKey(categoryKey.value);
 
     return (loadedApplets ?? []) as IFullApplet[];
   },
-  defaultErrorMessage: 'Failed to load category applets',
+  defaultErrorMessage: t('categoryPage.error.loadFailed'),
   onSuccess: (loadedApplets) => {
     console.log('[CategoryPage] Category applets loaded:', {
       categoryKey: categoryKey.value,
@@ -76,11 +77,13 @@ watch(categoryKey, () => {
 
     <AppletGrid v-if="categoryApplets" :applets="categoryApplets" />
 
-    <p v-else-if="isLoading" class="m-4 text-center">Loading category applets...</p>
-    <p v-else-if="isWaitingForPeer" class="m-4 text-center">Waiting for device connection...</p>
+    <p v-else-if="isLoading" class="m-4 text-center">{{ $t('categoryPage.loading') }}</p>
+    <p v-else-if="isWaitingForPeer" class="m-4 text-center">
+      {{ $t('generic.waitingForDevice') }}
+    </p>
     <div v-else-if="error" class="m-4 text-center">
       <p class="text-error">{{ error }}</p>
-      <DButton size="xs" color="neutral" @click="reload">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reload">{{ $t('generic.retry') }}</DButton>
     </div>
 
     <FeatureToggle features="debug">

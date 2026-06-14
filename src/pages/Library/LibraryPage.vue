@@ -13,6 +13,7 @@ import DebugSection from '@/components/DebugSection.vue';
 import FeatureToggle from '@/components/FeatureToggle.vue';
 
 import { Button as DButton, Flex as DFlex, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
+import { t } from 'i18next';
 
 const isTimeOfTheYear = new Date().getMonth() === 11; // christmas + nye
 // const isTimeOfTheYear = (new Date()).getMonth() === 7; // zomer + wk voetbal?
@@ -40,14 +41,14 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     const categoryApplets = await applets.getAppletsByCategoryKey(spotlightCategoryKey);
 
     return (categoryApplets ?? []) as IFullApplet[];
   },
-  defaultErrorMessage: 'Failed to load spotlight applets',
+  defaultErrorMessage: t('libraryPage.error.spotlight'),
   onSuccess: (loadedApplets) => {
     console.log('[LibraryPage] Spotlight applets loaded:', {
       categoryKey: spotlightCategoryKey,
@@ -73,7 +74,7 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     const loadedApplets = await applets.getAllApplets({
@@ -83,7 +84,7 @@ const {
 
     return (loadedApplets ?? []) as IFullApplet[];
   },
-  defaultErrorMessage: 'Failed to load newly added applets',
+  defaultErrorMessage: t('libraryPage.error.new'),
   onSuccess: (loadedApplets) => {
     console.log('[LibraryPage] Newly added applets loaded:', {
       count: loadedApplets.length
@@ -110,14 +111,14 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     const categoryApplets = await applets.getAppletsByCategoryKey(starterPackCategoryKey);
 
     return (categoryApplets ?? []) as IFullApplet[];
   },
-  defaultErrorMessage: 'Failed to load starter pack applets',
+  defaultErrorMessage: t('libraryPage.error.starterPack'),
   onSuccess: (loadedApplets) => {
     console.log('[LibraryPage] Starter pack applets loaded:', {
       categoryKey: starterPackCategoryKey,
@@ -145,14 +146,14 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     const categoryApplets = await applets.getAppletsByCategoryKey(clockCategoryKey);
 
     return (categoryApplets ?? []) as IFullApplet[];
   },
-  defaultErrorMessage: 'Failed to load clock applets',
+  defaultErrorMessage: t('libraryPage.error.clock'),
   onSuccess: (loadedApplets) => {
     console.log('[LibraryPage] Clock applets loaded:', {
       categoryKey: clockCategoryKey,
@@ -191,14 +192,14 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     const categoryApplets = await applets.getAppletsByCategoryKey(randomCategory);
 
     return (categoryApplets ?? []) as IFullApplet[];
   },
-  defaultErrorMessage: 'Failed to load randomCategory applets',
+  defaultErrorMessage: t('libraryPage.error.randomCategory'),
   onSuccess: (loadedApplets) => {
     console.log('[LibraryPage] randomCategory applets loaded:', {
       categoryKey: randomCategory,
@@ -226,14 +227,14 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     const categoryApplets = await applets.getAppletsByCategoryKey(newsCategoryKey);
 
     return (categoryApplets ?? []) as IFullApplet[];
   },
-  defaultErrorMessage: 'Failed to load news applets',
+  defaultErrorMessage: t('libraryPage.error.news'),
   onSuccess: (loadedApplets) => {
     console.log('[LibraryPage] news applets loaded:', {
       categoryKey: newsCategoryKey,
@@ -259,14 +260,14 @@ const {
   }),
   load: async () => {
     if (!applets) {
-      throw new Error('Applets API not available');
+      throw new Error(t('generic.appletsApiUnavailable'));
     }
 
     const loadedCategories = await applets.getAllCategories();
 
     return (loadedCategories ?? []) as ICategory[];
   },
-  defaultErrorMessage: 'Failed to load categories',
+  defaultErrorMessage: t('libraryPage.error.categories'),
   onSuccess: (loadedCategories) => {
     console.log('[LibraryPage] Categories loaded:', {
       count: loadedCategories.length
@@ -309,19 +310,23 @@ const themedItems = newlyAddedItems;
       </AppletCarousel>
     </LibrarySection>
 
-    <p v-else-if="isSpotlightLoading" class="m-4 text-center">Loading spotlight applets...</p>
+    <p v-else-if="isSpotlightLoading" class="m-4 text-center">
+      {{ $t('libraryPage.loading.spotlight') }}
+    </p>
     <p v-else-if="isWaitingForSpotlightPeer" class="m-4 text-center">
-      Waiting for device connection...
+      {{ $t('generic.waitingForDevice') }}
     </p>
     <div v-else-if="spotlightError" class="m-4 text-center">
       <p class="text-error">{{ spotlightError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadSpotlight">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reloadSpotlight">{{
+        $t('generic.retry')
+      }}</DButton>
     </div>
 
     <!-- <LibrarySection
       v-if="isTimeOfTheYear && themedItems"
-      title="[themed items]"
-      payoff="[themed applets]"
+      :title="$t('libraryPage.themed.title')"
+      :payoff="$t('libraryPage.themed.payoff')"
     >
       <AppletCarousel :applets="themedItems">
         <template #item="applet">
@@ -342,13 +347,17 @@ const themedItems = newlyAddedItems;
       </AppletCarousel>
     </LibrarySection>
 
-    <p v-else-if="isNewlyAddedLoading" class="m-4 text-center">Loading newly added applets...</p>
+    <p v-else-if="isNewlyAddedLoading" class="m-4 text-center">
+      {{ $t('libraryPage.loading.new') }}
+    </p>
     <p v-else-if="isWaitingForNewlyAddedPeer" class="m-4 text-center">
-      Waiting for device connection...
+      {{ $t('generic.waitingForDevice') }}
     </p>
     <div v-else-if="newlyAddedError" class="m-4 text-center">
       <p class="text-error">{{ newlyAddedError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadNewlyAdded">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reloadNewlyAdded">{{
+        $t('generic.retry')
+      }}</DButton>
     </div>
 
     <LibrarySection
@@ -363,26 +372,34 @@ const themedItems = newlyAddedItems;
       </AppletCarousel>
     </LibrarySection>
 
-    <p v-else-if="isStarterPackLoading" class="m-4 text-center">Loading starter pack applets...</p>
+    <p v-else-if="isStarterPackLoading" class="m-4 text-center">
+      {{ $t('libraryPage.loading.starterPack') }}
+    </p>
     <p v-else-if="isWaitingForStarterPackPeer" class="m-4 text-center">
-      [Waiting for device connection...]
+      {{ $t('generic.waitingForDevice') }}
     </p>
     <div v-else-if="starterPackError" class="m-4 text-center">
       <p class="text-error">{{ starterPackError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadStarterPack">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reloadStarterPack">{{
+        $t('generic.retry')
+      }}</DButton>
     </div>
 
     <LibrarySection v-if="categories" :title="$t('libraryPage.categories.title')">
       <CategoryList :categories isInteractive />
     </LibrarySection>
 
-    <p v-else-if="isCategoriesLoading" class="m-4 text-center">Loading categories...</p>
+    <p v-else-if="isCategoriesLoading" class="m-4 text-center">
+      {{ $t('libraryPage.loading.categories') }}
+    </p>
     <p v-else-if="isWaitingForCategoriesPeer" class="m-4 text-center">
-      Waiting for device connection...
+      {{ $t('generic.waitingForDevice') }}
     </p>
     <div v-else-if="categoriesError" class="m-4 text-center">
       <p class="text-error">{{ categoriesError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadCategories">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reloadCategories">{{
+        $t('generic.retry')
+      }}</DButton>
     </div>
 
     <LibrarySection
@@ -397,13 +414,15 @@ const themedItems = newlyAddedItems;
       </AppletCarousel>
     </LibrarySection>
 
-    <p v-else-if="isClockLoading" class="m-4 text-center">Loading clock applets...</p>
+    <p v-else-if="isClockLoading" class="m-4 text-center">
+      {{ $t('libraryPage.loading.clock') }}
+    </p>
     <p v-else-if="isWaitingForClockPeer" class="m-4 text-center">
-      [Waiting for device connection...]
+      {{ $t('generic.waitingForDevice') }}
     </p>
     <div v-else-if="clockError" class="m-4 text-center">
       <p class="text-error">{{ clockError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadClock">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reloadClock">{{ $t('generic.retry') }}</DButton>
     </div>
 
     <LibrarySection
@@ -419,14 +438,16 @@ const themedItems = newlyAddedItems;
     </LibrarySection>
 
     <p v-else-if="isRandomCategoryLoading" class="m-4 text-center">
-      Loading random category applets...
+      {{ $t('libraryPage.loading.randomCategory') }}
     </p>
     <p v-else-if="isWaitingForRandomCategoryPeer" class="m-4 text-center">
-      [Waiting for device connection...]
+      {{ $t('generic.waitingForDevice') }}
     </p>
     <div v-else-if="randomCategoryError" class="m-4 text-center">
       <p class="text-error">{{ randomCategoryError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadRandomCategory">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reloadRandomCategory">{{
+        $t('generic.retry')
+      }}</DButton>
     </div>
 
     <LibrarySection v-if="newsItems" :title="$t('libraryPage.news.title')">
@@ -437,13 +458,15 @@ const themedItems = newlyAddedItems;
       </AppletCarousel>
     </LibrarySection>
 
-    <p v-else-if="isNewsLoading" class="m-4 text-center">Loading news applets...</p>
+    <p v-else-if="isNewsLoading" class="m-4 text-center">
+      {{ $t('libraryPage.loading.news') }}
+    </p>
     <p v-else-if="isWaitingForNewsPeer" class="m-4 text-center">
-      [Waiting for device connection...]
+      {{ $t('generic.waitingForDevice') }}
     </p>
     <div v-else-if="newsError" class="m-4 text-center">
       <p class="text-error">{{ newsError }}</p>
-      <DButton size="xs" color="neutral" @click="reloadNews">Retry</DButton>
+      <DButton size="xs" color="neutral" @click="reloadNews">{{ $t('generic.retry') }}</DButton>
     </div>
 
     <FeatureToggle features="debug">
