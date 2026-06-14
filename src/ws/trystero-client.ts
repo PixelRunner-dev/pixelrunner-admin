@@ -189,17 +189,17 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   // ============================================================================
 
   protected async connectTransport(): Promise<void> {
-    console.log('[trystero-client] connectTransport() called');
+    this.logDebug('[trystero-client] connectTransport() called');
     if (this.config.debug) {
       this.installRelaySocketDebugging();
     }
     // this.installWebRtcDebugging();
 
     if (!trystero) {
-      console.log('[trystero-client] Loading trystero module...');
+      this.logDebug('[trystero-client] Loading trystero module...');
       trystero = await import('trystero');
-      console.log('[trystero-client] Trystero module loaded');
-      console.log('[trystero-client] selfId:', trystero.selfId);
+      this.logDebug('[trystero-client] Trystero module loaded');
+      this.logDebug('[trystero-client] selfId:', trystero.selfId);
     }
 
     const roomPassword = this.config.roomPassword ?? DEFAULT_ROOM_PASSWORD;
@@ -207,9 +207,9 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       password: roomPassword,
       fallbackRoomId: this.config.fallbackRoomId
     });
-    console.log('[trystero-client] Room ID:', roomId);
-    console.log('[trystero-client] Relay URLs:', this.config.relayUrls);
-    console.log('[trystero-client] APP_ID:', APP_ID);
+    this.logDebug('[trystero-client] Room ID:', roomId);
+    this.logDebug('[trystero-client] Relay URLs:', this.config.relayUrls);
+    this.logDebug('[trystero-client] APP_ID:', APP_ID);
     await this.logDerivedTopics(roomId);
 
     const trysteroConfig: JoinRoomConfig = {
@@ -224,10 +224,10 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     // Configure Nostr relays if provided
     if (this.config.relayUrls && this.config.relayUrls.length > 0) {
       trysteroConfig.relayConfig = { urls: this.config.relayUrls };
-      console.log('[trystero-client] Relay URLs configured:', this.config.relayUrls);
-      console.log('[trystero-client] Checking relay health...');
+      this.logDebug('[trystero-client] Relay URLs configured:', this.config.relayUrls);
+      this.logDebug('[trystero-client] Checking relay health...');
       const relayHealth = await this.checkRelayHealth();
-      console.log('[trystero-client] Relay health:', relayHealth);
+      this.logDebug('[trystero-client] Relay health:', relayHealth);
       if (!Object.values(relayHealth).some(Boolean)) {
         throw new Error('No Nostr relays reachable from browser');
       }
@@ -239,7 +239,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     // }
 
     // Create the room (acts as host/join peer)
-    console.log('[trystero-client] About to join room:', {
+    this.logDebug('[trystero-client] About to join room:', {
       roomId,
       appId: trysteroConfig.appId,
       relayUrls: this.config.relayUrls,
@@ -248,7 +248,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.room = trystero.joinRoom(trysteroConfig, roomId, {
       onJoinError: (details) => {
         const error = new Error(details.error);
-        console.error('[trystero-client] Join error:', details);
+        this.logError('[trystero-client] Join error:', details);
         this.handleTransportError(error);
       }
     });
@@ -266,11 +266,11 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   private setupRoomHandlers(): void {
     if (!this.room) throw new Error('no room found');
     this.room.onPeerJoin = (peerId: string) => {
-      console.log('[trystero-client] Peer joined:', peerId);
+      this.logDebug('[trystero-client] Peer joined:', peerId);
       this.handlePeersAvailable('peer joined');
     };
     this.room.onPeerLeave = (peerId: string) => {
-      console.log('[trystero-client] Peer left:', peerId);
+      this.logDebug('[trystero-client] Peer left:', peerId);
       if (this.getPeerCount() > 0) {
         return;
       }
@@ -278,17 +278,17 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     };
     if (this.room.getPeers) {
       const existingPeerCount = this.getPeerCount();
-      console.log('[trystero-client] Existing peers:', this.room.getPeers());
+      this.logDebug('[trystero-client] Existing peers:', this.room.getPeers());
       if (existingPeerCount > 0) {
         this.handlePeersAvailable('existing peers');
       }
-    } else console.log('[trystero-client] No getPeers event found');
+    } else this.logDebug('[trystero-client] No getPeers event found');
     this.room.onPeerStream = (stream: MediaStream, peerId: string) => {
-      console.log('[trystero-client] Peer stream:', peerId, stream);
+      this.logDebug('[trystero-client] Peer stream:', peerId, stream);
     };
     if (this.room.onSignalingReady) {
       this.room.onSignalingReady(() => {
-        console.log('[trystero-client] Signaling ready');
+        this.logDebug('[trystero-client] Signaling ready');
       });
     }
   }
@@ -356,7 +356,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     try {
       const action = this.room.makeAction(ACTION_NAME);
-      console.log(
+      this.logDebug(
         '[trystero] makeAction result:',
         typeof action,
         Array.isArray(action) ? `[${action.length} elements]` : action
@@ -379,13 +379,13 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       this.receiveAction = receiver;
 
       receiver((data: string, peerId: string) => {
-        console.log('[trystero-client] Received from peer', peerId, ':', data);
+        this.logDebug('[trystero-client] Received from peer', peerId, ':', data);
         this.handleTransportMessage(data);
       });
 
-      console.log('[trystero] RPC action ready');
+      this.logDebug('[trystero] RPC action ready');
     } catch (error) {
-      console.error('[trystero] Failed to setup RPC action:', error);
+      this.logError('[trystero] Failed to setup RPC action:', error);
       throw error;
     }
   }
@@ -397,7 +397,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
           this.room.leave();
         }
       } catch (e) {
-        console.log('[trystero] Error leaving room', e);
+        this.logDebug('[trystero] Error leaving room', e);
       }
       this.room = null;
     }
@@ -406,7 +406,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     this.receiveAction = null;
     this.peerConnected = false;
     this.clearControllerConnectionLostTimer();
-    console.log('[trystero] Transport disconnected');
+    this.logDebug('[trystero] Transport disconnected');
   }
 
   protected prepareReconnect(): void {
@@ -418,28 +418,28 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
   protected send(message: string): void {
     if (!this.sendAction) {
-      console.error('[trystero-client] Cannot send - no sendAction available');
+      this.logError('[trystero-client] Cannot send - no sendAction available');
       throw new Error('Not connected to peer');
     }
 
     if (!this.peerConnected) {
-      console.error('[trystero] Cannot send - no peer connected');
+      this.logError('[trystero] Cannot send - no peer connected');
       throw new Error('No peer connected');
     }
 
-    console.log('[trystero-client] Sending message:', message);
+    this.logDebug('[trystero-client] Sending message:', message);
     this.sendAction(message);
   }
 
   protected isTransportConnected(): boolean {
-    console.log('isTransportConnected', this.peerConnected);
+    this.logDebug('isTransportConnected', this.peerConnected);
     return this.sendAction !== null && this.peerConnected;
     //this.state.value === 'connected';
   }
 
   protected handleTransportError(error: unknown): void {
     if (this.config.debug) {
-      console.error('[trystero] error:', error);
+      this.logError('[trystero] error:', error);
     }
 
     const errorEvent: IErrorEvent = {
@@ -455,14 +455,14 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     try {
       // Handle string data only (Trystero typically sends strings)
       if (typeof data !== 'string') {
-        console.warn('[trystero] Received non-string data:', typeof data);
+        this.logWarn('[trystero] Received non-string data:', typeof data);
         return;
       }
 
       const message = JSON.parse(data);
 
       if (!message) {
-        console.log('[trystero] No message');
+        this.logDebug('[trystero] No message');
         return;
       }
 
@@ -473,18 +473,18 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         this.handleNotification(message as IJsonRpcNotification);
       }
     } catch (error) {
-      console.error('[trystero] message parse error:', error);
+      this.logError('[trystero] message parse error:', error);
     }
   }
 
   protected handleResponse(response: IJsonRpcResponse): void {
-    console.log('[trystero-client] JSON-RPC response:', response);
+    this.logDebug('[trystero-client] JSON-RPC response:', response);
     super.handleResponse(response);
   }
 
   protected handleTransportClose(code: number, reason: string, wasClean: boolean): void {
     if (this.config.debug) {
-      console.log('[trystero] closed:', code, reason);
+      this.logDebug('[trystero] closed:', code, reason);
     }
 
     this.peerConnected = false;
@@ -506,7 +506,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     const prevReconnectAttempts = this.reconnectAttempts;
     this.reconnectAttempts = 0;
 
-    console.log('[trystero] connected');
+    this.logDebug('[trystero] connected');
 
     // Emit connected event
     const event: IConnectedEvent = {
@@ -544,10 +544,10 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         });
         ws.close();
         relayStatus[relayUrl] = true;
-        console.log(`[trystero] Relay ${relayUrl}: OK`);
+        this.logDebug(`[trystero] Relay ${relayUrl}: OK`);
       } catch {
         relayStatus[relayUrl] = false;
-        console.error(`[trystero] Relay ${relayUrl}: FAILED`);
+        this.logError(`[trystero] Relay ${relayUrl}: FAILED`);
       }
     }
 
@@ -575,7 +575,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     const peerCount = this.getPeerCount();
     const hasTransport = this.sendAction !== null;
 
-    console.log('[trystero-client] tryOpenConnection', {
+    this.logDebug('[trystero-client] tryOpenConnection', {
       reason,
       peerConnected: this.peerConnected,
       peerCount,
@@ -595,7 +595,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
     const rootTopicHash = await this.hashTopic(rootTopicPlaintext, 'SHA-1');
     const roomNamespace = await this.hashTopic(rootTopicPlaintext, 'SHA-256', 'hex');
 
-    console.log('[trystero-client] Derived topics:', {
+    this.logDebug('[trystero-client] Derived topics:', {
       rootTopicPlaintext,
       rootTopicHash,
       roomNamespace
@@ -623,6 +623,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   }
 
   private installRelaySocketDebugging(): void {
+    const logDebug = this.logDebug.bind(this);
     if (
       relaySocketDebugInstalled ||
       typeof window === 'undefined' ||
@@ -643,14 +644,14 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
           return;
         }
 
-        console.log('[trystero-client] Relay socket created:', normalizedUrl);
+        logDebug('[trystero-client] Relay socket created:', normalizedUrl);
 
         this.addEventListener('open', () => {
-          console.log('[trystero-client] Relay socket open:', normalizedUrl);
+          logDebug('[trystero-client] Relay socket open:', normalizedUrl);
         });
 
         this.addEventListener('close', (event) => {
-          console.log('[trystero-client] Relay socket close:', normalizedUrl, {
+          logDebug('[trystero-client] Relay socket close:', normalizedUrl, {
             code: event.code,
             reason: event.reason,
             wasClean: event.wasClean
@@ -658,7 +659,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         });
 
         this.addEventListener('error', () => {
-          console.log('[trystero-client] Relay socket error:', normalizedUrl);
+          logDebug('[trystero-client] Relay socket error:', normalizedUrl);
         });
 
         // this.addEventListener('message', (event) => {
@@ -673,7 +674,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       override send(data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
         const url = this.url;
         if (relayUrls.has(url)) {
-          console.log('[trystero-client] Relay socket send:', url, String(data).slice(0, 300));
+          logDebug('[trystero-client] Relay socket send:', url, String(data).slice(0, 300));
         }
 
         super.send(data);
@@ -682,10 +683,12 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     window.WebSocket = DebugWebSocket as typeof WebSocket;
     relaySocketDebugInstalled = true;
-    console.log('[trystero-client] Relay socket debugging installed');
+    logDebug('[trystero-client] Relay socket debugging installed');
   }
 
   private installWebRtcDebugging(): void {
+    const logDebug = this.logDebug.bind(this);
+    const logError = this.logError.bind(this);
     if (
       webRtcDebugInstalled ||
       typeof window === 'undefined' ||
@@ -698,7 +701,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     class DebugPeerConnection extends NativePeerConnection {
       constructor(configuration?: RTCConfiguration) {
-        console.log('[trystero-client] RTCPeerConnection created:', {
+        logDebug('[trystero-client] RTCPeerConnection created:', {
           ...configuration,
           iceServers: configuration?.iceServers?.map((server) => ({
             urls: server.urls,
@@ -709,33 +712,33 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         super(configuration);
 
         this.addEventListener('connectionstatechange', () => {
-          console.log('[trystero-client] RTCPeerConnection connectionState:', this.connectionState);
+          logDebug('[trystero-client] RTCPeerConnection connectionState:', this.connectionState);
         });
 
         this.addEventListener('iceconnectionstatechange', () => {
-          console.log(
+          logDebug(
             '[trystero-client] RTCPeerConnection iceConnectionState:',
             this.iceConnectionState
           );
         });
 
         this.addEventListener('icegatheringstatechange', () => {
-          console.log(
+          logDebug(
             '[trystero-client] RTCPeerConnection iceGatheringState:',
             this.iceGatheringState
           );
         });
 
         this.addEventListener('signalingstatechange', () => {
-          console.log('[trystero-client] RTCPeerConnection signalingState:', this.signalingState);
+          logDebug('[trystero-client] RTCPeerConnection signalingState:', this.signalingState);
         });
 
         this.addEventListener('icecandidateerror', (event) => {
-          console.error('[trystero-client] RTCPeerConnection icecandidateerror:', event);
+          logError('[trystero-client] RTCPeerConnection icecandidateerror:', event);
         });
 
         this.addEventListener('icecandidate', (event) => {
-          console.log(
+          logDebug(
             '[trystero-client] RTCPeerConnection icecandidate:',
             event.candidate?.candidate ?? null
           );
@@ -743,16 +746,16 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       }
 
       createDataChannel(label: string, dataChannelDict?: RTCDataChannelInit): RTCDataChannel {
-        console.log('[trystero-client] createDataChannel:', label, dataChannelDict);
+        logDebug('[trystero-client] createDataChannel:', label, dataChannelDict);
         const channel = super.createDataChannel(label, dataChannelDict);
         channel.addEventListener('open', () => {
-          console.log('[trystero-client] datachannel open:', label);
+          logDebug('[trystero-client] datachannel open:', label);
         });
         channel.addEventListener('close', () => {
-          console.log('[trystero-client] datachannel close:', label);
+          logDebug('[trystero-client] datachannel close:', label);
         });
         channel.addEventListener('error', (event) => {
-          console.error('[trystero-client] datachannel error:', label, event);
+          logError('[trystero-client] datachannel error:', label, event);
         });
         return channel;
       }
@@ -769,7 +772,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         options?: RTCOfferOptions
       ): Promise<RTCSessionDescriptionInit | void> {
         if (typeof optionsOrSuccessCallback === 'function') {
-          console.log('[trystero-client] createOffer called with callbacks:', options);
+          logDebug('[trystero-client] createOffer called with callbacks:', options);
           return super.createOffer(
             optionsOrSuccessCallback as RTCSessionDescriptionCallback,
             failureCallback!,
@@ -777,16 +780,16 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
           );
         }
 
-        console.log('[trystero-client] createOffer called:', optionsOrSuccessCallback);
+        logDebug('[trystero-client] createOffer called:', optionsOrSuccessCallback);
         try {
           const offer = await super.createOffer(optionsOrSuccessCallback);
-          console.log('[trystero-client] createOffer resolved:', {
+          logDebug('[trystero-client] createOffer resolved:', {
             type: offer.type,
             sdpLength: offer.sdp?.length ?? 0
           });
           return offer;
         } catch (error) {
-          console.error('[trystero-client] createOffer failed:', error);
+          logError('[trystero-client] createOffer failed:', error);
           throw error;
         }
       }
@@ -801,57 +804,57 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         failureCallback?: RTCPeerConnectionErrorCallback
       ): Promise<RTCSessionDescriptionInit | void> {
         if (typeof optionsOrSuccessCallback === 'function') {
-          console.log('[trystero-client] createAnswer called with callbacks');
+          logDebug('[trystero-client] createAnswer called with callbacks');
           return super.createAnswer(
             optionsOrSuccessCallback as RTCSessionDescriptionCallback,
             failureCallback!
           );
         }
 
-        console.log('[trystero-client] createAnswer called:', optionsOrSuccessCallback);
+        logDebug('[trystero-client] createAnswer called:', optionsOrSuccessCallback);
         try {
           const answer = await super.createAnswer(optionsOrSuccessCallback);
-          console.log('[trystero-client] createAnswer resolved:', {
+          logDebug('[trystero-client] createAnswer resolved:', {
             type: answer.type,
             sdpLength: answer.sdp?.length ?? 0
           });
           return answer;
         } catch (error) {
-          console.error('[trystero-client] createAnswer failed:', error);
+          logError('[trystero-client] createAnswer failed:', error);
           throw error;
         }
       }
 
       async setLocalDescription(description?: RTCLocalSessionDescriptionInit): Promise<void> {
-        console.log('[trystero-client] setLocalDescription called:', {
+        logDebug('[trystero-client] setLocalDescription called:', {
           type: description?.type,
           sdpLength: description?.sdp?.length ?? 0
         });
         try {
           await super.setLocalDescription(description);
-          console.log('[trystero-client] setLocalDescription resolved:', {
+          logDebug('[trystero-client] setLocalDescription resolved:', {
             type: this.localDescription?.type,
             sdpLength: this.localDescription?.sdp?.length ?? 0
           });
         } catch (error) {
-          console.error('[trystero-client] setLocalDescription failed:', error);
+          logError('[trystero-client] setLocalDescription failed:', error);
           throw error;
         }
       }
 
       async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
-        console.log('[trystero-client] setRemoteDescription called:', {
+        logDebug('[trystero-client] setRemoteDescription called:', {
           type: description.type,
           sdpLength: description.sdp?.length ?? 0
         });
         try {
           await super.setRemoteDescription(description);
-          console.log('[trystero-client] setRemoteDescription resolved:', {
+          logDebug('[trystero-client] setRemoteDescription resolved:', {
             type: this.remoteDescription?.type,
             sdpLength: this.remoteDescription?.sdp?.length ?? 0
           });
         } catch (error) {
-          console.error('[trystero-client] setRemoteDescription failed:', error);
+          logError('[trystero-client] setRemoteDescription failed:', error);
           throw error;
         }
       }
@@ -867,16 +870,16 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
         successCallback?: VoidFunction,
         failureCallback?: RTCPeerConnectionErrorCallback
       ): Promise<void> {
-        console.log('[trystero-client] addIceCandidate called:', candidate?.candidate ?? null);
+        logDebug('[trystero-client] addIceCandidate called:', candidate?.candidate ?? null);
         try {
           if (successCallback && failureCallback) {
             await super.addIceCandidate(candidate ?? null, successCallback, failureCallback);
           } else {
             await super.addIceCandidate(candidate);
           }
-          console.log('[trystero-client] addIceCandidate resolved');
+          logDebug('[trystero-client] addIceCandidate resolved');
         } catch (error) {
-          console.error('[trystero-client] addIceCandidate failed:', error);
+          logError('[trystero-client] addIceCandidate failed:', error);
           throw error;
         }
       }
@@ -884,6 +887,6 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
 
     window.RTCPeerConnection = DebugPeerConnection;
     webRtcDebugInstalled = true;
-    console.log('[trystero-client] WebRTC debugging installed');
+    logDebug('[trystero-client] WebRTC debugging installed');
   }
 }

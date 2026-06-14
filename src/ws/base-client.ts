@@ -116,6 +116,29 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
   protected abstract handleTransportClose(code: number, reason: string, wasClean: boolean): void;
 
   // ============================================================================
+  // Logging
+  // ============================================================================
+
+  /** Debug-level log, only emitted when `config.debug` is enabled. */
+  protected logDebug(...args: unknown[]): void {
+    if (this.config.debug) {
+      console.log(...args);
+    }
+  }
+
+  /** Warning-level log, only emitted when `config.debug` is enabled. */
+  protected logWarn(...args: unknown[]): void {
+    if (this.config.debug) {
+      console.warn(...args);
+    }
+  }
+
+  /** Error-level log, always emitted so failures remain visible in production. */
+  protected logError(...args: unknown[]): void {
+    console.error(...args);
+  }
+
+  // ============================================================================
   // Public Connection Management Methods
   // ============================================================================
 
