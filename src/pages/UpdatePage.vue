@@ -2,7 +2,7 @@
 
 <template>
   <main>
-    <h1>Update</h1>
+    <h1>{{ $t('updatePage.title') }}</h1>
   </main>
 </template>
 

@@ -292,6 +292,13 @@
           "label": "自动配置 URL",
           "placeholder": "https://proxy.example.com/proxy.pac"
         }
+      },
+      "selected": "已选择 {{ssid}}",
+      "configured": "WiFi 已配置。设备在加入目标网络时可能会断开与设置网络的连接。",
+      "error": {
+        "loadStatus": "无法加载 WiFi 状态",
+        "scan": "无法扫描 WiFi 网络",
+        "configure": "无法配置 WiFi"
       }
     },
     "brightness": {
@@ -320,7 +327,12 @@
       }
     },
     "theme": {
-      "label": "主题（管理界面）"
+      "label": "主题（管理界面）",
+      "group": {
+        "dark": "深色主题",
+        "light": "浅色主题",
+        "other": "其他主题"
+      }
     },
     "experimentalFeatures": {
       "label": "启用实验性功能",
@@ -356,6 +368,14 @@
     },
     "error": {
       "loadFailed": "无法加载设备设置"
+    },
+    "featureToggle": {
+      "loading": "正在加载功能开关...",
+      "empty": "此控制器版本没有可用的实验性功能。",
+      "permanentConfirm": "功能：'{{key}}' - {{label}}\n\n此实验性功能被标记为永久性。仅在你了解其作用时才启用。此功能可能以无法从此屏幕撤销的方式更改设备行为。",
+      "error": {
+        "loadVersion": "无法加载控制器版本"
+      }
     }
   },
   "listPage": {
@@ -479,7 +499,8 @@
     },
     "endTime": {
       "label": "结束时间"
-    }
+    },
+    "dayToggle": "切换{{day}}"
   },
   "librarySearchComponent": {
     "input": {
@@ -519,7 +540,10 @@
   },
   "setupPage": {
     "title": "从这里开始",
-    "intro": "欢迎！感谢您购买 Pixel Runner。您即将开始设置此设备。请确保在设置过程中不要关闭电源或中断该设备。"
+    "intro": "欢迎！感谢您购买 Pixel Runner。您即将开始设置此设备。请确保在设置过程中不要关闭电源或中断该设备。",
+    "error": {
+      "migrationFailed": "数据库迁移失败。"
+    }
   },
   "appletDetailPage": {
     "loading": "正在加载 applet...",
@@ -537,5 +561,37 @@
     "error": {
       "loadFailed": "无法加载功能开关设置"
     }
+  },
+  "updatePage": {
+    "title": "更新"
+  },
+  "fieldLocationbasedComponent": {
+    "useDeviceLocation": "使用设备位置"
+  },
+  "fieldOauth2Component": {
+    "connect": "连接",
+    "disconnect": "断开连接",
+    "error": {
+      "startFailed": "无法启动 OAuth 流程",
+      "stateMismatch": "OAuth 状态不匹配 - 可能的 CSRF 攻击",
+      "authFailed": "OAuth 身份验证失败"
+    }
+  },
+  "app": {
+    "notification": {
+      "updateAvailable": "此页面有新版本可用。点击刷新以继续。",
+      "controllerConnectionLost": "与你的 Pixelrunner 控制器的连接已断开。请等待或刷新页面。"
+    }
+  },
+  "documentTitle": "Pixelrunner 管理",
+  "routeTitle": {
+    "setup": "设置",
+    "settings": "设置",
+    "update": "更新",
+    "appletList": "Applet",
+    "appletDetail": "Applet",
+    "library": "库",
+    "category": "分类",
+    "search": "库搜索"
   }
 }

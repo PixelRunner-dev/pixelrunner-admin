@@ -273,14 +273,17 @@ const {
 
     return device.status({ full: true });
   },
-  defaultErrorMessage: 'TRANS: Failed to load controller version',
+  defaultErrorMessage: t('settingsPage.featureToggle.error.loadVersion'),
   onSuccess: (status) => {
     controllerVersion.value = extractControllerVersionFromStatus(status);
   }
 });
 
 function confirmPermanentFeature(feature: FeatureToggleItem): boolean {
-  const message = `Feature: '${feature.key}' - ${feature.label}\n\nThis experimental feature is marked PERMANENT. Enable it only if you understand it. This feature can change device behavior in a way that cannot be undone from this screen.`;
+  const message = t('settingsPage.featureToggle.permanentConfirm', {
+    key: feature.key,
+    label: feature.label
+  });
   return window.confirm(message);
 }
 
@@ -356,7 +359,7 @@ async function loadWifiStatus() {
     applyWifiStatus(await settings.getWifiStatus());
   } catch (error) {
     wifiStatusError.value =
-      error instanceof Error ? error.message : 'TRANS: Failed to load WiFi status';
+      error instanceof Error ? error.message : t('settingsPage.wifiNetwork.error.loadStatus');
   }
 }
 
@@ -374,7 +377,7 @@ function selectWifiNetwork(network: WifiScanNetwork) {
   ssid.value = network.ssid;
   security.value = getSecurityFromScan(network);
   password.value = '';
-  wifiStatusMessage.value = `[Selected ${network.ssid}]`;
+  wifiStatusMessage.value = t('settingsPage.wifiNetwork.selected', { ssid: network.ssid });
   wifiStatusError.value = '';
 }
 
@@ -388,7 +391,7 @@ async function loadWifiNetworks() {
     wifiNetworks.value = await settings.scanWifiNetworks();
   } catch (error) {
     wifiStatusError.value =
-      error instanceof Error ? error.message : 'TRANS: Failed to scan WiFi networks';
+      error instanceof Error ? error.message : t('settingsPage.wifiNetwork.error.scan');
   } finally {
     wifiIsScanning.value = false;
   }
@@ -417,10 +420,10 @@ async function saveWifiNetwork() {
     });
 
     applyWifiStatus(status);
-    wifiStatusMessage.value =
-      '[WiFi configured. Device may disconnect from setup network while it joins the target network.]';
+    wifiStatusMessage.value = t('settingsPage.wifiNetwork.configured');
   } catch (error) {
-    wifiStatusError.value = error instanceof Error ? error.message : 'Failed to configure WiFi';
+    wifiStatusError.value =
+      error instanceof Error ? error.message : t('settingsPage.wifiNetwork.error.configure');
   } finally {
     wifiIsSaving.value = false;
   }
@@ -1031,17 +1034,17 @@ watchEffect(() => {
             <DText size="sm">{{ $t('settingsPage.theme.label') }}</DText>
           </DLabel>
           <select id="theme" class="select" v-model="theme" @change="setTheme">
-            <optgroup label="Dark themes">
+            <optgroup :label="$t('settingsPage.theme.group.dark')">
               <option v-for="t in themesDark" :key="'t-' + t" :value="t">
                 {{ toCapitalizeWords(t) }}
               </option>
             </optgroup>
-            <optgroup label="Light themes">
+            <optgroup :label="$t('settingsPage.theme.group.light')">
               <option v-for="t in themesLight" :key="'t-' + t" :value="t">
                 {{ toCapitalizeWords(t) }}
               </option>
             </optgroup>
-            <optgroup label="Other themes">
+            <optgroup :label="$t('settingsPage.theme.group.other')">
               <option v-for="t in themesOther" :key="'t-' + t" :value="t">
                 {{ toCapitalizeWords(t) }}
               </option>
@@ -1078,17 +1081,19 @@ watchEffect(() => {
         <DFormControl class="gap-1">
           <dl class="divide-y divide-base-200 text-sm">
             <div v-if="isLoadingFeatureToggleStatus" class="py-2">
-              <DText is="p">Loading feature toggles...</DText>
+              <DText is="p">{{ $t('settingsPage.featureToggle.loading') }}</DText>
             </div>
             <div v-else-if="isWaitingForFeatureToggleStatusPeer" class="py-2">
-              <DText is="p">Waiting for device connection...</DText>
+              <DText is="p">{{ $t('generic.waitingForDevice') }}</DText>
             </div>
             <div v-else-if="featureToggleStatusError" class="flex items-center gap-2 py-2">
               <DText is="p" class="flex-1 text-error">{{ featureToggleStatusError }}</DText>
-              <DButton size="xs" color="neutral" @click="reloadFeatureToggleStatus">Retry</DButton>
+              <DButton size="xs" color="neutral" @click="reloadFeatureToggleStatus">{{
+                $t('generic.retry')
+              }}</DButton>
             </div>
             <div v-else-if="availableFeatureToggleList.length === 0" class="py-2">
-              <DText is="p">No experimental features available for this controller version.</DText>
+              <DText is="p">{{ $t('settingsPage.featureToggle.empty') }}</DText>
             </div>
             <div
               v-for="feature in availableFeatureToggleList"

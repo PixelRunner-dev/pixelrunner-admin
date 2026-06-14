@@ -102,31 +102,21 @@ afterEach(() => {
 });
 
 describe('AccessWarning', () => {
-  it('renders fallback access warning text when translations are unavailable', async () => {
+  it('renders translated access warning text via the i18next-vue global translator', async () => {
     mount(AccessWarning, {
-      attachTo: document.body
+      attachTo: document.body,
+      global: {
+        mocks: {
+          $t: (key: string) => `translated:${key}`
+        }
+      }
     });
 
     await nextTick();
 
-    expect(document.body.textContent).toContain('Access Via Device IP');
-    expect(document.body.textContent).toContain('Pixelrunner device');
-    expect(document.body.textContent).toContain('http://[device-ip]');
-  });
-
-  it('renders global translator output when a global translator is available', async () => {
-    const translator = vi.fn((key: string) => `translated:${key}`);
-    (window as typeof window & { $t?: (key: string) => string }).$t = translator;
-
-    mount(AccessWarning, {
-      attachTo: document.body
-    });
-
-    await nextTick();
-
-    expect(translator).toHaveBeenCalledTimes(3);
-    expect(document.body.textContent).toContain('translated:');
-    expect(document.body.textContent).not.toContain('Access Via Device IP');
+    expect(document.body.textContent).toContain('translated:accessWarningComponent.title');
+    expect(document.body.textContent).toContain('translated:accessWarningComponent.message');
+    expect(document.body.textContent).toContain('translated:accessWarningComponent.instruction');
   });
 });
 

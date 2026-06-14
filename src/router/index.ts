@@ -5,9 +5,9 @@ import {
   NavigationFailureType
 } from 'vue-router';
 
-import { getSetupRedirect } from '@/services/setup-status.ts';
+import i18next, { t } from 'i18next';
 
-const APP_TITLE = document.title;
+import { getSetupRedirect } from '@/services/setup-status.ts';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,60 +17,65 @@ const router = createRouter({
       path: '/setup',
       name: 'setup',
       component: () => import('@/pages/SetupPage.vue'),
-      meta: { title: 'Setup' }
+      meta: { titleKey: 'routeTitle.setup' }
     },
     {
       path: '/settings',
       name: 'settings',
       component: () => import('@/pages/SettingsPage.vue'),
-      meta: { title: 'Settings' }
+      meta: { titleKey: 'routeTitle.settings' }
     },
     {
       path: '/update',
       name: 'update',
       component: () => import('@/pages/UpdatePage.vue'),
-      meta: { title: 'Update' }
+      meta: { titleKey: 'routeTitle.update' }
     },
     {
       path: '/applets',
       name: 'applet-list',
       component: () => import('@/pages/Applets/ListPage.vue'),
-      meta: { title: 'Applets' }
+      meta: { titleKey: 'routeTitle.appletList' }
     },
     {
       path: '/applets/:uuid',
       name: 'applet-detail',
       component: () => import('@/pages/Applets/DetailPage.vue'),
-      meta: { title: 'Applet' }
+      meta: { titleKey: 'routeTitle.appletDetail' }
     },
     {
       path: '/library',
       name: 'library',
       component: () => import('@/pages/Library/LibraryPage.vue'),
-      meta: { title: 'Library' }
+      meta: { titleKey: 'routeTitle.library' }
     },
     { path: '/library/categories', redirect: '/library' },
     {
       path: '/library/categories/:categoryKey',
       name: 'library-category',
       component: () => import('@/pages/CategoryPage.vue'),
-      meta: { title: 'Category' }
+      meta: { titleKey: 'routeTitle.category' }
     },
     {
       path: '/library/search',
       name: 'library-search',
       component: () => import('@/pages/Library/SearchPage.vue'),
-      meta: { title: 'Library Search' }
+      meta: { titleKey: 'routeTitle.search' }
     },
     { path: '/library/applets', redirect: '/library' },
     {
       path: '/library/applets/:packageName',
       name: 'library-detail',
       component: () => import('@/pages/Applets/DetailPage.vue'),
-      meta: { title: 'Applet' }
+      meta: { titleKey: 'routeTitle.appletDetail' }
     }
   ]
 });
+
+function applyDocumentTitle(titleKey: unknown): void {
+  const baseTitle = t('documentTitle');
+  document.title = typeof titleKey === 'string' ? `${t(titleKey)} - ${baseTitle}` : baseTitle;
+}
 
 router.beforeEach(async (to) => {
   const redirect = await getSetupRedirect(to).catch(() => null);
@@ -79,9 +84,12 @@ router.beforeEach(async (to) => {
     return redirect;
   }
 
-  if (to.meta.title) {
-    document.title = `${to.meta.title} - ${APP_TITLE}`;
-  }
+  applyDocumentTitle(to.meta.titleKey);
+});
+
+// Re-localize the current route's document title when the language changes.
+i18next.on('languageChanged', () => {
+  applyDocumentTitle(router.currentRoute.value.meta.titleKey);
 });
 
 router.afterEach((_to, _from, failure) => {

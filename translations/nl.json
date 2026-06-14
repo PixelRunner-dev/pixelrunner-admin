@@ -292,6 +292,13 @@
           "label": "URL voor automatische configuratie",
           "placeholder": "https://proxy.example.com/proxy.pac"
         }
+      },
+      "selected": "{{ssid}} geselecteerd",
+      "configured": "WiFi geconfigureerd. Het apparaat kan de verbinding met het instelnetwerk verbreken terwijl het verbinding maakt met het doelnetwerk.",
+      "error": {
+        "loadStatus": "Kon WiFi-status niet laden",
+        "scan": "Kon WiFi-netwerken niet scannen",
+        "configure": "Kon WiFi niet configureren"
       }
     },
     "brightness": {
@@ -320,7 +327,12 @@
       }
     },
     "theme": {
-      "label": "Thema (admin-interface)"
+      "label": "Thema (admin-interface)",
+      "group": {
+        "dark": "Donkere thema's",
+        "light": "Lichte thema's",
+        "other": "Andere thema's"
+      }
     },
     "experimentalFeatures": {
       "label": "Experimentele functies inschakelen",
@@ -356,6 +368,14 @@
     },
     "error": {
       "loadFailed": "Kon apparaatinstellingen niet laden"
+    },
+    "featureToggle": {
+      "loading": "Functieschakelaars laden...",
+      "empty": "Geen experimentele functies beschikbaar voor deze controllerversie.",
+      "permanentConfirm": "Functie: '{{key}}' - {{label}}\n\nDeze experimentele functie is gemarkeerd als PERMANENT. Schakel deze alleen in als je begrijpt wat ze doet. Deze functie kan het gedrag van het apparaat veranderen op een manier die niet vanaf dit scherm ongedaan kan worden gemaakt.",
+      "error": {
+        "loadVersion": "Kon controllerversie niet laden"
+      }
     }
   },
   "listPage": {
@@ -479,7 +499,8 @@
     },
     "endTime": {
       "label": "Eindtijd"
-    }
+    },
+    "dayToggle": "{{day}} in-/uitschakelen"
   },
   "librarySearchComponent": {
     "input": {
@@ -519,7 +540,10 @@
   },
   "setupPage": {
     "title": "Begin hier",
-    "intro": "Welkom! Bedankt voor het aanschaffen van deze Pixel Runner. Je begint nu met het instellen van dit apparaat. Zorg ervoor dat je het apparaat niet uitschakelt of onderbreekt tijdens het instellen."
+    "intro": "Welkom! Bedankt voor het aanschaffen van deze Pixel Runner. Je begint nu met het instellen van dit apparaat. Zorg ervoor dat je het apparaat niet uitschakelt of onderbreekt tijdens het instellen.",
+    "error": {
+      "migrationFailed": "Databasemigratie mislukt."
+    }
   },
   "appletDetailPage": {
     "loading": "Applet laden...",
@@ -537,5 +561,37 @@
     "error": {
       "loadFailed": "Kon functieschakelaarinstellingen niet laden"
     }
+  },
+  "updatePage": {
+    "title": "Bijwerken"
+  },
+  "fieldLocationbasedComponent": {
+    "useDeviceLocation": "Gebruik apparaatlocatie"
+  },
+  "fieldOauth2Component": {
+    "connect": "Verbinden",
+    "disconnect": "Verbinding verbreken",
+    "error": {
+      "startFailed": "Kon OAuth-flow niet starten",
+      "stateMismatch": "OAuth-state komt niet overeen - mogelijke CSRF-aanval",
+      "authFailed": "OAuth-authenticatie mislukt"
+    }
+  },
+  "app": {
+    "notification": {
+      "updateAvailable": "Er is een nieuwe versie van deze pagina beschikbaar. Klik op vernieuwen om door te gaan.",
+      "controllerConnectionLost": "De verbinding met de controller van je Pixelrunner is verbroken. Wacht even of vernieuw de pagina."
+    }
+  },
+  "documentTitle": "Pixelrunner Admin",
+  "routeTitle": {
+    "setup": "Instellen",
+    "settings": "Instellingen",
+    "update": "Bijwerken",
+    "appletList": "Applets",
+    "appletDetail": "Applet",
+    "library": "Bibliotheek",
+    "category": "Categorie",
+    "search": "Bibliotheek zoeken"
   }
 }

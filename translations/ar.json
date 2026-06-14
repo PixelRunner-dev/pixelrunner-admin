@@ -292,6 +292,13 @@
           "label": "رابط التكوين التلقائي",
           "placeholder": "https://proxy.example.com/proxy.pac"
         }
+      },
+      "selected": "تم اختيار {{ssid}}",
+      "configured": "تم إعداد WiFi. قد يقطع الجهاز الاتصال بشبكة الإعداد أثناء انضمامه إلى الشبكة المستهدفة.",
+      "error": {
+        "loadStatus": "فشل تحميل حالة WiFi",
+        "scan": "فشل فحص شبكات WiFi",
+        "configure": "فشل إعداد WiFi"
       }
     },
     "brightness": {
@@ -320,7 +327,12 @@
       }
     },
     "theme": {
-      "label": "السمة (واجهة الإدارة)"
+      "label": "السمة (واجهة الإدارة)",
+      "group": {
+        "dark": "السمات الداكنة",
+        "light": "السمات الفاتحة",
+        "other": "سمات أخرى"
+      }
     },
     "experimentalFeatures": {
       "label": "تمكين الميزات التجريبية",
@@ -356,6 +368,14 @@
     },
     "error": {
       "loadFailed": "فشل تحميل إعدادات الجهاز"
+    },
+    "featureToggle": {
+      "loading": "جارٍ تحميل مفاتيح الميزات...",
+      "empty": "لا توجد ميزات تجريبية متاحة لهذا الإصدار من وحدة التحكم.",
+      "permanentConfirm": "الميزة: '{{key}}' - {{label}}\n\nتم وضع علامة على هذه الميزة التجريبية كدائمة. لا تقم بتمكينها إلا إذا كنت تفهمها. قد تغيّر هذه الميزة سلوك الجهاز بطريقة لا يمكن التراجع عنها من هذه الشاشة.",
+      "error": {
+        "loadVersion": "فشل تحميل إصدار وحدة التحكم"
+      }
     }
   },
   "listPage": {
@@ -479,7 +499,8 @@
     },
     "endTime": {
       "label": "وقت الانتهاء"
-    }
+    },
+    "dayToggle": "تبديل {{day}}"
   },
   "librarySearchComponent": {
     "input": {
@@ -519,7 +540,10 @@
   },
   "setupPage": {
     "title": "ابدأ من هنا",
-    "intro": "مرحبًا! شكرًا لشرائك جهاز Pixel Runner. أنت الآن على وشك إعداد هذا الجهاز. يُرجى الحرص على عدم إيقاف تشغيله أو مقاطعته أثناء الإعداد."
+    "intro": "مرحبًا! شكرًا لشرائك جهاز Pixel Runner. أنت الآن على وشك إعداد هذا الجهاز. يُرجى الحرص على عدم إيقاف تشغيله أو مقاطعته أثناء الإعداد.",
+    "error": {
+      "migrationFailed": "فشل ترحيل قاعدة البيانات."
+    }
   },
   "appletDetailPage": {
     "loading": "جارٍ تحميل الأبلت...",
@@ -537,5 +561,37 @@
     "error": {
       "loadFailed": "فشل تحميل إعدادات مفاتيح الميزات"
     }
+  },
+  "updatePage": {
+    "title": "تحديث"
+  },
+  "fieldLocationbasedComponent": {
+    "useDeviceLocation": "استخدام موقع الجهاز"
+  },
+  "fieldOauth2Component": {
+    "connect": "اتصال",
+    "disconnect": "قطع الاتصال",
+    "error": {
+      "startFailed": "فشل بدء تدفق OAuth",
+      "stateMismatch": "عدم تطابق حالة OAuth - هجوم CSRF محتمل",
+      "authFailed": "فشلت مصادقة OAuth"
+    }
+  },
+  "app": {
+    "notification": {
+      "updateAvailable": "يتوفر إصدار جديد من هذه الصفحة. انقر على تحديث للمتابعة.",
+      "controllerConnectionLost": "فُقد الاتصال مع وحدة تحكم جهاز Pixelrunner. يرجى الانتظار أو تحديث الصفحة."
+    }
+  },
+  "documentTitle": "إدارة Pixelrunner",
+  "routeTitle": {
+    "setup": "الإعداد",
+    "settings": "الإعدادات",
+    "update": "تحديث",
+    "appletList": "الأبلتات",
+    "appletDetail": "أبلت",
+    "library": "المكتبة",
+    "category": "الفئة",
+    "search": "بحث المكتبة"
   }
 }

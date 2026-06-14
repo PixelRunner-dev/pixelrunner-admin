@@ -17,6 +17,8 @@ import { useClientApi } from '@/ws/index.ts';
 import { vibrateDevice } from '@/utils/generic.ts';
 import { runDatabaseMigrations } from '@/services/device-maintenance.ts';
 
+import { t } from 'i18next';
+
 // Get WebSocket functionality
 const { device, isConnected, lastError, settings, state } = useClientApi();
 const router = useRouter();
@@ -35,7 +37,8 @@ async function doSetup() {
     await runDatabaseMigrations(device);
     await router.replace('/settings?first-time=1');
   } catch (error) {
-    setupError.value = error instanceof Error ? error.message : '[Database migration failed.]';
+    setupError.value =
+      error instanceof Error ? error.message : t('setupPage.error.migrationFailed');
   } finally {
     isMigratingDatabase.value = false;
   }

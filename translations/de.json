@@ -292,6 +292,13 @@
           "label": "URL für automatische Konfiguration",
           "placeholder": "https://proxy.example.com/proxy.pac"
         }
+      },
+      "selected": "{{ssid}} ausgewählt",
+      "configured": "WLAN konfiguriert. Das Gerät trennt möglicherweise die Verbindung zum Einrichtungsnetzwerk, während es dem Zielnetzwerk beitritt.",
+      "error": {
+        "loadStatus": "WLAN-Status konnte nicht geladen werden",
+        "scan": "WLAN-Netzwerke konnten nicht gescannt werden",
+        "configure": "WLAN konnte nicht konfiguriert werden"
       }
     },
     "brightness": {
@@ -320,7 +327,12 @@
       }
     },
     "theme": {
-      "label": "Theme (Admin-Oberfläche)"
+      "label": "Theme (Admin-Oberfläche)",
+      "group": {
+        "dark": "Dunkle Designs",
+        "light": "Helle Designs",
+        "other": "Andere Designs"
+      }
     },
     "experimentalFeatures": {
       "label": "Experimentelle Funktionen aktivieren",
@@ -356,6 +368,14 @@
     },
     "error": {
       "loadFailed": "Geräteeinstellungen konnten nicht geladen werden"
+    },
+    "featureToggle": {
+      "loading": "Feature-Schalter werden geladen...",
+      "empty": "Keine experimentellen Funktionen für diese Controller-Version verfügbar.",
+      "permanentConfirm": "Funktion: '{{key}}' - {{label}}\n\nDiese experimentelle Funktion ist als PERMANENT markiert. Aktiviere sie nur, wenn du sie verstehst. Diese Funktion kann das Geräteverhalten so verändern, dass es von diesem Bildschirm aus nicht rückgängig gemacht werden kann.",
+      "error": {
+        "loadVersion": "Controller-Version konnte nicht geladen werden"
+      }
     }
   },
   "listPage": {
@@ -479,7 +499,8 @@
     },
     "endTime": {
       "label": "Endzeit"
-    }
+    },
+    "dayToggle": "{{day}} umschalten"
   },
   "librarySearchComponent": {
     "input": {
@@ -519,7 +540,10 @@
   },
   "setupPage": {
     "title": "Hier starten",
-    "intro": "Willkommen! Vielen Dank für den Kauf dieses Pixel Runner. Du wirst dieses Gerät nun einrichten. Bitte achte darauf, das Gerät während der Einrichtung nicht auszuschalten oder zu unterbrechen."
+    "intro": "Willkommen! Vielen Dank für den Kauf dieses Pixel Runner. Du wirst dieses Gerät nun einrichten. Bitte achte darauf, das Gerät während der Einrichtung nicht auszuschalten oder zu unterbrechen.",
+    "error": {
+      "migrationFailed": "Datenbankmigration fehlgeschlagen."
+    }
   },
   "appletDetailPage": {
     "loading": "Applet wird geladen...",
@@ -537,5 +561,37 @@
     "error": {
       "loadFailed": "Feature-Toggle-Einstellungen konnten nicht geladen werden"
     }
+  },
+  "updatePage": {
+    "title": "Aktualisieren"
+  },
+  "fieldLocationbasedComponent": {
+    "useDeviceLocation": "Gerätestandort verwenden"
+  },
+  "fieldOauth2Component": {
+    "connect": "Verbinden",
+    "disconnect": "Trennen",
+    "error": {
+      "startFailed": "OAuth-Flow konnte nicht gestartet werden",
+      "stateMismatch": "OAuth-State stimmt nicht überein – möglicher CSRF-Angriff",
+      "authFailed": "OAuth-Authentifizierung fehlgeschlagen"
+    }
+  },
+  "app": {
+    "notification": {
+      "updateAvailable": "Eine neue Version dieser Seite ist verfügbar. Zum Fortfahren auf Aktualisieren klicken.",
+      "controllerConnectionLost": "Die Verbindung mit dem Controller deines Pixelrunner ist verloren. Bitte warte oder aktualisiere die Seite."
+    }
+  },
+  "documentTitle": "Pixelrunner Admin",
+  "routeTitle": {
+    "setup": "Einrichtung",
+    "settings": "Einstellungen",
+    "update": "Aktualisieren",
+    "appletList": "Applets",
+    "appletDetail": "Applet",
+    "library": "Bibliothek",
+    "category": "Kategorie",
+    "search": "Bibliothekssuche"
   }
 }

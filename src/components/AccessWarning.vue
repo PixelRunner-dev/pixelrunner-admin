@@ -1,25 +1,4 @@
-<script setup lang="ts">
-import { computed } from 'vue';
-
-// Use Vue's global t function from i18next-vue plugin
-const title = computed(
-  () =>
-    (window as unknown as { $t: (key: string) => string }).$t?.('accessWarningComponent.title') ??
-    'Access Via Device IP'
-);
-const message = computed(
-  () =>
-    (window as unknown as { $t: (key: string) => string }).$t?.('accessWarningComponent.message') ??
-    "You are accessing this admin interface directly. For full functionality, please access this site through your Pixelrunner device's local IP address."
-);
-const instruction = computed(
-  () =>
-    (window as unknown as { $t: (key: string) => string }).$t?.(
-      'accessWarningComponent.instruction'
-    ) ??
-    "Find your device's IP address in your router's connected devices list, then access this admin interface via: http://[device-ip]"
-);
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <Teleport to="body">
@@ -43,9 +22,9 @@ const instruction = computed(
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
           </svg>
         </div>
-        <h2 class="access-warning__title">{{ title }}</h2>
-        <p class="access-warning__message">{{ message }}</p>
-        <p class="access-warning__instruction">{{ instruction }}</p>
+        <h2 class="access-warning__title">{{ $t('accessWarningComponent.title') }}</h2>
+        <p class="access-warning__message">{{ $t('accessWarningComponent.message') }}</p>
+        <p class="access-warning__instruction">{{ $t('accessWarningComponent.instruction') }}</p>
       </div>
     </div>
   </Teleport>

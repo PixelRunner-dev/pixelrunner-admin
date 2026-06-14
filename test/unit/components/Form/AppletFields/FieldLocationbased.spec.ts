@@ -53,7 +53,7 @@ describe('FieldLocationbased.vue', () => {
       global: globalMocks
     });
     expect(wrapper.find('input[type="checkbox"]').exists()).toBe(true);
-    expect(wrapper.text()).toContain('[Use device location]');
+    expect(wrapper.text()).toContain('fieldLocationbasedComponent.useDeviceLocation');
   });
 
   it('shows LocationSearch by default (toggle off)', () => {

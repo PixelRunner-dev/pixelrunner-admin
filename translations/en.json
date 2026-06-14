@@ -295,6 +295,13 @@
           "label": "Auto config URL",
           "placeholder": "https://proxy.example.com/proxy.pac"
         }
+      },
+      "selected": "Selected {{ssid}}",
+      "configured": "WiFi configured. Device may disconnect from setup network while it joins the target network.",
+      "error": {
+        "loadStatus": "Failed to load WiFi status",
+        "scan": "Failed to scan WiFi networks",
+        "configure": "Failed to configure WiFi"
       }
     },
     "brightness": {
@@ -323,7 +330,12 @@
       }
     },
     "theme": {
-      "label": "Theme (Admin Interface)"
+      "label": "Theme (Admin Interface)",
+      "group": {
+        "dark": "Dark themes",
+        "light": "Light themes",
+        "other": "Other themes"
+      }
     },
     "experimentalFeatures": {
       "label": "Enable experimental features",
@@ -355,6 +367,14 @@
       "factoryReset": {
         "button": "Factory Reset",
         "confirm": "This will erase all data on the device. Are you sure you want to factory reset this device?"
+      }
+    },
+    "featureToggle": {
+      "loading": "Loading feature toggles...",
+      "empty": "No experimental features available for this controller version.",
+      "permanentConfirm": "Feature: '{{key}}' - {{label}}\n\nThis experimental feature is marked PERMANENT. Enable it only if you understand it. This feature can change device behavior in a way that cannot be undone from this screen.",
+      "error": {
+        "loadVersion": "Failed to load controller version"
       }
     }
   },
@@ -496,7 +516,8 @@
     },
     "endTime": {
       "label": "End time"
-    }
+    },
+    "dayToggle": "Toggle {{day}}"
   },
   "librarySearchComponent": {
     "input": {
@@ -536,6 +557,41 @@
   },
   "setupPage": {
     "title": "Start here",
-    "intro": "Welcome! Thank you for buying this Pixel Runner. You're now about to setup this device. Please make sure not to poweroff or interrupt this device while setting everything up."
+    "intro": "Welcome! Thank you for buying this Pixel Runner. You're now about to setup this device. Please make sure not to poweroff or interrupt this device while setting everything up.",
+    "error": {
+      "migrationFailed": "Database migration failed."
+    }
+  },
+  "updatePage": {
+    "title": "Update"
+  },
+  "fieldLocationbasedComponent": {
+    "useDeviceLocation": "Use device location"
+  },
+  "fieldOauth2Component": {
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "error": {
+      "startFailed": "Failed to start OAuth flow",
+      "stateMismatch": "OAuth state mismatch - possible CSRF attack",
+      "authFailed": "OAuth authentication failed"
+    }
+  },
+  "app": {
+    "notification": {
+      "updateAvailable": "A new version of this page is available. Click refresh to continue.",
+      "controllerConnectionLost": "The connection with the controller of your Pixelrunner is lost. Please wait or refresh the page."
+    }
+  },
+  "documentTitle": "Pixelrunner Admin",
+  "routeTitle": {
+    "setup": "Setup",
+    "settings": "Settings",
+    "update": "Update",
+    "appletList": "Applets",
+    "appletDetail": "Applet",
+    "library": "Library",
+    "category": "Category",
+    "search": "Library Search"
   }
 }

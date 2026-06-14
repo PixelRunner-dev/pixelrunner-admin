@@ -20,11 +20,6 @@ const accessMode = inject<AccessMode>('accessMode', 'unknown');
 const showAccessWarning = ref(true);
 const { hasUpdateAvailable, refreshPage } = useAdminVersionCheck();
 
-const UPDATE_AVAILABLE_MESSAGE =
-  '[A new version of this page is available. Click refresh to continue.]';
-const CONTROLLER_CONNECTION_LOST_MESSAGE =
-  '[The connection with the controller of your Pixelrunner is lost. Please wait or refresh the page.]';
-
 const { notifications, setNotification } = provideNotifications();
 
 watch(
@@ -32,7 +27,7 @@ watch(
   (isAvailable) => {
     setNotification(isAvailable, {
       type: 'warning',
-      message: UPDATE_AVAILABLE_MESSAGE,
+      message: i18next.t('app.notification.updateAvailable'),
       actionLabel: i18next.t('generic.refresh'),
       onAction: refreshPage
     });
@@ -45,7 +40,7 @@ watch(
   (isConnectionLost) => {
     setNotification(isConnectionLost, {
       type: 'error',
-      message: CONTROLLER_CONNECTION_LOST_MESSAGE
+      message: i18next.t('app.notification.controllerConnectionLost')
     });
   },
   { immediate: true }

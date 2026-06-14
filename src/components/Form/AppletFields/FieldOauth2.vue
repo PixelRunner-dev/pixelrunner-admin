@@ -2,6 +2,7 @@
 import { ref, watch, onUnmounted } from 'vue';
 
 import { Button as DButton, Flex as DFlex, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
+import { t } from 'i18next';
 
 interface Props {
   id: string;
@@ -154,7 +155,8 @@ async function startTrysteroOAuthFlow(): Promise<void> {
       'OAuth via Trystero is not yet implemented. Please allow popups for this site.';
     isLoading.value = false;
   } catch (err) {
-    errorMessage.value = err instanceof Error ? err.message : 'Failed to start OAuth flow';
+    errorMessage.value =
+      err instanceof Error ? err.message : t('fieldOauth2Component.error.startFailed');
     isLoading.value = false;
   }
 }
@@ -173,7 +175,7 @@ function handleOAuthMessage(event: MessageEvent): void {
       // Validate state if provided
       const storedState = sessionStorage.getItem(`oauth_state_${props.id}`);
       if (data.state && data.state !== storedState) {
-        errorMessage.value = 'OAuth state mismatch - possible CSRF attack';
+        errorMessage.value = t('fieldOauth2Component.error.stateMismatch');
         cleanup();
         return;
       }
@@ -184,7 +186,7 @@ function handleOAuthMessage(event: MessageEvent): void {
         isLoading.value = false;
       }
     } else if (data.type === 'oauth_error') {
-      errorMessage.value = (data.error as string) || 'OAuth authentication failed';
+      errorMessage.value = (data.error as string) || t('fieldOauth2Component.error.authFailed');
       isLoading.value = false;
     }
   }
@@ -238,7 +240,9 @@ onUnmounted(() => {
         :loading="isLoading"
         @click="isConnected ? disconnect() : startOAuthFlow()"
       >
-        {{ isConnected ? 'Disconnect' : 'Connect' }}
+        {{
+          isConnected ? $t('fieldOauth2Component.disconnect') : $t('fieldOauth2Component.connect')
+        }}
       </DButton>
       <DText v-if="errorMessage" class="has-text-danger" size="sm">
         {{ errorMessage }}

@@ -41,7 +41,9 @@ const scheduleDays = ref([false, true, true, true, true, true, false]);
             v-for="d in daysOfWeek"
             :key="d"
             :for="`schedule-${d}`"
-            :aria-label="`Toggle ${d}`"
+            :aria-label="
+              $t('fieldScheduleComponent.dayToggle', { day: $t(`generic.daysOfWeek.${d}`) })
+            "
             tabindex="0"
             class="rounded-field border border-base-300 bg-base-100 hover:border-neutral focus-within:outline-2 focus-within:outline-2 focus-within:outline-offset-2 focus:border-neutral"
             @keyup.enter.space="
