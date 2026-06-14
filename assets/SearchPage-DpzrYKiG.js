@@ -1,0 +1,1 @@
+import{Et as e,G as t,J as n,Q as r,X as i,ct as a}from"./index-CDp1Qb1z.js";import{t as o}from"./LibrarySearch-vYG1-Sfc.js";var s=r({__name:`SearchPage`,setup(r){return(r,s)=>(a(),n(`main`,null,[t(`h1`,null,e(r.$t(`searchPage.title`)),1),i(o),t(`p`,null,e(r.$t(`searchPage.searchingFor`,{query:r.$route.query.q})),1)]))}});export{s as default};
