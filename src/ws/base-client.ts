@@ -288,9 +288,7 @@ export abstract class BaseWebSocketClient<TConfig extends IWebSocketConfig = IWe
     const prevReconnectAttempts = this.reconnectAttempts;
     this.reconnectAttempts = 0;
 
-    if (this.config.debug) {
-      console.log('[ws] connected');
-    }
+    this.logDebug('[ws] connected');
 
     // Emit connected event
     const event: IConnectedEvent = {

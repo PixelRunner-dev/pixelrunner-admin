@@ -12,7 +12,6 @@ import type {
   IJsonRpcResponse,
   IJsonRpcNotification,
   IWebSocketConfig,
-  IConnectedEvent,
   IErrorEvent
 } from 'pixelrunner-shared';
 import { controllerConnectionLost } from '@/utils/controllerConnectionState.ts';
@@ -497,29 +496,7 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
   // Protected Override Methods
   // ============================================================================
 
-  protected handleOpen(): void {
-    if (this.state.value === 'connected') return;
-
-    this.state.value = 'connected';
-    this.lastError.value = null;
-    const wasReconnect = this.reconnectAttempts > 0;
-    const prevReconnectAttempts = this.reconnectAttempts;
-    this.reconnectAttempts = 0;
-
-    this.logDebug('[trystero] connected');
-
-    // Emit connected event
-    const event: IConnectedEvent = {
-      timestamp: Date.now(),
-      reconnectAttempt: wasReconnect ? prevReconnectAttempts : 0
-    };
-
-    this.emit('connected', event);
-
-    if (wasReconnect) {
-      this.emit('reconnected', event);
-    }
-  }
+  // handleOpen is inherited from BaseWebSocketClient (identical behavior).
 
   private async checkRelayHealth(): Promise<Record<string, boolean>> {
     const relayStatus: Record<string, boolean> = {};

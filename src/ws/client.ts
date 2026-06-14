@@ -6,7 +6,6 @@ import type {
   IJsonRpcResponse,
   IJsonRpcNotification,
   IWebSocketConfig,
-  IConnectedEvent,
   IErrorEvent,
   INotificationEvent
 } from 'pixelrunner-shared';
@@ -136,33 +135,14 @@ export class WebSocketClient extends BaseWebSocketClient {
   // ============================================================================
 
   protected handleOpen(): void {
-    if (this.state.value === 'connected') return;
+    // Skip heartbeat setup on a redundant open; base handleOpen also no-ops then.
+    const wasAlreadyConnected = this.state.value === 'connected';
 
-    this.state.value = 'connected';
-    this.lastError.value = null;
-    const wasReconnect = this.reconnectAttempts > 0;
-    const prevReconnectAttempts = this.reconnectAttempts;
-    this.reconnectAttempts = 0;
+    super.handleOpen();
 
-    if (this.config.debug) {
-      console.log('[ws] connected');
-    }
-
-    // Start heartbeat if configured
-    if (this.config.heartbeatInterval > 0) {
+    // Start heartbeat if configured (only on a genuine transition to connected)
+    if (!wasAlreadyConnected && this.config.heartbeatInterval > 0) {
       this.startHeartbeat();
-    }
-
-    // Emit connected event
-    const event: IConnectedEvent = {
-      timestamp: Date.now(),
-      reconnectAttempt: wasReconnect ? prevReconnectAttempts : 0
-    };
-
-    this.emit('connected', event);
-
-    if (wasReconnect) {
-      this.emit('reconnected', event);
     }
   }
 
