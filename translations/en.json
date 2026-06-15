@@ -481,6 +481,12 @@
       "payoff": "Be smart at home and automate everything!"
     }
   },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Previous page",
+    "next": "Next page",
+    "status": "Page {{page}} of {{pageCount}}"
+  },
   "categoryPage": {
     "pageTitle": "{{category}} applets",
     "loading": "Loading category applets...",

@@ -481,6 +481,12 @@
       "payoff": "Applets thématiques"
     }
   },
+  "pagination": {
+    "label": "Pagination",
+    "previous": "Page précédente",
+    "next": "Page suivante",
+    "status": "Page {{page}} sur {{pageCount}}"
+  },
   "categoryPage": {
     "pageTitle": "Applets {{category}}",
     "loading": "Chargement des applets de la catégorie...",

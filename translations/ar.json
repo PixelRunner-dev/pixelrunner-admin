@@ -481,6 +481,12 @@
       "payoff": "أبلتات مواضيعية"
     }
   },
+  "pagination": {
+    "label": "ترقيم الصفحات",
+    "previous": "الصفحة السابقة",
+    "next": "الصفحة التالية",
+    "status": "صفحة {{page}} من {{pageCount}}"
+  },
   "categoryPage": {
     "pageTitle": "تطبيقات {{category}} المصغرة",
     "loading": "جارٍ تحميل أبلتات الفئة...",

@@ -481,6 +481,12 @@
       "payoff": "主题 applet"
     }
   },
+  "pagination": {
+    "label": "分页",
+    "previous": "上一页",
+    "next": "下一页",
+    "status": "第 {{page}} 页，共 {{pageCount}} 页"
+  },
   "categoryPage": {
     "pageTitle": "{{category}} 小程序",
     "loading": "正在加载分类 applet...",

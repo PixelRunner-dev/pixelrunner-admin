@@ -481,6 +481,12 @@
       "payoff": "Thema-applets"
     }
   },
+  "pagination": {
+    "label": "Paginering",
+    "previous": "Vorige pagina",
+    "next": "Volgende pagina",
+    "status": "Pagina {{page}} van {{pageCount}}"
+  },
   "categoryPage": {
     "pageTitle": "{{category}}-applets",
     "loading": "Categorie-applets laden...",
