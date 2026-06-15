@@ -39,6 +39,7 @@
     "src/components/Icon/IconSprite.vue",
     "src/components/Library/LibrarySearch.vue",
     "src/components/Library/LibrarySection.vue",
+    "src/components/PaginationNavigation.vue",
     "src/components/PlayList.vue",
     "src/components/SiteHeader.vue",
     "src/components/SiteNotifications.vue",
