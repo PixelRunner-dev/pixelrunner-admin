@@ -38,7 +38,7 @@ function go(next: number) {
         :aria-label="t('pagination.previous')"
         @click="go(page - 1)"
       >
-        «
+        &#9204;
       </DButton>
       <DButton join size="sm" class="pointer-events-none" aria-current="page">
         {{ t('pagination.status', { page, pageCount }) }}
@@ -50,7 +50,7 @@ function go(next: number) {
         :aria-label="t('pagination.next')"
         @click="go(page + 1)"
       >
-        »
+        &#9205;
       </DButton>
     </DJoin>
   </nav>

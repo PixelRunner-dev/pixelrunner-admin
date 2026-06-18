@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 import AppletCard from '@/components/Applet/AppletCard.vue';
 import AppletList from '@/components/Applet/AppletList.vue';
@@ -14,16 +15,35 @@ interface Props {
 
 const { applets, pageSize = 20 }: Props = defineProps<Props>();
 
-const page = ref(1);
-const offset = computed(() => (page.value - 1) * pageSize);
+const route = useRoute();
+const router = useRouter();
 
-// Reset to first page when the applet set changes (e.g. switching category).
-watch(
-  () => applets,
-  () => {
-    page.value = 1;
+const pageCount = computed(() => Math.max(1, Math.ceil(applets.length / pageSize)));
+
+// Current page is driven by the `?page=` query param so it is deep-linkable and
+// survives reloads. The setter writes it back (omitting `page=1` to keep URLs clean).
+// ponytail: a stale ?page beyond the range just clamps for display; the URL is
+// rewritten as soon as the user paginates.
+const page = computed({
+  get() {
+    const raw = Number(route.query.page);
+
+    if (!Number.isInteger(raw) || raw < 1) return 1;
+
+    return Math.min(raw, pageCount.value);
+  },
+  set(value) {
+    const clamped = Math.min(Math.max(1, value), pageCount.value);
+    const query = { ...route.query };
+
+    if (clamped > 1) query.page = String(clamped);
+    else delete query.page;
+
+    void router.replace({ query });
   }
-);
+});
+
+const offset = computed(() => (page.value - 1) * pageSize);
 </script>
 
 <template>
