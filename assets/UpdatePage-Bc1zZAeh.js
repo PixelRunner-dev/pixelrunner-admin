@@ -1,0 +1,1 @@
+import{A as e,Et as t,G as n,J as r,ct as i}from"./index-SzvR4Xti.js";var a={};function o(e,a){return i(),r(`main`,null,[n(`h1`,null,t(e.$t(`updatePage.title`)),1)])}var s=e(a,[[`render`,o]]);export{s as default};
