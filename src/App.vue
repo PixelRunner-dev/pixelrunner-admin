@@ -136,6 +136,21 @@ watchEffect(() => {
 
 @custom-variant dark (&:where([data-theme-mode="dark"], [data-theme-mode="dark"] *));
 
+@font-face {
+  font-family: 'Cooper Std Black';
+  src: url('/fonts/cooper-black-std.woff') format('woff');
+  font-display: swap;
+}
+
+:root {
+  --font-title: 'Cooper Std Black', Georgia, serif;
+}
+
+h1 {
+  font-family: var(--font-title);
+  font-weight: 900;
+}
+
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.5s;
