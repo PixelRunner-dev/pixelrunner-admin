@@ -11,6 +11,7 @@
     "src/components/Applet/AppletCard.vue",
     "src/components/Applet/AppletCarousel.vue",
     "src/components/Applet/AppletConfig.vue",
+    "src/components/Form/AppletFields/index.ts",
     "src/components/Applet/AppletGrid.vue",
     "src/components/Applet/AppletDetails.vue",
     "src/components/Applet/AppletImage.vue",

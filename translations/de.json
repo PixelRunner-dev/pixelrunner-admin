@@ -161,6 +161,17 @@
       "error": {
         "schemaUnavailable": "Konfigurationsschema nicht verfügbar.",
         "saveFailed": "Applet-Konfiguration konnte nicht gespeichert werden."
+      },
+      "generated": {
+        "loading": "Optionen werden geladen…",
+        "error": "Optionen konnten nicht erzeugt werden. Vorheriges Feld erneut ändern.",
+        "empty": "Keine Optionen für diese Auswahl.",
+        "misconfigured": "Dieses Feld ist falsch konfiguriert (Handler oder Source fehlt)."
+      },
+      "typeahead": {
+        "loading": "Wird gesucht…",
+        "error": "Vorschläge konnten nicht geladen werden. Erneut versuchen.",
+        "empty": "Keine Treffer."
       }
     }
   },

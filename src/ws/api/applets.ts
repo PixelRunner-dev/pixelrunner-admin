@@ -6,14 +6,22 @@
  */
 
 import type {
+  AppletConfigurationValues,
   IAppletConfigurations,
   IAppletSchema,
+  IAppletSchemaObject,
   ICategory,
   UUID,
   IFullApplet,
   IFullAppletRecord
 } from 'pixelrunner-shared';
 import { ApiClientBase, type IRpcClient } from './client.ts';
+
+/** Tidbyt typeahead option returned from a schema `handler` function. */
+export interface ITypeaheadOption {
+  display: string;
+  value: AppletConfigurationValues;
+}
 
 interface AppletActionResponse<T> {
   method: string;
@@ -89,6 +97,58 @@ export class AppletAPI extends ApiClientBase<IRpcClient> {
     return this.action<IAppletSchema | string | null>('getSchema', {
       packageName
     });
+  }
+
+  /**
+   * Invoke a Tidbyt schema `handler` for an applet. Used by the `generated`
+   * and `typeahead` field types: the source field's current value is passed
+   * to the named Starlark function and the returned list of fields/options
+   * is rendered dynamically.
+   *
+   * @param packageName - The applet package name
+   * @param handler - Starlark function name from the schema
+   * @param value - Current value of the source field, forwarded as-is
+   */
+  async callSchemaHandler(
+    packageName: string,
+    handler: string,
+    value: unknown
+  ): Promise<IAppletSchemaObject[]> {
+    const data = await this.action<IAppletSchemaObject[] | null>('callSchemaHandler', {
+      packageName,
+      handler,
+      value
+    });
+
+    return Array.isArray(data) ? data : [];
+  }
+
+  /**
+   * Invoke a typeahead `handler` for the current query string. Same
+   * backend method as `callSchemaHandler`, but typed to the option-list
+   * shape Tidbyt typeahead handlers return.
+   *
+   * @param packageName - The applet package name
+   * @param handler - Starlark function name from the schema
+   * @param value - Current query text from the input field
+   */
+  async callTypeaheadHandler(
+    packageName: string,
+    handler: string,
+    value: string
+  ): Promise<ITypeaheadOption[]> {
+    const data = await this.action<ITypeaheadOption[] | null>('callSchemaHandler', {
+      packageName,
+      handler,
+      value
+    });
+
+    if (!Array.isArray(data)) return [];
+
+    return data.filter(
+      (option): option is ITypeaheadOption =>
+        Boolean(option) && typeof option === 'object' && typeof option.display === 'string'
+    );
   }
 
   /**

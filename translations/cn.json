@@ -161,6 +161,17 @@
       "error": {
         "schemaUnavailable": "配置架构不可用。",
         "saveFailed": "无法保存 applet 配置。"
+      },
+      "generated": {
+        "loading": "正在加载选项…",
+        "error": "无法生成选项。请再次修改上一个字段。",
+        "empty": "此选择没有可用选项。",
+        "misconfigured": "字段配置错误（缺少 handler 或 source）。"
+      },
+      "typeahead": {
+        "loading": "搜索中…",
+        "error": "无法加载建议。请重试。",
+        "empty": "没有匹配项。"
       }
     }
   },

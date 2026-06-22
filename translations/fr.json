@@ -161,6 +161,17 @@
       "error": {
         "schemaUnavailable": "Schéma de configuration indisponible.",
         "saveFailed": "Échec de l'enregistrement de la configuration de l'applet."
+      },
+      "generated": {
+        "loading": "Chargement des options…",
+        "error": "Impossible de générer les options. Modifiez à nouveau le champ précédent.",
+        "empty": "Aucune option pour cette sélection.",
+        "misconfigured": "Champ mal configuré (handler ou source manquant)."
+      },
+      "typeahead": {
+        "loading": "Recherche…",
+        "error": "Impossible de charger les suggestions. Réessayez.",
+        "empty": "Aucun résultat."
       }
     }
   },

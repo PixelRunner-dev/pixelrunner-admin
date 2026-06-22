@@ -161,6 +161,17 @@
       "error": {
         "schemaUnavailable": "Configuratieschema niet beschikbaar.",
         "saveFailed": "Kon appletconfiguratie niet opslaan."
+      },
+      "generated": {
+        "loading": "Opties laden…",
+        "error": "Kon geen opties genereren. Wijzig het vorige veld nogmaals.",
+        "empty": "Geen opties voor deze keuze.",
+        "misconfigured": "Dit veld is verkeerd geconfigureerd (handler of source ontbreekt)."
+      },
+      "typeahead": {
+        "loading": "Zoeken…",
+        "error": "Kon suggesties niet laden. Probeer het opnieuw.",
+        "empty": "Geen resultaten."
       }
     }
   },

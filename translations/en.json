@@ -161,6 +161,17 @@
       "error": {
         "schemaUnavailable": "Configuration schema unavailable.",
         "saveFailed": "Failed to save applet configuration."
+      },
+      "generated": {
+        "loading": "Loading options…",
+        "error": "Could not generate options. Try changing the previous field again.",
+        "empty": "No options for this selection.",
+        "misconfigured": "This field is misconfigured (missing handler or source)."
+      },
+      "typeahead": {
+        "loading": "Searching…",
+        "error": "Could not load suggestions. Try again.",
+        "empty": "No matches."
       }
     }
   },

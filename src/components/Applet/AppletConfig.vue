@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, ref, watch } from 'vue';
+import { computed, provide, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 import FormField from '../Form/FormField.vue';
 import FieldSchedule from '../Form/AppletFields/FieldSchedule.vue';
 import FeatureToggle from '../FeatureToggle.vue';
 
+import { appletFieldComponents } from '../Form/AppletFields/index.ts';
+import {
+  appletConfigContextKey,
+  type AppletConfigurationValue as ContextValue
+} from '@/utils/applet-config-context.ts';
+
 import { useClientApi } from '@/ws/index.ts';
 import { useNotifications } from '@/composables/useNotifications.ts';
 
-import type { Component } from 'vue';
 import type {
   IAppletConfigurations,
   IAppletSchema,
@@ -53,19 +58,7 @@ type ParsedAppletSchema = Omit<IAppletSchema, 'schema'> & {
   schema: AppletSchemaField[];
 };
 
-const fieldComponents: Partial<Record<IAppletSchemaObject['type'], Component>> = {
-  color: defineAsyncComponent(() => import('../Form/AppletFields/FieldColor.vue')),
-  datetime: defineAsyncComponent(() => import('../Form/AppletFields/FieldDatetime.vue')),
-  dropdown: defineAsyncComponent(() => import('../Form/AppletFields/FieldDropdown.vue')),
-  generated: defineAsyncComponent(() => import('../Form/AppletFields/FieldGenerated.vue')),
-  location: defineAsyncComponent(() => import('../Form/AppletFields/FieldLocation.vue')),
-  locationbased: defineAsyncComponent(() => import('../Form/AppletFields/FieldLocationbased.vue')),
-  oauth2: defineAsyncComponent(() => import('../Form/AppletFields/FieldOauth2.vue')),
-  photoselect: defineAsyncComponent(() => import('../Form/AppletFields/FieldPhotoselect.vue')),
-  text: defineAsyncComponent(() => import('../Form/AppletFields/FieldText.vue')),
-  onoff: defineAsyncComponent(() => import('../Form/AppletFields/FieldOnoff.vue')),
-  typeahead: defineAsyncComponent(() => import('../Form/AppletFields/FieldTypeahead.vue'))
-};
+const fieldComponents = appletFieldComponents;
 
 const appletSchema = ref<ParsedAppletSchema | null>(null);
 const schemaError = ref<string | null>(null);
@@ -395,6 +388,19 @@ const updatePinnedState = async (nextValue: boolean) => {
     isUpdatingPinned.value = false;
   }
 };
+
+// Expose the live config dict + setters to nested field components so
+// generated sub-fields can read the source value and write their own.
+provide(appletConfigContextKey, {
+  packageName: applet.packageName,
+  values: configurationValues,
+  setValue: (id: string, value: ContextValue) => setConfigurationValue(id, value),
+  ensureDefault: (id: string, value: ContextValue | undefined) => {
+    if (value !== undefined && configurationValues.value[id] === undefined) {
+      setConfigurationValue(id, value);
+    }
+  }
+});
 
 watch(
   () => [isConnected.value, applet.packageName],

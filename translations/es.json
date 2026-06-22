@@ -161,6 +161,17 @@
       "error": {
         "schemaUnavailable": "Esquema de configuración no disponible.",
         "saveFailed": "No se pudo guardar la configuración del applet."
+      },
+      "generated": {
+        "loading": "Cargando opciones…",
+        "error": "No se pudieron generar las opciones. Vuelve a modificar el campo anterior.",
+        "empty": "No hay opciones para esta selección.",
+        "misconfigured": "Campo mal configurado (falta handler o source)."
+      },
+      "typeahead": {
+        "loading": "Buscando…",
+        "error": "No se pudieron cargar las sugerencias. Inténtalo de nuevo.",
+        "empty": "Sin resultados."
       }
     }
   },
