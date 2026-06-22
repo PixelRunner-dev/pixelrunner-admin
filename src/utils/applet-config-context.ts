@@ -23,6 +23,5 @@ export interface IAppletConfigContext {
   ensureDefault: (id: string, value: AppletConfigurationValue | undefined) => void;
 }
 
-export const appletConfigContextKey: InjectionKey<IAppletConfigContext> = Symbol(
-  'appletConfigContext'
-);
+export const appletConfigContextKey: InjectionKey<IAppletConfigContext> =
+  Symbol('appletConfigContext');

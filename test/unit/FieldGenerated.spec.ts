@@ -90,7 +90,11 @@ describe('FieldGenerated', () => {
 
     await vi.advanceTimersByTimeAsync(250);
     expect(apiMock.applets.callSchemaHandler).toHaveBeenCalledTimes(2);
-    expect(apiMock.applets.callSchemaHandler).toHaveBeenLastCalledWith('weather', 'list_cities', 'ES');
+    expect(apiMock.applets.callSchemaHandler).toHaveBeenLastCalledWith(
+      'weather',
+      'list_cities',
+      'ES'
+    );
   });
 
   it('shows an error message when the handler rejects and keeps the form responsive', async () => {
@@ -106,7 +110,14 @@ describe('FieldGenerated', () => {
   it('seeds sub-field defaults into the parent config dict without overwriting user values', async () => {
     const ctx = makeContext({ country: 'NL', existing: 'kept' });
     apiMock.applets.callSchemaHandler.mockResolvedValueOnce([
-      { id: 'existing', type: 'text', name: 'Existing', desc: '', icon: '', default: 'fromHandler' },
+      {
+        id: 'existing',
+        type: 'text',
+        name: 'Existing',
+        desc: '',
+        icon: '',
+        default: 'fromHandler'
+      },
       { id: 'fresh', type: 'text', name: 'Fresh', desc: '', icon: '', default: 'fromHandler' }
     ]);
 
@@ -119,10 +130,7 @@ describe('FieldGenerated', () => {
   });
 
   it('renders a misconfigured notice when no context is provided', async () => {
-    const wrapper = mountField(
-      { id: 'city', source: 'country', handler: 'list_cities' },
-      null
-    );
+    const wrapper = mountField({ id: 'city', source: 'country', handler: 'list_cities' }, null);
     await flushPromises();
 
     expect(wrapper.text()).toContain('applet.config.generated.misconfigured');

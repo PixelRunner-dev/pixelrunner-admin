@@ -131,25 +131,13 @@ const onSubFieldUpdate = (subId: string, value: AppletConfigurationValue) => {
     </template>
 
     <template v-else>
-      <DText
-        v-if="isLoading"
-        size="xs"
-        data-testid="field-generated-loading"
-      >
+      <DText v-if="isLoading" size="xs" data-testid="field-generated-loading">
         {{ $t('applet.config.generated.loading') }}
       </DText>
-      <DText
-        v-else-if="error"
-        size="xs"
-        data-testid="field-generated-error"
-      >
+      <DText v-else-if="error" size="xs" data-testid="field-generated-error">
         {{ $t('applet.config.generated.error') }}
       </DText>
-      <DText
-        v-else-if="!generated.length"
-        size="xs"
-        data-testid="field-generated-empty"
-      >
+      <DText v-else-if="!generated.length" size="xs" data-testid="field-generated-empty">
         {{ $t('applet.config.generated.empty') }}
       </DText>
 
@@ -160,7 +148,9 @@ const onSubFieldUpdate = (subId: string, value: AppletConfigurationValue) => {
             v-if="getFieldComponent(item)"
             v-bind="item"
             :model-value="ctx?.values.value[item.id]"
-            @update:model-value="(value: AppletConfigurationValue) => onSubFieldUpdate(item.id, value)"
+            @update:model-value="
+              (value: AppletConfigurationValue) => onSubFieldUpdate(item.id, value)
+            "
           />
         </FormField>
       </template>

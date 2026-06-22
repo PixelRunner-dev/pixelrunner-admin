@@ -6,11 +6,7 @@ import { useClientApi } from '@/ws/index.ts';
 
 import type { ITypeaheadOption } from '@/ws/api/applets.ts';
 
-import {
-  Flex as DFlex,
-  Input as DInput,
-  Text as DText
-} from '(vendor)/daisy-ui-kit/index.ts';
+import { Flex as DFlex, Input as DInput, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 
 /**
  * Tidbyt "typeahead" schema field
@@ -135,8 +131,7 @@ function onInput(event: Event) {
 function selectOption(option: ITypeaheadOption) {
   lastPicked.value = option;
   query.value = option.display;
-  modelValue.value =
-    typeof option.value === 'string' ? option.value : JSON.stringify(option.value);
+  modelValue.value = typeof option.value === 'string' ? option.value : JSON.stringify(option.value);
   options.value = [];
   isOpen.value = false;
   highlightedIndex.value = -1;
@@ -281,25 +276,13 @@ watch([options, highlightedIndex], async () => {
       class="typeahead-listbox"
       data-testid="typeahead-listbox"
     >
-      <li
-        v-if="isLoading"
-        class="typeahead-status"
-        data-testid="typeahead-loading"
-      >
+      <li v-if="isLoading" class="typeahead-status" data-testid="typeahead-loading">
         <DText size="xs">{{ $t('applet.config.typeahead.loading') }}</DText>
       </li>
-      <li
-        v-else-if="hasError"
-        class="typeahead-status"
-        data-testid="typeahead-error"
-      >
+      <li v-else-if="hasError" class="typeahead-status" data-testid="typeahead-error">
         <DText size="xs">{{ $t('applet.config.typeahead.error') }}</DText>
       </li>
-      <li
-        v-else-if="!hasOptions"
-        class="typeahead-status"
-        data-testid="typeahead-empty"
-      >
+      <li v-else-if="!hasOptions" class="typeahead-status" data-testid="typeahead-empty">
         <DText size="xs">{{ $t('applet.config.typeahead.empty') }}</DText>
       </li>
       <li
