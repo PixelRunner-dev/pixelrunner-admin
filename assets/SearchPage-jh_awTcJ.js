@@ -1,1 +1,0 @@
-import{$ as e,K as t,Y as n,Z as r,kt as i,ut as a}from"./index-Cv0YqIBu.js";import{t as o}from"./LibrarySearch-CIl09K29.js";var s=e({__name:`SearchPage`,setup(e){return(e,s)=>(a(),n(`main`,null,[t(`h1`,null,i(e.$t(`searchPage.title`)),1),r(o),t(`p`,null,i(e.$t(`searchPage.searchingFor`,{query:e.$route.query.q})),1)]))}});export{s as default};

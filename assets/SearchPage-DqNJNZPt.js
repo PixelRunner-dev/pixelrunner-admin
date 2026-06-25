@@ -1,0 +1,1 @@
+import{G as e,J as t,Ot as n,Q as r,X as i,lt as a}from"./index-DLFeL64S.js";import{t as o}from"./LibrarySearch-P9DfSKVM.js";var s=r({__name:`SearchPage`,setup(r){return(r,s)=>(a(),t(`main`,null,[e(`h1`,null,n(r.$t(`searchPage.title`)),1),i(o),e(`p`,null,n(r.$t(`searchPage.searchingFor`,{query:r.$route.query.q})),1)]))}});export{s as default};

@@ -1,1 +1,0 @@
-import{A as e,K as t,Y as n,kt as r,ut as i}from"./index-Cv0YqIBu.js";var a={};function o(e,a){return i(),n(`main`,null,[t(`h1`,null,r(e.$t(`updatePage.title`)),1)])}var s=e(a,[[`render`,o]]);export{s as default};
