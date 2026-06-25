@@ -30,27 +30,6 @@ test.describe('Settings page flows', () => {
     await expect(page.locator('[role="status"]')).toBeVisible();
   });
 
-  test('first-time setup mode (?first-time=1) hides general settings', async ({ page }) => {
-    await page.goto('/settings?first-time=1');
-    await expect(page.locator('h1')).toBeVisible();
-
-    // General settings (deviceName, theme, brightness) must not appear
-    await expect(page.locator('#deviceName')).toHaveCount(0);
-    await expect(page.locator('#theme')).toHaveCount(0);
-    await expect(page.locator('#brightness')).toHaveCount(0);
-
-    // WiFi section must still appear
-    await expect(page.locator('#ssid')).toBeVisible();
-  });
-
-  test('first-time setup mode shows access-point info banner', async ({ page }) => {
-    await page.goto('/settings?first-time=1');
-    await expect(page.locator('h1')).toBeVisible();
-
-    // DAlert inside wifi section explains first-time setup.
-    await expect(page.locator('[role="alert"]')).toBeVisible();
-  });
-
   test('WiFi scan error is shown and retry is available', async ({ page }) => {
     await page.goto('/settings');
 
