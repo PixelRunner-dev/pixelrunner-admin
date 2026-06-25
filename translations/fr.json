@@ -555,13 +555,6 @@
       "title": "Aller à la page des paramètres"
     }
   },
-  "setupPage": {
-    "title": "Commencez ici",
-    "intro": "Bienvenue ! Merci d'avoir acheté ce Pixel Runner. Vous êtes sur le point de configurer cet appareil. Veuillez vous assurer de ne pas l'éteindre ni l'interrompre pendant la configuration.",
-    "error": {
-      "migrationFailed": "Échec de la migration de la base de données."
-    }
-  },
   "appletDetailPage": {
     "loading": "Chargement de l'applet...",
     "notFound": "Applet introuvable",
@@ -602,7 +595,6 @@
   },
   "documentTitle": "Pixelrunner Admin",
   "routeTitle": {
-    "setup": "Configuration",
     "settings": "Paramètres",
     "update": "Mettre à jour",
     "appletList": "Applets",

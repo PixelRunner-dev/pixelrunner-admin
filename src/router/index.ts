@@ -7,18 +7,10 @@ import {
 
 import i18next, { t } from 'i18next';
 
-import { getSetupRedirect } from '@/services/setup-status.ts';
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     { path: '/', redirect: '/applets' },
-    {
-      path: '/setup',
-      name: 'setup',
-      component: () => import('@/pages/SetupPage.vue'),
-      meta: { titleKey: 'routeTitle.setup' }
-    },
     {
       path: '/settings',
       name: 'settings',
@@ -77,13 +69,7 @@ function applyDocumentTitle(titleKey: unknown): void {
   document.title = typeof titleKey === 'string' ? `${t(titleKey)} - ${baseTitle}` : baseTitle;
 }
 
-router.beforeEach(async (to) => {
-  const redirect = await getSetupRedirect(to).catch(() => null);
-
-  if (redirect) {
-    return redirect;
-  }
-
+router.beforeEach((to) => {
   applyDocumentTitle(to.meta.titleKey);
 });
 

@@ -31,7 +31,6 @@ const mainMock = vi.hoisted(() => {
   return {
     app,
     clients: [] as MockClient[],
-    configureSetupStatusClient: vi.fn(),
     cookieGet: vi.fn(),
     cookieHas: vi.fn(),
     createApp: vi.fn(() => app),
@@ -106,10 +105,6 @@ vi.mock('@/utils/CookieStore.ts', () => ({
   }
 }));
 
-vi.mock('@/services/setup-status.ts', () => ({
-  configureSetupStatusClient: mainMock.configureSetupStatusClient
-}));
-
 vi.mock('@/ws/index.ts', () => ({
   WS_INJECTION_KEY: mainMock.wsInjectionKey,
   WebSocketClient: mainMock.webSocketClient
@@ -182,7 +177,6 @@ describe('main bootstrap', () => {
     expect(document.documentElement.dataset.theme).toBe('retro');
     expect(mainMock.markAsViaProxy).toHaveBeenCalledOnce();
     expect(mainMock.mockRpcClient).toHaveBeenCalledOnce();
-    expect(mainMock.configureSetupStatusClient).toHaveBeenCalledWith(client);
     expect(mainMock.app.provide).toHaveBeenCalledWith(mainMock.wsInjectionKey, client);
     expect(mainMock.app.provide).toHaveBeenCalledWith('accessMode', 'proxy');
     expect(mainMock.app.use).toHaveBeenCalledWith(mainMock.i18NextVue, {

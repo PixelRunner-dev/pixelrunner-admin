@@ -555,13 +555,6 @@
       "title": "转到设置页面"
     }
   },
-  "setupPage": {
-    "title": "从这里开始",
-    "intro": "欢迎！感谢您购买 Pixel Runner。您即将开始设置此设备。请确保在设置过程中不要关闭电源或中断该设备。",
-    "error": {
-      "migrationFailed": "数据库迁移失败。"
-    }
-  },
   "appletDetailPage": {
     "loading": "正在加载 applet...",
     "notFound": "未找到 applet",
@@ -602,7 +595,6 @@
   },
   "documentTitle": "Pixelrunner 管理",
   "routeTitle": {
-    "setup": "设置",
     "settings": "设置",
     "update": "更新",
     "appletList": "Applet",

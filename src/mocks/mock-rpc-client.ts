@@ -25,19 +25,6 @@ class MockJsonRpcError extends Error {
   }
 }
 
-interface DatabaseMigrationResult {
-  code: number | null;
-  signal?: string | null;
-  stdout?: string;
-  stderr?: string;
-}
-
-interface SetupStatus {
-  databaseExists: boolean;
-  wifiConfigured: boolean;
-  setupRequired: boolean;
-}
-
 interface SettingsRecord {
   id?: number;
   key: string;
@@ -538,16 +525,12 @@ export class MockRpcClient {
     switch (method) {
       case 'device.status':
         return this.deviceStatus() as T;
-      case 'device.setupStatus':
-        return this.setupStatus() as T;
       case 'device.reboot':
       case 'device.shutdown':
       case 'device.factoryReset':
         return undefined as T;
       case 'device.updateFirmware':
         return this.deviceUpdateStatus() as T;
-      case 'device.migrateDatabase':
-        return this.migrateDatabase() as T;
       case 'settings.action':
         return this.settingsAction(getActionPayload(params)) as T;
       case 'applets.action':
@@ -630,14 +613,6 @@ export class MockRpcClient {
     };
   }
 
-  private setupStatus(): SetupStatus {
-    return {
-      databaseExists: true,
-      wifiConfigured: true,
-      setupRequired: false
-    };
-  }
-
   private deviceUpdateStatus() {
     return {
       id: 1,
@@ -651,14 +626,6 @@ export class MockRpcClient {
           os: 'idle'
         }
       }
-    };
-  }
-
-  private migrateDatabase(): DatabaseMigrationResult {
-    return {
-      code: 0,
-      stdout: 'Mock database migration completed.',
-      stderr: ''
     };
   }
 

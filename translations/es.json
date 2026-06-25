@@ -555,13 +555,6 @@
       "title": "Ir a la página de ajustes"
     }
   },
-  "setupPage": {
-    "title": "Empieza aquí",
-    "intro": "¡Bienvenido! Gracias por comprar este Pixel Runner. Estás a punto de configurar este dispositivo. Por favor, asegúrate de no apagarlo ni interrumpirlo mientras se configura todo.",
-    "error": {
-      "migrationFailed": "Falló la migración de la base de datos."
-    }
-  },
   "appletDetailPage": {
     "loading": "Cargando applet...",
     "notFound": "Applet no encontrado",
@@ -602,7 +595,6 @@
   },
   "documentTitle": "Pixelrunner Admin",
   "routeTitle": {
-    "setup": "Configuración",
     "settings": "Ajustes",
     "update": "Actualizar",
     "appletList": "Applets",
