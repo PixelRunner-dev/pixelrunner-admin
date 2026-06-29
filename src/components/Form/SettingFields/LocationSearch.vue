@@ -17,10 +17,15 @@ export interface LocationResult {
 
 interface Props {
   id: string;
-  modelValue: LocationResult;
+  modelValue?: LocationResult;
   defaultQuery?: string;
   default?: LocationResult;
 }
+
+type RawPlace = Omit<Place, 'lat' | 'lng'> & {
+  lat: number | string;
+  lng: number | string;
+};
 
 const { id, defaultQuery, default: defaultValue }: Props = defineProps<Props>();
 
@@ -37,8 +42,24 @@ const selected = ref<Place | null>(null);
 let worker: Worker | null = null;
 let debounceT: number | undefined;
 
+function shouldUseMainThreadSearch() {
+  return navigator.userAgent.includes('AppleWebKit') && !navigator.userAgent.includes('Chrome');
+}
+
 function startWorker() {
-  worker = new Worker(new URL('@/workers/search-worker.ts', import.meta.url), { type: 'module' });
+  if (shouldUseMainThreadSearch()) {
+    isLoading.value = false;
+    return;
+  }
+
+  try {
+    worker = new Worker(new URL('@/workers/search-worker.ts', import.meta.url), { type: 'module' });
+  } catch (err) {
+    console.error('Worker error', err);
+    isLoading.value = false;
+    return;
+  }
+
   worker.onmessage = (e: MessageEvent) => {
     const msg = e.data;
     if (!msg || !msg.type) return;
@@ -58,8 +79,32 @@ function startWorker() {
   };
 }
 
-function doSearch(q: string) {
-  if (!worker) return;
+async function doSearch(q: string) {
+  if (!worker) {
+    const [{ default: Fuse }, { default: places }] = await Promise.all([
+      import('fuse.js'),
+      import('@/geo_db.json')
+    ]);
+    const searchablePlaces = (places as RawPlace[]).map((place) => ({
+      ...place,
+      lat: Number(place.lat),
+      lng: Number(place.lng)
+    }));
+    const fuse = new Fuse(searchablePlaces, {
+      keys: [
+        { name: 'country', weight: 0.3 },
+        { name: 'name', weight: 0.7 }
+      ],
+      includeScore: false,
+      threshold: 0.33,
+      ignoreLocation: true,
+      minMatchCharLength: 2
+    });
+    suggestions.value = fuse.search(q, { limit: 10 }).map((result) => result.item);
+    isLoading.value = false;
+    return;
+  }
+
   worker.postMessage({ type: 'search', q, limit: 10 });
 }
 
@@ -80,7 +125,7 @@ function onInput(e: Event) {
       return;
     }
     isLoading.value = true;
-    doSearch(v);
+    void doSearch(v);
   }, 250);
 }
 

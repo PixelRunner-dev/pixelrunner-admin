@@ -122,8 +122,8 @@ describe('LocationSearch.vue', () => {
       }
     });
 
-    expect(wrapper.props('modelValue').lat).toBe('40.7128');
-    expect(wrapper.props('modelValue').lng).toBe('-74.0060');
+    expect(wrapper.props('modelValue')?.lat).toBe('40.7128');
+    expect(wrapper.props('modelValue')?.lng).toBe('-74.0060');
   });
 
   it('supports location suggestions', () => {

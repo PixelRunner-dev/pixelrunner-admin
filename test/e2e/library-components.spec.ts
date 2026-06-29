@@ -31,9 +31,9 @@ test.describe('LibrarySection', () => {
   test('multiple library sections present on library page', async ({ page }) => {
     await page.goto('/library');
     // Wait for at least one section to be visible before counting
-    await expect(page.locator('section.component--library-selection').first()).toBeVisible();
-    const count = await page.locator('section.component--library-selection').count();
-    expect(count).toBeGreaterThan(1);
+    const sections = page.locator('section.component--library-selection');
+    await expect(sections.first()).toBeVisible();
+    await expect.poll(() => sections.count()).toBeGreaterThan(1);
   });
 });
 

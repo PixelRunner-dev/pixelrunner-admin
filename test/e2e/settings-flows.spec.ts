@@ -44,6 +44,9 @@ test.describe('Settings page flows', () => {
   test('scanned WiFi network can be selected and populated into form', async ({ page }) => {
     await page.goto('/settings');
     await expect(page.locator('h1')).toBeVisible();
+    const refreshButton = page.getByTestId('wifi-refresh');
+    await expect(refreshButton).toBeEnabled();
+    await refreshButton.click();
 
     const guestNetwork = page.locator(
       '[data-testid="wifi-network-option"][data-wifi-ssid="Guest"]'
