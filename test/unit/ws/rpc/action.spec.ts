@@ -9,12 +9,15 @@ import {
 } from '@/ws/rpc/action';
 import { MockTrysteroRoom } from '@/../test/mocks/transport';
 import { ACTION_NAME, APP_ID, NOSTR_RELAYS } from '@/constants';
+import type { Room } from 'trystero';
 
 describe('action.ts', () => {
   let mockRoom: MockTrysteroRoom;
+  let room: Room;
 
   beforeEach(() => {
     mockRoom = new MockTrysteroRoom();
+    room = mockRoom as unknown as Room;
     vi.clearAllMocks();
   });
 
@@ -50,38 +53,36 @@ describe('action.ts', () => {
 
   describe('createRpcAction', () => {
     it('creates sender function for RPC action', () => {
-      const [send, receive] = mockRoom.makeAction(ACTION_NAME) as unknown as [
-        (data: string) => void,
-        (handler: (data: string, peerId: string) => void) => void
-      ];
+      const send = createRpcAction(room);
 
       expect(typeof send).toBe('function');
-      expect(typeof receive).toBe('function');
     });
 
     it('uses default ACTION_NAME when not provided', () => {
-      const [send] = mockRoom.makeAction(ACTION_NAME) as unknown as [(data: string) => void];
+      const makeAction = vi.spyOn(mockRoom, 'makeAction');
+      const send = createRpcAction(room);
 
       expect(typeof send).toBe('function');
+      expect(makeAction).toHaveBeenCalledWith(ACTION_NAME);
     });
 
     it('uses custom action name when provided', () => {
       const customAction = 'custom-rpc';
-      const [send] = mockRoom.makeAction(customAction) as unknown as [(data: string) => void];
+      const makeAction = vi.spyOn(mockRoom, 'makeAction');
+      const send = createRpcAction(room, customAction);
 
       expect(typeof send).toBe('function');
+      expect(makeAction).toHaveBeenCalledWith(customAction);
     });
   });
 
   describe('setupRpcHandler', () => {
     it('registers message handler on room', () => {
-      const handler = vi.fn((data: string, peerId: string) => {});
-      const [, receive] = mockRoom.makeAction(ACTION_NAME) as unknown as [
-        (data: string) => void,
-        (cb: (data: string, peerId: string) => void) => void
-      ];
-
-      receive(handler);
+      const handler = vi.fn((data: string, peerId: string): void => {
+        void data;
+        void peerId;
+      });
+      setupRpcHandler(room, handler);
 
       mockRoom.simulateMessage(ACTION_NAME, 'test data', 'peer1');
       expect(handler).toHaveBeenCalledWith('test data', 'peer1');
@@ -89,15 +90,7 @@ describe('action.ts', () => {
 
     it('returns unsubscribe function', () => {
       const handler = vi.fn();
-      const [, receive] = mockRoom.makeAction(ACTION_NAME) as unknown as [
-        (data: string) => void,
-        (cb: (data: string, peerId: string) => void) => void
-      ];
-
-      receive(handler);
-      const unsubscribe = () => {
-        // Mock unsubscribe
-      };
+      const unsubscribe = setupRpcHandler(room, handler);
 
       expect(typeof unsubscribe).toBe('function');
     });
@@ -105,12 +98,7 @@ describe('action.ts', () => {
     it('handles handler for custom action name', () => {
       const customAction = 'custom-action';
       const handler = vi.fn();
-      const [, receive] = mockRoom.makeAction(customAction) as unknown as [
-        (data: string) => void,
-        (cb: (data: string, peerId: string) => void) => void
-      ];
-
-      receive(handler);
+      setupRpcHandler(room, handler, customAction);
       mockRoom.simulateMessage(customAction, 'data', 'peer2');
 
       expect(handler).toHaveBeenCalledWith('data', 'peer2');
@@ -118,12 +106,8 @@ describe('action.ts', () => {
 
     it('supports receiving action data', () => {
       const handler = vi.fn();
-      const [, receive] = mockRoom.makeAction(ACTION_NAME) as unknown as [
-        (data: string) => void,
-        (cb: (data: string, peerId: string) => void) => void
-      ];
 
-      receive(handler);
+      setupRpcHandler(room, handler);
       mockRoom.simulateMessage(ACTION_NAME, 'received', 'peer1');
 
       expect(handler).toHaveBeenCalledWith('received', 'peer1');
@@ -135,7 +119,7 @@ describe('action.ts', () => {
       const onJoin = vi.fn();
       const onLeave = vi.fn();
 
-      setupPeerHandlers(mockRoom as unknown as any, onJoin, onLeave);
+      setupPeerHandlers(room, onJoin, onLeave);
       mockRoom.simulatePeerJoin('peer1');
 
       expect(onJoin).toHaveBeenCalledWith('peer1');
@@ -146,7 +130,7 @@ describe('action.ts', () => {
       const onJoin = vi.fn();
       const onLeave = vi.fn();
 
-      setupPeerHandlers(mockRoom as unknown as any, onJoin, onLeave);
+      setupPeerHandlers(room, onJoin, onLeave);
       mockRoom.simulatePeerJoin('peer1');
       mockRoom.simulatePeerLeave('peer1');
 
@@ -157,7 +141,7 @@ describe('action.ts', () => {
       const onJoin = vi.fn();
       const onLeave = vi.fn();
 
-      setupPeerHandlers(mockRoom as unknown as any, onJoin, onLeave);
+      setupPeerHandlers(room, onJoin, onLeave);
 
       mockRoom.simulatePeerJoin('peer1');
       mockRoom.simulatePeerJoin('peer2');
@@ -259,7 +243,7 @@ describe('action.ts', () => {
       const onLeave = vi.fn();
 
       expect(() => {
-        setupPeerHandlers(mockRoom as unknown as any, onJoin, onLeave);
+        setupPeerHandlers(room, onJoin, onLeave);
         mockRoom.simulatePeerJoin('peer1');
       }).toThrow();
     });
@@ -268,7 +252,7 @@ describe('action.ts', () => {
       const onJoin = vi.fn();
       const onLeave = vi.fn();
 
-      setupPeerHandlers(mockRoom as unknown as any, onJoin, onLeave);
+      setupPeerHandlers(room, onJoin, onLeave);
 
       mockRoom.simulatePeerJoin('peer1');
       mockRoom.simulatePeerJoin('peer2');

@@ -22,13 +22,7 @@ export interface DeviceStatusResult {
 export type DeviceStatusResponse = SuccessResponse<DeviceStatusResult> | ErrorResponse;
 
 type DeviceUpdateStatus =
-  | 'idle'
-  | 'skipping'
-  | 'downloading'
-  | 'installing'
-  | 'restarting'
-  | 'error'
-  | 'done';
+  'idle' | 'skipping' | 'downloading' | 'installing' | 'restarting' | 'error' | 'done';
 export interface DeviceUpdateResult {
   result?: {
     admin: DeviceUpdateStatus;

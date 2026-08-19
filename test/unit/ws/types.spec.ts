@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type {
-  DeviceStatusResult,
-  DeviceStatusResponse,
-  DeviceUpdateResult,
-  DeviceUpdateResponse
-} from '@/ws/types';
+import type { DeviceStatusResult, DeviceUpdateResult } from '@/ws/types';
 
 describe('src/ws/types.ts', () => {
   describe('DeviceStatusResult', () => {

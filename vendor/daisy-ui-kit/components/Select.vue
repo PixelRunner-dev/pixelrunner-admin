@@ -2,14 +2,7 @@
 import { computed } from 'vue';
 
 type Color =
-  | 'neutral'
-  | 'primary'
-  | 'secondary'
-  | 'accent'
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'error';
+  'neutral' | 'primary' | 'secondary' | 'accent' | 'info' | 'success' | 'warning' | 'error';
 
 const props = withDefaults(
   defineProps<{

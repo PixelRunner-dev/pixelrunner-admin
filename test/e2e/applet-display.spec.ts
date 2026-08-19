@@ -64,13 +64,8 @@ test.describe('AppletCarousel', () => {
     await expect(prevButton).toHaveClass(/pointer-coarse:hidden/);
     await expect(nextButton).toHaveClass(/pointer-coarse:hidden/);
 
-    if (isCoarsePointer) {
-      await expect(prevButton).toBeHidden();
-      await expect(nextButton).toBeHidden();
-    } else {
-      await expect(prevButton).toBeVisible();
-      await expect(nextButton).toBeVisible();
-    }
+    await expect(prevButton).toBeVisible({ visible: !isCoarsePointer });
+    await expect(nextButton).toBeVisible({ visible: !isCoarsePointer });
   });
 
   test('carousel contains applet cards', async ({ page }) => {

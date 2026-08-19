@@ -72,7 +72,7 @@ export function createRpcAction(
  */
 export function setupRpcHandler(
   room: Room,
-  handler: (data: string) => void,
+  handler: (data: string, peerId: string) => void,
   actionName: string = ACTION_NAME
 ): () => void {
   console.log('room.on in setupRpcHandler', actionName);

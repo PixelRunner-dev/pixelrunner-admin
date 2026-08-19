@@ -1,7 +1,28 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { TrysteroConfig } from '@/ws/trystero-client';
 import { DEFAULT_ICE_SERVERS, TrysteroWebRTCClient } from '@/ws/trystero-client';
 import { MockTrysteroRoom, createMockTransport } from '@/../test/mocks/transport';
+
+class MockRelayWebSocket {
+  public onopen: (() => void) | null = null;
+  public onerror: (() => void) | null = null;
+  public readonly close = vi.fn();
+
+  constructor(public readonly url: string) {
+    mockRelaySockets.push(this);
+  }
+}
+
+const mockRelaySockets: MockRelayWebSocket[] = [];
+
+function checkRelayHealth(client: TrysteroWebRTCClient): Promise<Record<string, boolean>> {
+  const method = Reflect.get(client, 'checkRelayHealth') as () => Promise<Record<string, boolean>>;
+  return method.call(client);
+}
+
+function createRelayHealthClient(relayUrls: string[]): TrysteroWebRTCClient {
+  return new TrysteroWebRTCClient({ relayUrls });
+}
 
 describe('TrysteroWebRTCClient', () => {
   let mockRoom: MockTrysteroRoom;
@@ -15,6 +36,12 @@ describe('TrysteroWebRTCClient', () => {
       roomId: 'test-room',
       roomPassword: 'test-password'
     });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    mockRelaySockets.length = 0;
   });
 
   describe('constructor', () => {
@@ -308,6 +335,48 @@ describe('TrysteroWebRTCClient', () => {
       });
 
       expect(clientWithFallback).toBeDefined();
+    });
+  });
+
+  describe('relay health', () => {
+    beforeEach(() => {
+      vi.stubGlobal('WebSocket', MockRelayWebSocket);
+    });
+
+    it('marks a relay healthy when the WebSocket opens', async () => {
+      const relayUrl = 'wss://relay.example.com';
+      const healthPromise = checkRelayHealth(createRelayHealthClient([relayUrl]));
+
+      expect(mockRelaySockets[0].url).toBe(relayUrl);
+      mockRelaySockets[0].onopen!();
+
+      await expect(healthPromise).resolves.toEqual({ [relayUrl]: true });
+      expect(mockRelaySockets[0].close).toHaveBeenCalledTimes(1);
+    });
+
+    it('marks a relay unhealthy when the WebSocket errors', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      const relayUrl = 'wss://relay.example.com';
+      const healthPromise = checkRelayHealth(createRelayHealthClient([relayUrl]));
+
+      mockRelaySockets[0].onerror!();
+
+      await expect(healthPromise).resolves.toEqual({ [relayUrl]: false });
+      expect(mockRelaySockets[0].close).toHaveBeenCalledTimes(1);
+      expect(consoleError).toHaveBeenCalled();
+    });
+
+    it('marks a relay unhealthy when the WebSocket does not open before timeout', async () => {
+      vi.useFakeTimers();
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+      const relayUrl = 'wss://relay.example.com';
+      const healthPromise = checkRelayHealth(createRelayHealthClient([relayUrl]));
+
+      await vi.advanceTimersByTimeAsync(3000);
+
+      await expect(healthPromise).resolves.toEqual({ [relayUrl]: false });
+      expect(mockRelaySockets[0].close).toHaveBeenCalledTimes(1);
     });
   });
 });

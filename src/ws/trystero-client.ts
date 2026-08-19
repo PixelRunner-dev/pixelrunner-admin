@@ -503,7 +503,10 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
       try {
         const ws = new WebSocket(relayUrl);
         await new Promise<void>((resolve, reject) => {
-          let timeoutId: ReturnType<typeof setTimeout>;
+          const timeoutId = setTimeout(() => {
+            ws.close();
+            reject(new Error('relay timeout'));
+          }, 3000);
           ws.onopen = () => {
             clearTimeout(timeoutId);
             resolve();
@@ -513,9 +516,6 @@ export class TrysteroWebRTCClient extends BaseWebSocketClient<TrysteroConfig> {
             ws.close();
             reject(new Error('relay error'));
           };
-          timeoutId = setTimeout(() => {
-            resolve();
-          }, 3000);
         });
         ws.close();
         relayStatus[relayUrl] = true;

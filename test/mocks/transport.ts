@@ -3,7 +3,6 @@
  * Provides reusable mocks for WebSocket, RPC, and Trystero behavior.
  */
 
-import type { IJsonRpcResponse, IJsonRpcRequest } from 'pixelrunner-shared';
 import { EventEmitter } from 'node:events';
 
 export interface MockTransportOptions {
@@ -168,10 +167,12 @@ export class MockTrysteroRoom extends EventEmitter {
   ] {
     const send = (data: string, peerId?: string) => {
       // Mock send action
+      console.log('[MOCK] Send action', actionName, peerId, data);
     };
 
     const receive = (handler: (data: string, peerId: string) => void) => {
       this.actionCallbacks.set(actionName, handler);
+      console.log('[MOCK] Receive action', actionName);
     };
 
     return [send, receive];

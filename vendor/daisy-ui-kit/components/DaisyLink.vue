@@ -9,14 +9,7 @@ export default defineComponent({
     hover: Boolean,
 
     color: String as () =>
-      | 'neutral'
-      | 'primary'
-      | 'secondary'
-      | 'accent'
-      | 'success'
-      | 'info'
-      | 'warning'
-      | 'error',
+      'neutral' | 'primary' | 'secondary' | 'accent' | 'success' | 'info' | 'warning' | 'error',
     neutral: Boolean,
     primary: Boolean,
     secondary: Boolean,

@@ -2,19 +2,27 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { IWebSocketConfig } from 'pixelrunner-shared';
 import { BaseWebSocketClient } from '@/ws/base-client';
 
+type TestWebSocketClientLegacyApi = TestWebSocketClient & {
+  handleMessage: (data: string) => void;
+};
+
 // Create concrete test implementation
 class TestWebSocketClient extends BaseWebSocketClient<IWebSocketConfig> {
   async connect(): Promise<void> {}
   disconnect(): void {}
-  protected send(_message: string): void {}
+  protected send(message: string): void;
+  protected send(): void {}
   protected isTransportConnected(): boolean {
     return false;
   }
-  protected handleTransportError(_error: unknown): void {}
-  protected handleTransportMessage(_data: unknown): void {}
-  protected handleTransportClose(_code: number, _reason: string, _wasClean: boolean): void {}
-  /** @deprecated kept for legacy tests only */
-  protected handleMessage(_data: string): void {}
+  protected handleTransportError(error: unknown): void;
+  protected handleTransportError(): void {}
+  protected handleTransportMessage(data: unknown): void;
+  protected handleTransportMessage(): void {}
+  protected handleTransportClose(code: number, reason: string, wasClean: boolean): void;
+  protected handleTransportClose(): void {}
+  protected handleMessage(data: string): void;
+  protected handleMessage(): void {}
 }
 
 describe('base-client.ts', () => {
@@ -95,7 +103,7 @@ describe('base-client.ts', () => {
     });
 
     it('requires handleMessage implementation', () => {
-      expect(typeof (client as any).handleMessage).toBe('function');
+      expect(typeof (client as TestWebSocketClientLegacyApi).handleMessage).toBe('function');
     });
   });
 
@@ -156,7 +164,7 @@ describe('base-client.ts', () => {
     });
 
     it('provides protected methods to subclasses', () => {
-      expect(typeof (client as any).handleMessage).toBe('function');
+      expect(typeof (client as TestWebSocketClientLegacyApi).handleMessage).toBe('function');
     });
   });
 });

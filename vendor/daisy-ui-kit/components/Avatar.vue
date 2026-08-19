@@ -52,10 +52,7 @@ const maskShapeKeys = [
 ] as const;
 
 type AvatarClassKey =
-  | (typeof maskShapeKeys)[number]
-  | 'rounded-box'
-  | 'avatar-online'
-  | 'avatar-offline';
+  (typeof maskShapeKeys)[number] | 'rounded-box' | 'avatar-online' | 'avatar-offline';
 
 const avatarClasses = computed<Record<AvatarClassKey, boolean>>(() => {
   const mask: Record<AvatarClassKey, boolean> = {

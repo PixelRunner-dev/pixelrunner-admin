@@ -243,20 +243,17 @@ describe('errors.ts', () => {
         throw new WebSocketTimeoutError('test', 5000);
       } catch (error) {
         caughtError = error as Error;
-        if (error instanceof WebSocketTimeoutError) {
-          expect(true).toBe(true); // timeout caught
-        }
       }
 
       expect(caughtError).toBeInstanceOf(WebSocketTimeoutError);
+      expect(caughtError instanceof WebSocketTimeoutError).toBe(true);
     });
 
     it('handles error in catch block with specific code check', () => {
       const testError = new JsonRpcError('Not found', '-32601');
 
-      if (testError.code === '-32601') {
-        expect(testError.message).toBe('Not found');
-      }
+      expect(testError.code).toBe('-32601');
+      expect(testError.message).toBe('Not found');
     });
   });
 });

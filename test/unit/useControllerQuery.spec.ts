@@ -1,5 +1,5 @@
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils';
-import { computed, defineComponent, ref, type Ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {

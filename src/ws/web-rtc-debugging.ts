@@ -45,10 +45,7 @@ export function installWebRtcDebugging({
       });
 
       this.addEventListener('icegatheringstatechange', () => {
-        logDebug(
-          '[trystero-client] RTCPeerConnection iceGatheringState:',
-          this.iceGatheringState
-        );
+        logDebug('[trystero-client] RTCPeerConnection iceGatheringState:', this.iceGatheringState);
       });
 
       this.addEventListener('signalingstatechange', () => {
