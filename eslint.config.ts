@@ -22,7 +22,8 @@ export default defineConfigWithVueTs(
     '**/coverage/**',
     '**/node_modules/**',
     '**/playwright-report/**',
-    '**/test-results/**'
+    '**/test-results/**',
+    '**/vendor/daisy-ui-kit/**'
   ]),
 
   ...pluginVue.configs['flat/essential'],
