@@ -1,0 +1,1 @@
+import{O as e,bt as t,s as n,u as r}from"./runtime-core.esm-bundler-VC-hZBwh.js";import{t as i}from"./_plugin-vue_export-helper-BDNMzG2s.js";var a={};function o(i,a){return e(),r(`main`,null,[n(`h1`,null,t(i.$t(`updatePage.title`)),1)])}var s=i(a,[[`render`,o]]);export{s as default};

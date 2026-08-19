@@ -1,0 +1,1 @@
+import{O as e,bt as t,h as n,p as r,s as i,u as a}from"./runtime-core.esm-bundler-VC-hZBwh.js";import{t as o}from"./LibrarySearch-Mj4amvhG.js";var s=n({__name:`SearchPage`,setup(n){return(n,s)=>(e(),a(`main`,null,[i(`h1`,null,t(n.$t(`searchPage.title`)),1),r(o),i(`p`,null,t(n.$t(`searchPage.searchingFor`,{query:n.$route.query.q})),1)]))}});export{s as default};

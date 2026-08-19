@@ -1,0 +1,1 @@
+function e(e){return e.replace(/([-_][a-z])/g,e=>e.toUpperCase().replace(`-`,``).replace(`_`,``))}function t(e){return e.split(` `).map(e=>e.charAt(0).toUpperCase()+e.slice(1).toLowerCase()).join(` `)}function n(e=10){`vibrate`in navigator&&navigator.vibrate(e)}export{t as n,n as r,e as t};

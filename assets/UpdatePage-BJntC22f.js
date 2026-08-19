@@ -1,1 +1,0 @@
-import{A as e,G as t,J as n,Ot as r,lt as i}from"./index-aQSMt5PF.js";var a={};function o(e,a){return i(),n(`main`,null,[t(`h1`,null,r(e.$t(`updatePage.title`)),1)])}var s=e(a,[[`render`,o]]);export{s as default};
