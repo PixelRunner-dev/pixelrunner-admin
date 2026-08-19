@@ -15,7 +15,7 @@ import FeatureToggle from '@/components/FeatureToggle.vue';
 import { Button as DButton, Flex as DFlex, Text as DText } from '(vendor)/daisy-ui-kit/index.ts';
 import { t } from 'i18next';
 
-const isTimeOfTheYear = new Date().getMonth() === 11; // christmas + nye
+// const isTimeOfTheYear = new Date().getMonth() === 11; // christmas + nye
 // const isTimeOfTheYear = (new Date()).getMonth() === 7; // zomer + wk voetbal?
 
 const mostSearchedTerms = ['clock', 'spotify', 'zapier', 'buienradar', 'bitcoin'];
@@ -275,7 +275,7 @@ const {
   }
 });
 
-const themedItems = newlyAddedItems;
+// const themedItems = newlyAddedItems;
 </script>
 
 <template>
