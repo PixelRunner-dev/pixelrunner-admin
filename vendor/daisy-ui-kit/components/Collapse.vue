@@ -12,7 +12,7 @@ const props = defineProps<{
   value?: any;
 }>();
 
-const isOpen = defineModel('open', { default: false });
+const isOpen = defineModel('open', { default: false, type: Boolean });
 
 const accordionValue = inject('accordion-value', ref(null));
 const useAccordion = accordionValue.value !== null;
